@@ -7,6 +7,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -37,10 +38,17 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        LatLng northWestLatLng = new LatLng(55.946233, -3.192473);
+        LatLng northEastLatLng = new LatLng(55.946233, -3.184319);
+        LatLng southEastLatLng = new LatLng(55.942617, -3.184319);
+        LatLng southWestLatLng = new LatLng(55.942617, -3.192473);
+        LatLng centralLatLng = new LatLng(55.944425, -3.188396);
+        CameraPosition central = new CameraPosition(centralLatLng, 15, 0, 0);
+        mMap.addMarker(new MarkerOptions().position(northWestLatLng).title("Marker in Forrest Hill"));
+        mMap.addMarker(new MarkerOptions().position(northEastLatLng).title("Marker in KFC"));
+        mMap.addMarker(new MarkerOptions().position(southEastLatLng).title("Marker in Buccleuch Street bus stop"));
+        mMap.addMarker(new MarkerOptions().position(southWestLatLng).title("Marker in Top of the Meadows"));
+        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(central));
     }
 }
