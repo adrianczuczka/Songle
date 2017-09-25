@@ -1,12 +1,18 @@
 package com.adrianczuczka.songle;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
-import com.google.android.gms.location.places.GeoDataClient;
-import com.google.android.gms.location.places.Places;
-import com.google.android.gms.location.places.PlaceDetectionClient;
-
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -14,11 +20,15 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.StreetViewPanoramaCamera;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.maps.android.data.kml.KmlLayer;
+
+import java.io.InputStream;
 
 public class GameUI extends FragmentActivity implements OnMapReadyCallback {
-
+    private FusedLocationProviderClient mFusedLocationClient;
     private GoogleMap mMap;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,13 +37,6 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        //Construct a GeoDataClient.
-        GeoDataClient mGeoDataClient = Places.getGeoDataClient(this, null);
-
-        // Construct a PlaceDetectionClient.
-        PlaceDetectionClient mPlaceDetectionClient = Places.getPlaceDetectionClient(this, null);
-
-        // Construct a FusedLocationProviderClient.
     }
 
 
@@ -49,6 +52,30 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        Log.e("GameUI", "hello");
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            /*if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+                //show explanation
+            } else {*/
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    1);
+            //}
+        }
+        else{
+            Log.e("GameUI", "hello5");
+            try{
+                mMap.setMyLocationEnabled(true);
+                Log.e("GameUI", String.valueOf(mMap.isMyLocationEnabled()));
+            }
+            catch (SecurityException e){
+                //warning
+            }
+        }
         LatLng northWestLatLng = new LatLng(55.946233, -3.192473);
         LatLng northEastLatLng = new LatLng(55.946233, -3.184319);
         LatLng southEastLatLng = new LatLng(55.942617, -3.184319);
@@ -60,5 +87,32 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
         mMap.addMarker(new MarkerOptions().position(southEastLatLng).title("Marker in Buccleuch Street bus stop"));
         mMap.addMarker(new MarkerOptions().position(southWestLatLng).title("Marker in Top of the Meadows"));
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(central));
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case 1: {
+                if (permissions.length == 1 &&
+                        permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION) &&
+                        grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.e("GameUI","hello3");
+                    try {
+                        Log.e("GameUI","hello4");
+                        mMap.setMyLocationEnabled(true);
+                        Log.e("GameUI", String.valueOf(mMap.isMyLocationEnabled()));
+                    } catch (SecurityException s) {
+                        Log.e("GameUI","error");
+                        //warning
+                    }
+                } else {
+                    //permission denied
+                }
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
     }
 }
