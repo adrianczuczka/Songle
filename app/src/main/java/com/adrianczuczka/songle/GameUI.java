@@ -45,34 +45,28 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
     private Looper looper = Looper.getMainLooper();
     private LocationRequest mLocationRequest = new LocationRequest();
     LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
-    private boolean mRequestingLocationUpdates = true;
+    private boolean mRequestingLocationUpdates = false;
     private LocationCallback mLocationCallback;
 
-    /*
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (mRequestingLocationUpdates) {
-            startLocationUpdates();
-        }
-    }
-*/
     private void startLocationUpdates() {
-        try{
+        try {
+            Log.e("GameUI","made it to startlocationupdates");
+            Log.e("GameUI",String.valueOf(mLocationRequest));
             mFusedLocationClient.requestLocationUpdates(mLocationRequest,
                     mLocationCallback, looper);
-        }
-        catch (SecurityException e){
+            mRequestingLocationUpdates = true;
+        } catch (SecurityException e) {
 
         }
     }
 
-    protected void createLocationRequest() {
-        LocationRequest mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(10000);
-        mLocationRequest.setFastestInterval(5000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    protected void createLocationRequest(LocationRequest locReq) {
+        locReq.setInterval(10000);
+        locReq.setFastestInterval(5000);
+        locReq.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        Log.e("GameUI", String.valueOf(mLocationRequest)+"inside createlocationrequest");
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,17 +76,22 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        createLocationRequest();
+        createLocationRequest(mLocationRequest);
+        Log.e("GameUI",String.valueOf(mLocationRequest));
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
+                Log.e("GameUI","made it to callback");
                 for (Location location : locationResult.getLocations()) {
                     // Update UI with location data
                     // ...
-                    //LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
-                    //mMap.addMarker(new MarkerOptions().position(loc).title("Marker in Forrest Hill"));
+                    Log.e("GameUI","made it to tracking location");
+                    LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
+                    mMap.addMarker(new MarkerOptions().position(loc).title("Marker in Forrest Hill"));
                 }
-            };
+            }
+
+            ;
         };
         /*
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
@@ -113,10 +112,10 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        Log.e("GameUI","made it to onMapReady");
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-
             /*if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.ACCESS_FINE_LOCATION)) {
                 //show explanation
@@ -125,9 +124,8 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     1);
             //}
-        }
-        else{
-            try{
+        } else {
+            try {
                 mMap.setMyLocationEnabled(true);
                 Log.e("GameUI", String.valueOf(mMap.isMyLocationEnabled()));
                 mFusedLocationClient.getLastLocation()
@@ -148,14 +146,15 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                         // All location settings are satisfied. The client can initialize
                         // location requests here.
                         // ...
-                        Log.e("GameUI","hello6");
+                        Log.e("GameUI",String.valueOf(mLocationRequest));
+                        Log.e("GameUI", "hello6");
                         startLocationUpdates();
                     }
                 });
                 task.addOnFailureListener(this, new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.e("GameUI","Hello11");
+                        Log.e("GameUI", "Hello11");
                         int REQUEST_CHECK_SETTINGS = 1;
                         int statusCode = ((ApiException) e).getStatusCode();
                         switch (statusCode) {
@@ -179,8 +178,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                         }
                     }
                 });
-            }
-            catch (SecurityException e){
+            } catch (SecurityException e) {
                 //warning
             }
         }
@@ -196,7 +194,35 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
         mMap.addMarker(new MarkerOptions().position(southWestLatLng).title("Marker in Top of the Meadows"));
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(central));
     }
+/*
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!mRequestingLocationUpdates) {
+            try {
+                Log.e("GameUI","made it to onResume");
+                if (ContextCompat.checkSelfPermission(this,
+                        Manifest.permission.ACCESS_FINE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
 
+            /*if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+                //show explanation
+            } else {add comment line
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                            1);
+                    //}
+                }
+                else {
+                    startLocationUpdates();
+                }
+            } catch (SecurityException e) {
+
+            }
+        }
+    }
+*/
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
@@ -207,6 +233,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                         grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     try {
                         mMap.setMyLocationEnabled(true);
+                        mRequestingLocationUpdates = true;
                         Log.e("GameUI", String.valueOf(mMap.isMyLocationEnabled()));
                         mFusedLocationClient.getLastLocation()
                                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
@@ -227,14 +254,15 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                                 // All location settings are satisfied. The client can initialize
                                 // location requests here.
                                 // ...
-                                Log.e("GameUI","hello7");
+                                Log.e("GameUI", "hello7");
+                                Log.e("GameUI",String.valueOf(mLocationRequest));
                                 startLocationUpdates();
                             }
                         });
                         task.addOnFailureListener(this, new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                Log.e("GameUI","Hello11");
+                                Log.e("GameUI", "Hello11");
                                 int REQUEST_CHECK_SETTINGS = 1;
                                 int statusCode = ((ApiException) e).getStatusCode();
                                 switch (statusCode) {
