@@ -21,7 +21,7 @@ public class NetworkActivity extends FragmentActivity implements DownloadCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_network);
-        mNetworkFragment = NetworkFragment.getInstance(getFragmentManager(), "https://www.google.com");
+        mNetworkFragment = NetworkFragment.getInstance(getFragmentManager(), "http://www.inf.ed.ac.uk/teaching/courses/selp/data/songs/01/map1.kml");
     }
 
     private void startDownload() {

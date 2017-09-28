@@ -30,7 +30,6 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDfCKP-1zAJPzWSIOauu60wVmtmj9OWg3k" />
-
         <activity
             android:name=".GameUI"
             android:label="@string/title_activity_game_ui">

@@ -24,7 +24,7 @@ import javax.net.ssl.HttpsURLConnection;
  * Activities that contain this fragment must implement the
  * {@link NetworkFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link NetworkFragment#newInstance} factory method to
+ * Use the {@link NetworkFragment#getInstance} factory method to
  * create an instance of this fragment.
  */
 public class NetworkFragment extends Fragment {
@@ -82,7 +82,7 @@ public class NetworkFragment extends Fragment {
      */
     public void startDownload() {
         cancelDownload();
-        mDownloadTask = new DownloadTask();
+        mDownloadTask = new DownloadTask(mCallback);
         mDownloadTask.execute(mUrlString);
     }
 
@@ -94,13 +94,13 @@ public class NetworkFragment extends Fragment {
             mDownloadTask.cancel(true);
         }
     }
+
     /**
      * Implementation of AsyncTask designed to fetch data from the network.
      */
     private static class DownloadTask extends AsyncTask<String, Void, DownloadTask.Result> {
 
         private DownloadCallback<String> mCallback;
-        
 
         DownloadTask(DownloadCallback<String> callback) {
             setCallback(callback);
@@ -118,9 +118,11 @@ public class NetworkFragment extends Fragment {
         static class Result {
             public String mResultValue;
             public Exception mException;
+
             public Result(String resultValue) {
                 mResultValue = resultValue;
             }
+
             public Result(Exception exception) {
                 mException = exception;
             }
@@ -159,7 +161,7 @@ public class NetworkFragment extends Fragment {
                     } else {
                         throw new IOException("No response received.");
                     }
-                } catch(Exception e) {
+                } catch (Exception e) {
                     result = new Result(e);
                 }
             }
@@ -188,17 +190,17 @@ public class NetworkFragment extends Fragment {
                 connection.setDoInput(true);
                 // Open communications link (network traffic occurs here).
                 connection.connect();
-                publishProgress(DownloadCallback.Progress.CONNECT_SUCCESS);
+                //publishProgress(DownloadCallback.Progress.CONNECT_SUCCESS);
                 int responseCode = connection.getResponseCode();
                 if (responseCode != HttpsURLConnection.HTTP_OK) {
                     throw new IOException("HTTP error code: " + responseCode);
                 }
                 // Retrieve the response body as an InputStream.
                 stream = connection.getInputStream();
-                publishProgress(DownloadCallback.Progress.GET_INPUT_STREAM_SUCCESS, 0);
+                //publishProgress(DownloadCallback.Progress.GET_INPUT_STREAM_SUCCESS, 0);
                 if (stream != null) {
-                    // Converts Stream to String with max length of 500.
-                    result = readStream(stream, 500);
+                    // Converts Stream to String with max length of 2000.
+                    result = readStream(stream, 2000);
                 }
             } finally {
                 // Close Stream and disconnect HTTPS connection.

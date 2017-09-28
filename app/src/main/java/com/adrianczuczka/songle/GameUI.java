@@ -34,6 +34,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.maps.android.data.kml.KmlLayer;
 
 public class GameUI extends FragmentActivity implements OnMapReadyCallback {
     private FusedLocationProviderClient mFusedLocationClient;
@@ -43,6 +44,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
     LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
     private boolean mRequestingLocationUpdates = false;
     private LocationCallback mLocationCallback;
+    //private KmlLayer layer = new KmlLayer(mMap, , getApplicationContext());
 
     private void startLocationUpdates() {
         try {
