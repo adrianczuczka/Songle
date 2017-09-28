@@ -227,9 +227,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                 if (permissions.length == 1 &&
                         permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION) &&
                         grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.e("GameUI", "hello3");
                     try {
-                        Log.e("GameUI", "hello4");
                         mMap.setMyLocationEnabled(true);
                         mRequestingLocationUpdates = true;
                         Log.e("GameUI", String.valueOf(mMap.isMyLocationEnabled()));
