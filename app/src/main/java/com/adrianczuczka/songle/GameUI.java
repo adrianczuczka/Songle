@@ -1,32 +1,18 @@
 package com.adrianczuczka.songle;
 
 import android.Manifest;
-import android.content.IntentSender;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Looper;
-import android.os.Message;
-import android.support.annotation.NonNull;
+import android.location.LocationManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.common.api.CommonStatusCodes;
-import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResponse;
-import com.google.android.gms.location.LocationSettingsStatusCodes;
-import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -34,10 +20,11 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.maps.model.StreetViewPanoramaCamera;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.maps.android.data.kml.KmlLayer;
+
+import java.io.InputStream;
 
 public class GameUI extends FragmentActivity implements OnMapReadyCallback {
     private FusedLocationProviderClient mFusedLocationClient;
@@ -66,7 +53,6 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
         locReq.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         Log.e("GameUI", String.valueOf(mLocationRequest)+"inside createlocationrequest");
     }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -179,7 +165,15 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                     }
                 });
             } catch (SecurityException e) {
-                //warning
+        }
+        else{
+            Log.e("GameUI", "hello5");
+            try{
+                mMap.setMyLocationEnabled(true);
+                Log.e("GameUI", String.valueOf(mMap.isMyLocationEnabled()));
+            }
+            catch (SecurityException e){
+              //warning
             }
         }
         LatLng northWestLatLng = new LatLng(55.946233, -3.192473);
@@ -231,7 +225,9 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                 if (permissions.length == 1 &&
                         permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION) &&
                         grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.e("GameUI","hello3");
                     try {
+                        Log.e("GameUI","hello4");
                         mMap.setMyLocationEnabled(true);
                         mRequestingLocationUpdates = true;
                         Log.e("GameUI", String.valueOf(mMap.isMyLocationEnabled()));
@@ -289,7 +285,6 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                     } catch (SecurityException e) {
                         //warning
                     }
-
                 } else {
                     //permission denied
                 }
@@ -300,20 +295,3 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
         }
     }
 }
-/*
-class LooperThread extends Thread {
-    public Handler mHandler;
-
-    public void run() {
-        Looper.prepare();
-
-        mHandler = new Handler() {
-            public void handleMessage(Message msg) {
-                // process incoming messages here
-            }
-        };
-
-        Looper.loop();
-    }
-}
-*/
