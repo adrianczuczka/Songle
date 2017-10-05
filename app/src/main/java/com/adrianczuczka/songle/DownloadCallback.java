@@ -4,6 +4,8 @@ import android.net.NetworkInfo;
 
 import com.google.android.gms.tasks.Task;
 
+import java.io.InputStream;
+
 /**
  * Created by adria_000 on 28/09/2017.
  */

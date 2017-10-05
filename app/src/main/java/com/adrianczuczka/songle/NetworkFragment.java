@@ -8,12 +8,14 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -22,7 +24,7 @@ import javax.net.ssl.HttpsURLConnection;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link NetworkFragment.OnFragmentInteractionListener} interface
+ * {@link NetworkFragment//.OnFragmentInteractionListener} interface
  * to handle interaction events.
  * Use the {@link NetworkFragment#getInstance} factory method to
  * create an instance of this fragment.
@@ -80,8 +82,12 @@ public class NetworkFragment extends Fragment {
     /**
      * Start non-blocking execution of DownloadTask.
      */
-    public void startDownload() {
+    public void startDownload(Context context) {
+        Log.e("GameUI", "made it to networkFragment");
         cancelDownload();
+        mUrlString = getArguments().getString(URL_KEY);
+        Log.e("GameUI", "url right before download is"+ mUrlString);
+        mCallback = (DownloadCallback<String>) context;
         mDownloadTask = new DownloadTask(mCallback);
         mDownloadTask.execute(mUrlString);
     }
@@ -150,10 +156,12 @@ public class NetworkFragment extends Fragment {
          */
         @Override
         protected DownloadTask.Result doInBackground(String... urls) {
+            Log.e("GameUI","made it to doInBackground");
             Result result = null;
             if (!isCancelled() && urls != null && urls.length > 0) {
                 String urlString = urls[0];
                 try {
+                    Log.e("GameUI", "made it to inside doInBackground");
                     URL url = new URL(urlString);
                     String resultString = downloadUrl(url);
                     if (resultString != null) {
@@ -165,6 +173,7 @@ public class NetworkFragment extends Fragment {
                     result = new Result(e);
                 }
             }
+            Log.e("GameUI","Result =" + String.valueOf(result));
             return result;
         }
 
@@ -174,11 +183,12 @@ public class NetworkFragment extends Fragment {
          * it will throw an IOException.
          */
         private String downloadUrl(URL url) throws IOException {
+            Log.e("GameUI","made it to downloadURL");
             InputStream stream = null;
-            HttpsURLConnection connection = null;
+            HttpURLConnection connection = null;
             String result = null;
             try {
-                connection = (HttpsURLConnection) url.openConnection();
+                connection = (HttpURLConnection) url.openConnection();
                 // Timeout for reading InputStream arbitrarily set to 3000ms.
                 connection.setReadTimeout(3000);
                 // Timeout for connection.connect() arbitrarily set to 3000ms.
@@ -206,9 +216,11 @@ public class NetworkFragment extends Fragment {
                 // Close Stream and disconnect HTTPS connection.
                 if (stream != null) {
                     stream.close();
+                    Log.e("GameUI", "stream closed");
                 }
                 if (connection != null) {
                     connection.disconnect();
+                    Log.e("GameUI", "connection closed");
                 }
             }
             return result;
@@ -236,13 +248,18 @@ public class NetworkFragment extends Fragment {
          */
         @Override
         protected void onPostExecute(Result result) {
+            Log.e("GameUI", "made it to on post execute");
             if (result != null && mCallback != null) {
+                Log.e("GameUI", "made it inside on post execute");
                 if (result.mException != null) {
+                    Log.e("GameUI", "on post execute 1");
                     mCallback.updateFromDownload(result.mException.getMessage());
                 } else if (result.mResultValue != null) {
+                    Log.e("GameUI", "on post execute 2");
                     mCallback.updateFromDownload(result.mResultValue);
                 }
                 mCallback.finishDownloading();
+                Log.e("GameUI", "finish downloading");
             }
         }
 
