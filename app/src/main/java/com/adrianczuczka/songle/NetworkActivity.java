@@ -31,7 +31,7 @@ public class NetworkActivity extends FragmentActivity implements DownloadCallbac
         super.onCreate(savedInstanceState);
         Log.e("GameUI", "made it to network activity");
         setContentView(R.layout.activity_network);
-        mNetworkFragment = NetworkFragment.getInstance(getFragmentManager(), "http://www.inf.ed.ac.uk/teaching/courses/selp/data/songs/01/map1.kml");
+        mNetworkFragment = NetworkFragment.getInstance(getFragmentManager(), "http://www.inf.ed.ac.uk/teaching/courses/selp/data/songs/01/map4.kml");
         startDownload();
     }
 
@@ -46,17 +46,7 @@ public class NetworkActivity extends FragmentActivity implements DownloadCallbac
 
     public void updateFromDownload(String result) {
         // Update your UI here based on result of download.
-        Context context = getApplicationContext();
-        Log.e("GameUI", String.valueOf(context.getFilesDir()));
         Intent resultIntent = new Intent();
-        try {
-            FileOutputStream outputStream;
-            outputStream = openFileOutput("kmlLayer.kml", Context.MODE_PRIVATE);
-            outputStream.write(result.getBytes());
-            outputStream.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         resultIntent.putExtra("kmlString", result);
         setResult(Activity.RESULT_OK, resultIntent);
         finish();

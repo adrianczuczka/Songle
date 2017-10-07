@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Icon;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -13,6 +15,7 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.util.Xml;
 
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.CommonStatusCodes;
@@ -30,6 +33,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -37,15 +41,23 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.maps.android.data.kml.KmlLayer;
+import com.google.maps.android.ui.IconGenerator;
 
+import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GameUI extends FragmentActivity implements OnMapReadyCallback {
     private FusedLocationProviderClient mFusedLocationClient;
@@ -56,6 +68,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
     private boolean mRequestingLocationUpdates = false;
     private LocationCallback mLocationCallback;
     static final int LOAD_KML_REQUEST = 1;
+    private List kmlList = new ArrayList();
 
     private void startLocationUpdates() {
         try {
@@ -351,18 +364,93 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.e("GameUI", "made it to onActivityResult");
-        if(requestCode == LOAD_KML_REQUEST){
-            if(resultCode == RESULT_OK){
+        if (requestCode == LOAD_KML_REQUEST) {
+            if (resultCode == RESULT_OK) {
                 String kml = data.getStringExtra("kmlString");
-                try {
-                    FileInputStream stream = openFileInput("kmlLayer.kml");
-                    //KmlLayer layer = new KmlLayer(mMap, stream, getApplicationContext());
+                Log.e("GameUI", kml);
+                new test().execute(kml);
+                /*try {
+                    InputStream stream = new ByteArrayInputStream(kml.getBytes(StandardCharsets.UTF_8.name()));
+                    KMLParser parser = new KMLParser();
+                    Log.e("GameUI",String.valueOf(parser.parse(stream)));
                     Log.e("GameUI",String.valueOf(stream));
                 }
-                catch ( IOException e) {
+                catch (XmlPullParserException | IOException e) {
                     Log.e("Exception", "File write failed: " + e.toString());
-                }
+                }*/
             }
+        }
+    }
+    private class test extends AsyncTask<String, Void, KmlLayer>{
+        @Override
+        protected KmlLayer doInBackground(String... params) {
+            try {
+                InputStream stream = new ByteArrayInputStream(params[0].getBytes(StandardCharsets.UTF_8.name()));
+                KmlLayer layer = new KmlLayer(mMap, stream, GameUI.this);
+                return layer;
+            } catch (XmlPullParserException | IOException e){
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(KmlLayer kmlLayer) {
+            try {
+                kmlLayer.addLayerToMap();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (XmlPullParserException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private class parseXMLTask extends AsyncTask<String, Void, ArrayList<KMLParser.Placemark>> {
+        @Override
+        protected ArrayList<KMLParser.Placemark> doInBackground(String... params) {
+            try {
+                InputStream stream = new ByteArrayInputStream(params[0].getBytes(StandardCharsets.UTF_8.name()));
+                KMLParser parser = new KMLParser();
+                KmlLayer layer = new KmlLayer(mMap, stream, GameUI.this);
+                return parser.parse(stream);
+            } catch (XmlPullParserException | IOException e) {
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<KMLParser.Placemark> list) {
+            /*Log.e("GameUI", String.valueOf(list.size()));
+            IconGenerator unclassified = new IconGenerator(GameUI.this);
+            unclassified.setStyle(IconGenerator.STYLE_WHITE);
+            IconGenerator boring = new IconGenerator(GameUI.this);
+            boring.setStyle();
+            for (int i = 0; i < list.size(); i++) {
+                KMLParser.Placemark placemark = list.get(i);
+                switch (list.get(i).description) {
+                    case "unclassified":
+                        mMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(placemark.coordinates[1], placemark.coordinates[0]))
+                                .title(placemark.name))
+                                .setIcon(BitmapDescriptorFactory.fromBitmap(unclassified.makeIcon()));
+                        break;
+                    case "boring":
+                        mMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(placemark.coordinates[1], placemark.coordinates[0]))
+                                .title(placemark.name))
+                                .setIcon(BitmapDescriptorFactory.defaultMarker());
+                        break;
+                    case "notboring":
+                        mMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(placemark.coordinates[1], placemark.coordinates[0]))
+                                .title(placemark.name))
+                                .setIcon(BitmapDescriptorFactory.defaultMarker());
+                }
+                /*mMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(placemark.coordinates[1], placemark.coordinates[0]))
+                        .title(placemark.name));
+
+            }*/
         }
     }
 }

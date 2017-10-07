@@ -83,7 +83,6 @@ public class NetworkFragment extends Fragment {
      * Start non-blocking execution of DownloadTask.
      */
     public void startDownload(Context context) {
-        Log.e("GameUI", "made it to networkFragment");
         cancelDownload();
         mUrlString = getArguments().getString(URL_KEY);
         Log.e("GameUI", "url right before download is"+ mUrlString);
@@ -156,12 +155,10 @@ public class NetworkFragment extends Fragment {
          */
         @Override
         protected DownloadTask.Result doInBackground(String... urls) {
-            Log.e("GameUI","made it to doInBackground");
             Result result = null;
             if (!isCancelled() && urls != null && urls.length > 0) {
                 String urlString = urls[0];
                 try {
-                    Log.e("GameUI", "made it to inside doInBackground");
                     URL url = new URL(urlString);
                     String resultString = downloadUrl(url);
                     if (resultString != null) {
@@ -173,7 +170,6 @@ public class NetworkFragment extends Fragment {
                     result = new Result(e);
                 }
             }
-            Log.e("GameUI","Result =" + String.valueOf(result));
             return result;
         }
 
@@ -190,9 +186,9 @@ public class NetworkFragment extends Fragment {
             try {
                 connection = (HttpURLConnection) url.openConnection();
                 // Timeout for reading InputStream arbitrarily set to 3000ms.
-                connection.setReadTimeout(3000);
+                connection.setReadTimeout(30000);
                 // Timeout for connection.connect() arbitrarily set to 3000ms.
-                connection.setConnectTimeout(3000);
+                connection.setConnectTimeout(30000);
                 // For this use case, set HTTP method to GET.
                 connection.setRequestMethod("GET");
                 // Already true by default but setting just in case; needs to be true since this request
@@ -210,7 +206,7 @@ public class NetworkFragment extends Fragment {
                 //publishProgress(DownloadCallback.Progress.GET_INPUT_STREAM_SUCCESS, 0);
                 if (stream != null) {
                     // Converts Stream to String with max length of 2000.
-                    result = readStream(stream, 2000);
+                    result = readStream(stream, 300000);
                 }
             } finally {
                 // Close Stream and disconnect HTTPS connection.
