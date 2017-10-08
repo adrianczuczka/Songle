@@ -31,7 +31,8 @@ public class NetworkActivity extends FragmentActivity implements DownloadCallbac
         super.onCreate(savedInstanceState);
         Log.e("GameUI", "made it to network activity");
         setContentView(R.layout.activity_network);
-        mNetworkFragment = NetworkFragment.getInstance(getFragmentManager(), "http://www.inf.ed.ac.uk/teaching/courses/selp/data/songs/01/map4.kml");
+        String url = getIntent().getStringExtra("url");
+        mNetworkFragment = NetworkFragment.getInstance(getFragmentManager(), url);
         startDownload();
     }
 
