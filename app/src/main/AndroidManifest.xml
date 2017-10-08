@@ -30,9 +30,13 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDfCKP-1zAJPzWSIOauu60wVmtmj9OWg3k" />
+
         <activity
             android:name=".GameUI"
             android:label="@string/title_activity_game_ui">
+        </activity>
+        <activity android:name=".NetworkActivity" />
+        <activity android:name=".WelcomeScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -40,8 +44,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".NetworkActivity">
-
+            android:name=".ChooseSong"
+            android:label="@string/title_activity_choose_song"
+            android:parentActivityName=".WelcomeScreen"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.adrianczuczka.songle.WelcomeScreen" />
         </activity>
     </application>
 
