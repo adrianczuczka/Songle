@@ -4,8 +4,6 @@ package com.adrianczuczka.songle;
  * Created by s1550570 on 08/10/17.
  */
 import android.support.v7.widget.RecyclerView;
-
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,7 +36,6 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.MyViewHolder
             });
         }
     }
-
 
     public SongsAdapter(List<XMLParser.Song> songsList) {
         this.songsList = songsList;

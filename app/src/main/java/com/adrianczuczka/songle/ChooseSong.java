@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import org.xmlpull.v1.XmlPullParserException;
@@ -23,6 +24,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ChooseSong extends AppCompatActivity {
     private List<XMLParser.Song> songList = new ArrayList<>();
@@ -37,17 +39,8 @@ public class ChooseSong extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-
         //mAdapter = new SongsAdapter(songList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
@@ -73,9 +66,6 @@ public class ChooseSong extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(ArrayList<XMLParser.Song> songs) {
-            Log.e("GameUI", String.valueOf(songs.get(10).Number));
-            Log.e("GameUI", String.valueOf(songs.get(10).Artist));
-            Log.e("GameUI", String.valueOf(songs.get(10).Title));
             songList = songs;
             mAdapter = new SongsAdapter(songList);
             Log.e("GameUI", String.valueOf(songList));
@@ -93,11 +83,6 @@ public class ChooseSong extends AppCompatActivity {
                 new ParseXMLTask().execute(xml);
             }
         }
-    }
-
-    public void setSong(View view){
-        TextView v = (TextView) findViewById(R.id.Title);
-        Log.e("GameUI", String.valueOf(v.getText()));
     }
 }
 
