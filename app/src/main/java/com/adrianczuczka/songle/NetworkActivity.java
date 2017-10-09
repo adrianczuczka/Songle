@@ -48,7 +48,7 @@ public class NetworkActivity extends FragmentActivity implements DownloadCallbac
     public void updateFromDownload(String result) {
         // Update your UI here based on result of download.
         Intent resultIntent = new Intent();
-        resultIntent.putExtra("kmlString", result);
+        resultIntent.putExtra("xmlString", result);
         setResult(Activity.RESULT_OK, resultIntent);
         finish();
     }
@@ -98,5 +98,4 @@ public class NetworkActivity extends FragmentActivity implements DownloadCallbac
             mNetworkFragment.cancelDownload();
         }
     }
-
 }

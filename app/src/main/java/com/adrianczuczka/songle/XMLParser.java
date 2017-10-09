@@ -15,12 +15,12 @@ import java.util.ArrayList;
 
 public class XMLParser {
     public class Song {
-        public final int Number;
+        public final String Number;
         public final String Artist;
         public final String Title;
         public final String Link;
 
-        private Song(int Number, String Artist, String Title, String Link) {
+        private Song(String Number, String Artist, String Title, String Link) {
             this.Number = Number;
             this.Artist = Artist;
             this.Title = Title;
@@ -65,7 +65,7 @@ public class XMLParser {
     private Song readSong(XmlPullParser parser) throws XmlPullParserException, IOException {
         //Log.e("GameUI", "made it to readSong");
         parser.require(XmlPullParser.START_TAG, ns, "Song");
-        int number = 0;
+        String number = null;
         String artist = null;
         String title = null;
         String link = null;
@@ -90,9 +90,9 @@ public class XMLParser {
         return new Song(number, artist, title, link);
     }
 
-    private int readNumber(XmlPullParser parser) throws XmlPullParserException, IOException {
+    private String readNumber(XmlPullParser parser) throws XmlPullParserException, IOException {
         parser.require(XmlPullParser.START_TAG, ns, "Number");
-        int number = Integer.parseInt(readText(parser));
+        String number = readText(parser);
         parser.require(XmlPullParser.END_TAG, ns, "Number");
         return number;
     }

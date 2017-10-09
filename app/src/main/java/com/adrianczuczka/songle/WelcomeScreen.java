@@ -15,7 +15,7 @@ public class WelcomeScreen extends AppCompatActivity {
 
     //REDIRECTS TO MAPS ACTIVITY FOR TESTING PURPOSES
     public void startChooseSong(View view){
-        Intent intent = new Intent(WelcomeScreen.this, GameUI.class);
+        Intent intent = new Intent(WelcomeScreen.this, ChooseSong.class);
         startActivity(intent);
     }
 }

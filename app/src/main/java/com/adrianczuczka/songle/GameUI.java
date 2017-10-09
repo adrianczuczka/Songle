@@ -251,7 +251,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
         Log.e("GameUI", "made it to onActivityResult");
         if (requestCode == LOAD_KML_REQUEST) {
             if (resultCode == RESULT_OK) {
-                String kml = data.getStringExtra("kmlString");
+                String kml = data.getStringExtra("xmlString");
                 new createKMLtask().execute(kml);
             }
         }
