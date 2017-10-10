@@ -51,6 +51,10 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.adrianczuczka.songle.WelcomeScreen" />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+            </intent-filter>
         </activity>
     </application>
 
