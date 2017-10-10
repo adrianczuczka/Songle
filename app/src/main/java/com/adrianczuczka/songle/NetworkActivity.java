@@ -29,7 +29,6 @@ public class NetworkActivity extends FragmentActivity implements DownloadCallbac
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.e("GameUI", "made it to network activity");
         setContentView(R.layout.activity_network);
         String url = getIntent().getStringExtra("url");
         mNetworkFragment = NetworkFragment.getInstance(getFragmentManager(), url);
@@ -39,7 +38,6 @@ public class NetworkActivity extends FragmentActivity implements DownloadCallbac
     private void startDownload() {
         if (!mDownloading && mNetworkFragment != null) {
             // Execute the async download.
-            Log.e("GameUI", "made it to startDownload");
             mNetworkFragment.startDownload(this);
             mDownloading = true;
         }

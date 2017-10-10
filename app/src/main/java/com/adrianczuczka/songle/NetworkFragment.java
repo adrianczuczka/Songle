@@ -85,7 +85,6 @@ public class NetworkFragment extends Fragment {
     public void startDownload(Context context) {
         cancelDownload();
         mUrlString = getArguments().getString(URL_KEY);
-        Log.e("GameUI", "url right before download is"+ mUrlString);
         mCallback = (DownloadCallback<String>) context;
         mDownloadTask = new DownloadTask(mCallback);
         mDownloadTask.execute(mUrlString);
@@ -179,16 +178,15 @@ public class NetworkFragment extends Fragment {
          * it will throw an IOException.
          */
         private String downloadUrl(URL url) throws IOException {
-            Log.e("GameUI","made it to downloadURL");
             InputStream stream = null;
             HttpURLConnection connection = null;
             String result = null;
             try {
                 connection = (HttpURLConnection) url.openConnection();
                 // Timeout for reading InputStream arbitrarily set to 3000ms.
-                connection.setReadTimeout(30000);
+                connection.setReadTimeout(100000);
                 // Timeout for connection.connect() arbitrarily set to 3000ms.
-                connection.setConnectTimeout(30000);
+                connection.setConnectTimeout(100000);
                 // For this use case, set HTTP method to GET.
                 connection.setRequestMethod("GET");
                 // Already true by default but setting just in case; needs to be true since this request
@@ -206,17 +204,15 @@ public class NetworkFragment extends Fragment {
                 //publishProgress(DownloadCallback.Progress.GET_INPUT_STREAM_SUCCESS, 0);
                 if (stream != null) {
                     // Converts Stream to String with max length of 2000.
-                    result = readStream(stream, 300000);
+                    result = readStream(stream, 2000000);
                 }
             } finally {
                 // Close Stream and disconnect HTTPS connection.
                 if (stream != null) {
                     stream.close();
-                    Log.e("GameUI", "stream closed");
                 }
                 if (connection != null) {
                     connection.disconnect();
-                    Log.e("GameUI", "connection closed");
                 }
             }
             return result;
@@ -228,6 +224,7 @@ public class NetworkFragment extends Fragment {
             reader = new InputStreamReader(stream, "UTF-8");
             char[] rawBuffer = new char[maxReadSize];
             int readSize;
+            int count = 0;
             StringBuffer buffer = new StringBuffer();
             while (((readSize = reader.read(rawBuffer)) != -1) && maxReadSize > 0) {
                 if (readSize > maxReadSize) {
@@ -244,18 +241,13 @@ public class NetworkFragment extends Fragment {
          */
         @Override
         protected void onPostExecute(Result result) {
-            Log.e("GameUI", "made it to on post execute");
             if (result != null && mCallback != null) {
-                Log.e("GameUI", "made it inside on post execute");
                 if (result.mException != null) {
-                    Log.e("GameUI", "on post execute 1");
                     mCallback.updateFromDownload(result.mException.getMessage());
                 } else if (result.mResultValue != null) {
-                    Log.e("GameUI", "on post execute 2");
                     mCallback.updateFromDownload(result.mResultValue);
                 }
                 mCallback.finishDownloading();
-                Log.e("GameUI", "finish downloading");
             }
         }
 

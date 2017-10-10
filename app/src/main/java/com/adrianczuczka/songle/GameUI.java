@@ -59,6 +59,7 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.sql.Struct;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,11 +73,10 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
     private LocationCallback mLocationCallback;
     static final int LOAD_KML_REQUEST = 1;
     private List kmlList = new ArrayList();
+    private String kml = null;
 
     private void startLocationUpdates() {
         try {
-            Log.e("GameUI", "made it to startlocationupdates");
-            Log.e("GameUI", String.valueOf(mLocationRequest));
             mFusedLocationClient.requestLocationUpdates(mLocationRequest,
                     mLocationCallback, looper);
             mRequestingLocationUpdates = true;
@@ -89,14 +89,12 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
         locReq.setInterval(10000);
         locReq.setFastestInterval(5000);
         locReq.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        Log.e("GameUI", String.valueOf(mLocationRequest) + "inside createlocationrequest");
     }
 
     private void mapReadyFunction() {
         try {
             mMap.setMyLocationEnabled(true);
             mRequestingLocationUpdates = true;
-            Log.e("GameUI", String.valueOf(mMap.isMyLocationEnabled()));
             mFusedLocationClient.getLastLocation()
                     .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                         @Override
@@ -116,15 +114,12 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                     // All location settings are satisfied. The client can initialize
                     // location requests here.
                     // ...
-                    Log.e("GameUI", "hello7");
-                    Log.e("GameUI", String.valueOf(mLocationRequest));
                     startLocationUpdates();
                 }
             });
             task.addOnFailureListener(this, new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    Log.e("GameUI", "Hello11");
                     int REQUEST_CHECK_SETTINGS = 1;
                     int statusCode = ((ApiException) e).getStatusCode();
                     switch (statusCode) {
@@ -148,10 +143,11 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                     }
                 }
             });
-            Log.e("GameUI", "made it to intent");
-            Intent kmlIntent = new Intent(GameUI.this, NetworkActivity.class);
-            kmlIntent.putExtra("url", "http://www.inf.ed.ac.uk/teaching/courses/selp/data/songs/01/map3.kml");
-            startActivityForResult(kmlIntent, LOAD_KML_REQUEST);
+            String kml = getIntent().getStringExtra("kml");
+            new createKMLtask().execute(kml);
+            /*Intent kmlIntent = new Intent(GameUI.this, NetworkActivity.class);
+            kmlIntent.putExtra("url", "http://www.inf.ed.ac.uk/teaching/courses/selp/data/songs/01/map1.kml");
+            startActivityForResult(kmlIntent, LOAD_KML_REQUEST);*/
         } catch (SecurityException e) {
             //warning
         }
@@ -167,7 +163,6 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
         mapFragment.getMapAsync(this);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         createLocationRequest(mLocationRequest);
-        Log.e("GameUI", String.valueOf(getApplicationContext()));
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
@@ -179,7 +174,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
 
             ;
         };
-        /*
+                /*
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
                 .addLocationRequest(mLocationRequest);
                 */
@@ -198,7 +193,6 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        Log.e("GameUI", "made it to onMapReady");
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -220,7 +214,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
         LatLng centralLatLng = new LatLng(55.944425, -3.188396);
         CameraPosition central = new CameraPosition(centralLatLng, 15, 0, 0);
         Polyline polyline = mMap.addPolyline(new PolylineOptions()
-                .add(northEastLatLng, northWestLatLng, southWestLatLng, southEastLatLng,northEastLatLng)
+                .add(northEastLatLng, northWestLatLng, southWestLatLng, southEastLatLng, northEastLatLng)
                 .width(5)
                 .color(Color.RED));
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(central));
@@ -248,7 +242,6 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.e("GameUI", "made it to onActivityResult");
         if (requestCode == LOAD_KML_REQUEST) {
             if (resultCode == RESULT_OK) {
                 String kml = data.getStringExtra("xmlString");
@@ -296,7 +289,6 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
 
         @Override
         protected void onPostExecute(ArrayList<KMLParser.Placemark> list) {
-            Log.e("GameUI", String.valueOf(list.size()));
             IconGenerator unclassified = new IconGenerator(GameUI.this);
             unclassified.setStyle(IconGenerator.STYLE_WHITE);
             IconGenerator boring = new IconGenerator(GameUI.this);
