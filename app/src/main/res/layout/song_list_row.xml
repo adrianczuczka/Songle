@@ -10,7 +10,7 @@
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     android:paddingTop="10dp"
-    android:onClick="setSong">
+    >
 
     <TextView
         android:id="@+id/Number"

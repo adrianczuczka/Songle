@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.xmlpull.v1.XmlPullParserException;
@@ -27,7 +28,7 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ChooseSong extends AppCompatActivity {
-    private List<XMLParser.Song> songList = new ArrayList<>();
+    private ArrayList<XMLParser.Song> songList = new ArrayList<>();
     private RecyclerView recyclerView;
     private SongsAdapter mAdapter;
     static final int LOAD_XML_REQUEST = 2;
@@ -41,6 +42,7 @@ public class ChooseSong extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+
         //mAdapter = new SongsAdapter(songList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
@@ -51,26 +53,25 @@ public class ChooseSong extends AppCompatActivity {
         startActivityForResult(kmlIntent, LOAD_XML_REQUEST);
     }
 
-    private class ParseXMLTask extends AsyncTask<String, Void, ArrayList<XMLParser.Song>>{
+    private class ParseXMLTask extends AsyncTask<String, Void, ArrayList<XMLParser.Song>> {
         @Override
         protected ArrayList<XMLParser.Song> doInBackground(String... strings) {
             try {
                 InputStream stream = new ByteArrayInputStream(strings[0].getBytes(StandardCharsets.UTF_8.name()));
                 XMLParser parser = new XMLParser();
                 return parser.parse(stream);
-            }
-            catch (XmlPullParserException | IOException e) {
+            } catch (XmlPullParserException | IOException e) {
                 return null;
             }
         }
 
         @Override
         protected void onPostExecute(ArrayList<XMLParser.Song> songs) {
-            songList = songs;
-            mAdapter = new SongsAdapter(songList);
-            Log.e("GameUI", String.valueOf(songList));
-            recyclerView.setAdapter(mAdapter);
-            mAdapter.notifyDataSetChanged();
+                songList = songs;
+                mAdapter = new SongsAdapter(songList);
+                Log.e("GameUI", String.valueOf(songList));
+                recyclerView.setAdapter(mAdapter);
+                mAdapter.notifyDataSetChanged();
         }
     }
 
@@ -83,6 +84,17 @@ public class ChooseSong extends AppCompatActivity {
                 new ParseXMLTask().execute(xml);
             }
         }
+    }
+
+    public void onClickSong(View view) {
+        TextView textView = (TextView) view.findViewById(R.id.Number);
+        Log.e("GameUI", String.valueOf(textView.getText()));
+    }
+
+    public void onClickRandom(View view) {
+        TextView textView = (TextView) recyclerView.findViewHolderForLayoutPosition(1).itemView.findViewById(R.id.Number);
+        Log.e("GameUI",String.valueOf(textView.getText()));
+        Log.e("GameUI", String.valueOf(recyclerView.findViewHolderForLayoutPosition(1).itemView));
     }
 }
 

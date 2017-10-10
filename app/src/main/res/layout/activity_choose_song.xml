@@ -33,7 +33,6 @@
 
     <include
         layout="@layout/content_choose_song"
-        android:layout_height="581dp"
         tools:layout_editor_absoluteY="53dp" />
 
 
