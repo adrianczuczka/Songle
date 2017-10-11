@@ -10,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.xmlpull.v1.XmlPullParserException;
@@ -19,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ChooseSong extends AppCompatActivity {
     private ArrayList<XMLParser.Song> songList = new ArrayList<>();
@@ -96,7 +98,9 @@ public class ChooseSong extends AppCompatActivity {
     }
 
     public void onClickRandom(View view) {
-        TextView textView = (TextView) recyclerView.findViewHolderForLayoutPosition(1).itemView.findViewById(R.id.Number);
+        int randomNum = ThreadLocalRandom.current().nextInt(0, songList.size() + 1);
+        TextView textView = (TextView) recyclerView.findViewHolderForLayoutPosition(randomNum).itemView.findViewById(R.id.Title);
+        recyclerView.findViewHolderForAdapterPosition(randomNum).itemView.callOnClick();
     }
 }
 
