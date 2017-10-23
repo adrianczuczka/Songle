@@ -1,12 +1,10 @@
 package com.adrianczuczka.songle;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.graphics.drawable.Icon;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Looper;
@@ -15,8 +13,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
-import android.util.Xml;
 
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.CommonStatusCodes;
@@ -34,32 +30,23 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.maps.android.data.kml.KmlContainer;
 import com.google.maps.android.data.kml.KmlLayer;
-import com.google.maps.android.ui.IconGenerator;
-
-import org.xmlpull.v1.XmlPullParser;
+import com.google.maps.android.data.kml.KmlPlacemark;
+import com.google.maps.android.data.kml.KmlPoint;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.sql.Struct;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -266,6 +253,16 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
         protected void onPostExecute(KmlLayer kmlLayer) {
             try {
                 kmlLayer.addLayerToMap();
+                for (KmlContainer containers : kmlLayer.getContainers()) {
+                    for(KmlPlacemark placemark: containers.getPlacemarks()) {
+                        if(placemark.getGeometry().getGeometryType().equals("Point")) {
+                            KmlPoint point = (KmlPoint) placemark.getGeometry();
+                            LatLng latLng = new LatLng(point.getGeometryObject().latitude, point.getGeometryObject().longitude);
+
+                        }
+                    }
+                }
+
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (XmlPullParserException e) {

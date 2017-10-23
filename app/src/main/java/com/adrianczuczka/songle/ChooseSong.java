@@ -93,7 +93,7 @@ public class ChooseSong extends AppCompatActivity {
         TextView artistView = (TextView) view.findViewById(R.id.Artist);
         TextView titleView = (TextView) view.findViewById(R.id.Title);
         Intent kmlIntent = new Intent(ChooseSong.this, NetworkActivity.class);
-        kmlIntent.putExtra("url", "http://www.inf.ed.ac.uk/teaching/courses/selp/data/songs/" + String.valueOf(numberView.getText()) + "/map1.kml");
+        kmlIntent.putExtra("url", "http://www.inf.ed.ac.uk/teaching/courses/selp/data/songs/" + String.valueOf(numberView.getText()) + "/map3.kml");
         startActivityForResult(kmlIntent, LOAD_KML_REQUEST);
     }
 
