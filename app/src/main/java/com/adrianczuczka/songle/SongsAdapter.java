@@ -37,11 +37,9 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.MyViewHolder
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 TextView v = (TextView) view.findViewById(R.id.Number);
                 Log.e("GameUI", String.valueOf(v.getText()));
                 Log.e("GameUI", String.valueOf(view));
-
             }
         });
     }

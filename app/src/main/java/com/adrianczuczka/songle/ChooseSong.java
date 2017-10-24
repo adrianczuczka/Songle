@@ -49,7 +49,7 @@ public class ChooseSong extends AppCompatActivity {
         startActivityForResult(kmlIntent, LOAD_XML_REQUEST);
     }
 
-    private class ParseXMLTask extends AsyncTask<String, Void, ArrayList<XMLParser.Song>> {
+    private class parseXMLTask extends AsyncTask<String, Void, ArrayList<XMLParser.Song>> {
         @Override
         protected ArrayList<XMLParser.Song> doInBackground(String... strings) {
             try {
@@ -75,7 +75,7 @@ public class ChooseSong extends AppCompatActivity {
         if (requestCode == LOAD_XML_REQUEST) {
             if (resultCode == RESULT_OK) {
                 String xml = data.getStringExtra("xmlString");
-                new ParseXMLTask().execute(xml);
+                new parseXMLTask().execute(xml);
             }
         }
         else if(requestCode == LOAD_KML_REQUEST){

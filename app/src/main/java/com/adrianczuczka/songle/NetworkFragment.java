@@ -204,7 +204,7 @@ public class NetworkFragment extends Fragment {
                 //publishProgress(DownloadCallback.Progress.GET_INPUT_STREAM_SUCCESS, 0);
                 if (stream != null) {
                     // Converts Stream to String with max length of 2000.
-                    result = readStream(stream, 2000000);
+                    result = readStream(stream, 200000);
                 }
             } finally {
                 // Close Stream and disconnect HTTPS connection.

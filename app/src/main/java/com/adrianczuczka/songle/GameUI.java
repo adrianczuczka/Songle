@@ -9,10 +9,14 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.NestedScrollView;
+import android.widget.TextView;
 
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.CommonStatusCodes;
@@ -56,11 +60,10 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
     private Looper looper = Looper.getMainLooper();
     private LocationRequest mLocationRequest = new LocationRequest();
     LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
-    private boolean mRequestingLocationUpdates = false;
+    private boolean mRequestingLocationUpdates;
     private LocationCallback mLocationCallback;
     static final int LOAD_KML_REQUEST = 1;
-    private List kmlList = new ArrayList();
-    private String kml = null;
+    private BottomSheetBehavior mBottomSheetBehavior;
 
     private void startLocationUpdates() {
         try {
@@ -68,7 +71,6 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                     mLocationCallback, looper);
             mRequestingLocationUpdates = true;
         } catch (SecurityException e) {
-
         }
     }
 
@@ -156,11 +158,22 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                 for (Location location : locationResult.getLocations()) {
                     // Update UI with location data
                     // ...
+
                 }
             }
 
             ;
         };
+        NestedScrollView view = (NestedScrollView) findViewById(R.id.view);
+        mBottomSheetBehavior = BottomSheetBehavior.from(view);
+        mBottomSheetBehavior.setPeekHeight(200);
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
+/*
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab);
+        tabLayout.addTab(tabLayout.newTab().setText("Lyrics"));
+        tabLayout.addTab(tabLayout.newTab().setText("Guess"));
+        tabLayout.addTab(tabLayout.newTab().setText("Settings"));*/
                 /*
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
                 .addLocationRequest(mLocationRequest);
