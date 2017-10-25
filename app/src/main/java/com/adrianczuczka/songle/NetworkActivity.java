@@ -46,7 +46,14 @@ public class NetworkActivity extends FragmentActivity implements DownloadCallbac
     public void updateFromDownload(String result) {
         // Update your UI here based on result of download.
         Intent resultIntent = new Intent();
-        resultIntent.putExtra("xmlString", result);
+        resultIntent.putExtra("string", result);
+        Log.e("gameUI", String.valueOf(getIntent().hasExtra("number")));
+        if(getIntent().hasExtra("number")){
+            resultIntent.putExtra("number", getIntent().getStringExtra("number"));
+        }
+        if (getIntent().hasExtra("kml")){
+            resultIntent.putExtra("kml", getIntent().getStringExtra("kml"));
+        }
         setResult(Activity.RESULT_OK, resultIntent);
         finish();
     }

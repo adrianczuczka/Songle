@@ -4,19 +4,22 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.NestedScrollView;
-import android.widget.TextView;
+import android.text.Html;
+import android.util.Log;
+import android.widget.RelativeLayout;
 
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.CommonStatusCodes;
@@ -34,8 +37,12 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -45,6 +52,7 @@ import com.google.maps.android.data.kml.KmlContainer;
 import com.google.maps.android.data.kml.KmlLayer;
 import com.google.maps.android.data.kml.KmlPlacemark;
 import com.google.maps.android.data.kml.KmlPoint;
+
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.ByteArrayInputStream;
@@ -52,7 +60,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 public class GameUI extends FragmentActivity implements OnMapReadyCallback {
     private FusedLocationProviderClient mFusedLocationClient;
@@ -63,14 +71,20 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
     private boolean mRequestingLocationUpdates;
     private LocationCallback mLocationCallback;
     static final int LOAD_KML_REQUEST = 1;
-    private BottomSheetBehavior mBottomSheetBehavior;
+    private BottomSheetBehavior mBottomSheetBehavior = null;
+    private HashMap<Marker, String> MarkerWordMap = new HashMap<>();
+    private ArrayList<Marker> MarkerList = new ArrayList<>();
+    private String lyrics = null;
 
     private void startLocationUpdates() {
         try {
-            mFusedLocationClient.requestLocationUpdates(mLocationRequest,
-                    mLocationCallback, looper);
-            mRequestingLocationUpdates = true;
+            if (!mRequestingLocationUpdates) {
+                mFusedLocationClient.requestLocationUpdates(mLocationRequest,
+                        mLocationCallback, looper);
+                mRequestingLocationUpdates = true;
+            }
         } catch (SecurityException e) {
+
         }
     }
 
@@ -83,7 +97,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
     private void mapReadyFunction() {
         try {
             mMap.setMyLocationEnabled(true);
-            mRequestingLocationUpdates = true;
+            mRequestingLocationUpdates = false;
             mFusedLocationClient.getLastLocation()
                     .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                         @Override
@@ -103,6 +117,8 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                     // All location settings are satisfied. The client can initialize
                     // location requests here.
                     // ...
+                    String kml = getIntent().getStringExtra("kml");
+                    new createKMLtask().execute(kml);
                     startLocationUpdates();
                 }
             });
@@ -132,8 +148,6 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                     }
                 }
             });
-            String kml = getIntent().getStringExtra("kml");
-            new createKMLtask().execute(kml);
             /*Intent kmlIntent = new Intent(GameUI.this, NetworkActivity.class);
             kmlIntent.putExtra("url", "http://www.inf.ed.ac.uk/teaching/courses/selp/data/songs/01/map1.kml");
             startActivityForResult(kmlIntent, LOAD_KML_REQUEST);*/
@@ -155,21 +169,39 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
-                for (Location location : locationResult.getLocations()) {
-                    // Update UI with location data
-                    // ...
-
+                if (!MarkerList.isEmpty()) {
+                    double minDistance = -1;
+                    Marker minMarker = null;
+                    for (Location location : locationResult.getLocations()) {
+                        for (Marker marker : MarkerList) {
+                            Location location1 = new Location("location");
+                            Double latitude = marker.getPosition().latitude;
+                            Double longitude = marker.getPosition().longitude;
+                            location1.setLatitude(latitude);
+                            location1.setLongitude(longitude);
+                            double locDistance = Double.parseDouble(String.valueOf(location.distanceTo(location1)));
+                            if (minDistance < 0) {
+                                minDistance = locDistance;
+                                minMarker = marker;
+                            } else {
+                                if (minDistance <= locDistance) {
+                                } else {
+                                    minDistance = locDistance;
+                                    minMarker = marker;
+                                }
+                            }
+                        }
+                    }
+                    Log.e("distance", String.valueOf(minDistance));
                 }
             }
-
-            ;
         };
-        NestedScrollView view = (NestedScrollView) findViewById(R.id.view);
+        RelativeLayout view = (RelativeLayout) findViewById(R.id.pullup);
         mBottomSheetBehavior = BottomSheetBehavior.from(view);
         mBottomSheetBehavior.setPeekHeight(200);
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
-/*
+        /*
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab);
         tabLayout.addTab(tabLayout.newTab().setText("Lyrics"));
         tabLayout.addTab(tabLayout.newTab().setText("Guess"));
@@ -180,6 +212,22 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                 */
     }
 
+    protected void onPause() {
+        super.onPause();
+        stopLocationUpdates();
+    }
+
+    protected void stopLocationUpdates() {
+        mFusedLocationClient.removeLocationUpdates(mLocationCallback);
+        mRequestingLocationUpdates = false;
+    }
+    /*
+    @Override
+    protected void onResume() {
+        super.onResume();
+        startLocationUpdates();
+    }
+    */
 
     /**
      * Manipulates the map once available.
@@ -244,7 +292,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == LOAD_KML_REQUEST) {
             if (resultCode == RESULT_OK) {
-                String kml = data.getStringExtra("xmlString");
+                String kml = data.getStringExtra("kml");
                 new createKMLtask().execute(kml);
             }
         }
@@ -266,22 +314,63 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
         protected void onPostExecute(KmlLayer kmlLayer) {
             try {
                 kmlLayer.addLayerToMap();
-                for (KmlContainer containers : kmlLayer.getContainers()) {
-                    for(KmlPlacemark placemark: containers.getPlacemarks()) {
-                        if(placemark.getGeometry().getGeometryType().equals("Point")) {
-                            KmlPoint point = (KmlPoint) placemark.getGeometry();
-                            LatLng latLng = new LatLng(point.getGeometryObject().latitude, point.getGeometryObject().longitude);
-
-                        }
-                    }
-                }
-
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (XmlPullParserException e) {
                 e.printStackTrace();
             }
+            for (KmlContainer containers : kmlLayer.getContainers()) {
+                for (KmlPlacemark placemark : containers.getPlacemarks()) {
+                    if (placemark.getGeometry().getGeometryType().equals("Point")) {
+                        Log.e("style", String.valueOf(placemark.getStyleId()));
+                        KmlPoint point = (KmlPoint) placemark.getGeometry();
+                        LatLng latLng = new LatLng(point.getGeometryObject().latitude, point.getGeometryObject().longitude);
+                        switch (placemark.getStyleId()) {
+                            case "#unclassified":
+                                MarkerWordMap.put(mMap.addMarker(new MarkerOptions()
+                                        .position(latLng)
+                                        .icon(BitmapDescriptorFactory.fromResource(R.mipmap.white_blank))
+                                        .title("unclassified")), findLyric(getIntent().getStringExtra("lyrics"), placemark.getProperty("name")));
+                                break;
+                            case "#boring":
+                                MarkerWordMap.put(mMap.addMarker(new MarkerOptions()
+                                        .position(latLng)
+                                        .icon(BitmapDescriptorFactory.fromResource(R.mipmap.yellow_blank))
+                                        .title("boring")), findLyric(getIntent().getStringExtra("lyrics"), placemark.getProperty("name")));
+                                break;
+                            case "#notboring":
+                                MarkerWordMap.put(mMap.addMarker(new MarkerOptions()
+                                        .position(latLng)
+                                        .icon(BitmapDescriptorFactory.fromResource(R.mipmap.yellow_circle))
+                                        .title("not boring")), findLyric(getIntent().getStringExtra("lyrics"), placemark.getProperty("name")));
+                                break;
+                            case "#interesting":
+                                MarkerWordMap.put(mMap.addMarker(new MarkerOptions()
+                                        .position(latLng)
+                                        .icon(BitmapDescriptorFactory.fromResource(R.mipmap.orange_diamond))
+                                        .title("interesting")), findLyric(getIntent().getStringExtra("lyrics"), placemark.getProperty("name")));
+                                break;
+                            case "#veryinteresting":
+                                MarkerWordMap.put(mMap.addMarker(new MarkerOptions()
+                                        .position(latLng)
+                                        .icon(BitmapDescriptorFactory.fromResource(R.mipmap.red_stars))
+                                        .title("very interesting")), findLyric(getIntent().getStringExtra("lyrics"), placemark.getProperty("name")));
+                                break;
+                        }
+                    }
+                }
+            }
+            kmlLayer.removeLayerFromMap();
         }
+    }
+
+    public String findLyric(String lyrics, String wordLoc) {
+        String[] coordinates = wordLoc.split(":");
+        String result = null;
+        String[] lines = lyrics.split("[0-9]+\t");
+        result = lines[Integer.parseInt(coordinates[0])].split("\\s")[Integer.parseInt(coordinates[1]) - 1];
+        Log.e("result", result);
+        return result;
     }
     /*
     private class parseXMLTask extends AsyncTask<String, Void, ArrayList<KMLParser.Placemark>> {

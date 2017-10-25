@@ -28,6 +28,8 @@ public class ChooseSong extends AppCompatActivity {
     private SongsAdapter mAdapter;
     static final int LOAD_KML_REQUEST = 1;
     static final int LOAD_XML_REQUEST = 2;
+    static final int LOAD_LYRICS_REQUEST = 3;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,14 +76,26 @@ public class ChooseSong extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == LOAD_XML_REQUEST) {
             if (resultCode == RESULT_OK) {
-                String xml = data.getStringExtra("xmlString");
+                String xml = data.getStringExtra("string");
                 new parseXMLTask().execute(xml);
             }
         }
         else if(requestCode == LOAD_KML_REQUEST){
             if (resultCode == RESULT_OK){
-                String kml = data.getStringExtra("xmlString");
+                Intent lyricIntent = new Intent(ChooseSong.this, NetworkActivity.class);
+                String kml = data.getStringExtra("string");
+                String number = data.getStringExtra("number");
+                lyricIntent.putExtra("url", "http://www.inf.ed.ac.uk/teaching/courses/selp/data/songs/" + number + "/words.txt");
+                lyricIntent.putExtra("kml", kml);
+                startActivityForResult(lyricIntent, LOAD_LYRICS_REQUEST);
+            }
+        }
+        else if (requestCode == LOAD_LYRICS_REQUEST){
+            if (resultCode == RESULT_OK){
                 Intent mapIntent = new Intent(ChooseSong.this, GameUI.class);
+                String lyrics = data.getStringExtra("string");
+                String kml = data.getStringExtra("kml");
+                mapIntent.putExtra("lyrics", lyrics);
                 mapIntent.putExtra("kml", kml);
                 startActivity(mapIntent);
             }
@@ -94,6 +108,7 @@ public class ChooseSong extends AppCompatActivity {
         TextView titleView = (TextView) view.findViewById(R.id.Title);
         Intent kmlIntent = new Intent(ChooseSong.this, NetworkActivity.class);
         kmlIntent.putExtra("url", "http://www.inf.ed.ac.uk/teaching/courses/selp/data/songs/" + String.valueOf(numberView.getText()) + "/map3.kml");
+        kmlIntent.putExtra("number", String.valueOf(numberView.getText()));
         startActivityForResult(kmlIntent, LOAD_KML_REQUEST);
     }
 
