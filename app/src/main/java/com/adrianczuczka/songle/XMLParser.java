@@ -32,7 +32,6 @@ public class XMLParser {
 
     public ArrayList<Song> parse(InputStream in) throws XmlPullParserException, IOException {
         try {
-            //Log.e("GameUI", "made it to kmlparse");
             XmlPullParser parser = Xml.newPullParser();
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
             parser.setInput(in, null);
@@ -86,7 +85,6 @@ public class XMLParser {
                 skip(parser);
             }
         }
-        //Log.e("GameUI",name + description + String.valueOf(coordinates) );
         return new Song(number, artist, title, link);
     }
 

@@ -4,10 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Looper;
@@ -17,7 +14,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
-import android.text.Html;
 import android.util.Log;
 import android.widget.RelativeLayout;
 
@@ -35,9 +31,9 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
@@ -59,7 +55,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class GameUI extends FragmentActivity implements OnMapReadyCallback {
@@ -73,7 +68,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
     static final int LOAD_KML_REQUEST = 1;
     private BottomSheetBehavior mBottomSheetBehavior = null;
     private HashMap<Marker, String> MarkerWordMap = new HashMap<>();
-    private ArrayList<Marker> MarkerList = new ArrayList<>();
+    private HashMap<Marker, String> SuccessWordMap = new HashMap<>();
     private String lyrics = null;
 
     private void startLocationUpdates() {
@@ -161,7 +156,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_ui);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+        final SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -169,17 +164,30 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
-                if (!MarkerList.isEmpty()) {
+                if (!MarkerWordMap.isEmpty()) {
                     double minDistance = -1;
                     Marker minMarker = null;
                     for (Location location : locationResult.getLocations()) {
-                        for (Marker marker : MarkerList) {
+                        for (Marker marker : MarkerWordMap.keySet()) {
+                            MarkerInfo markerInfo = (MarkerInfo) marker.getTag();
                             Location location1 = new Location("location");
                             Double latitude = marker.getPosition().latitude;
                             Double longitude = marker.getPosition().longitude;
                             location1.setLatitude(latitude);
                             location1.setLongitude(longitude);
                             double locDistance = Double.parseDouble(String.valueOf(location.distanceTo(location1)));
+                            if (locDistance < 50){
+                                if (!markerInfo.isGreen){
+                                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.success_marker));
+                                    markerInfo.isGreen = true;
+                                }
+                            }
+                            else{
+                                if (markerInfo.isGreen){
+                                    marker.setIcon(BitmapDescriptorFactory.fromResource(getMarkerStyle(markerInfo)));
+                                    markerInfo.isGreen = false;
+                                }
+                            }
                             if (minDistance < 0) {
                                 minDistance = locDistance;
                                 minMarker = marker;
@@ -192,7 +200,6 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                             }
                         }
                     }
-                    Log.e("distance", String.valueOf(minDistance));
                 }
             }
         };
@@ -266,6 +273,19 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                 .width(5)
                 .color(Color.RED));
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(central));
+        mMap.setOnMarkerClickListener(new OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                MarkerInfo markerInfo = (MarkerInfo) marker.getTag();
+                if(markerInfo.isGreen){
+                    //success!
+                    SuccessWordMap.put(marker, MarkerWordMap.get(marker));
+                    MarkerWordMap.remove(marker);
+                    marker.remove();
+                }
+                return false;
+            }
+        });
     }
 
     @Override
@@ -322,44 +342,55 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
             for (KmlContainer containers : kmlLayer.getContainers()) {
                 for (KmlPlacemark placemark : containers.getPlacemarks()) {
                     if (placemark.getGeometry().getGeometryType().equals("Point")) {
-                        Log.e("style", String.valueOf(placemark.getStyleId()));
                         KmlPoint point = (KmlPoint) placemark.getGeometry();
                         LatLng latLng = new LatLng(point.getGeometryObject().latitude, point.getGeometryObject().longitude);
+                        Marker marker;
                         switch (placemark.getStyleId()) {
                             case "#unclassified":
-                                MarkerWordMap.put(mMap.addMarker(new MarkerOptions()
+                                marker = mMap.addMarker(new MarkerOptions()
                                         .position(latLng)
                                         .icon(BitmapDescriptorFactory.fromResource(R.mipmap.white_blank))
-                                        .title("unclassified")), findLyric(getIntent().getStringExtra("lyrics"), placemark.getProperty("name")));
+                                        .title("unclassified"));
+                                marker.setTag(new MarkerInfo("unclassified", false));
+                                MarkerWordMap.put(marker, findLyric(getIntent().getStringExtra("lyrics"), placemark.getProperty("name")));
                                 break;
                             case "#boring":
-                                MarkerWordMap.put(mMap.addMarker(new MarkerOptions()
+                                marker = mMap.addMarker(new MarkerOptions()
                                         .position(latLng)
                                         .icon(BitmapDescriptorFactory.fromResource(R.mipmap.yellow_blank))
-                                        .title("boring")), findLyric(getIntent().getStringExtra("lyrics"), placemark.getProperty("name")));
+                                        .title("boring"));
+                                marker.setTag(new MarkerInfo("boring", false));
+                                MarkerWordMap.put(marker, findLyric(getIntent().getStringExtra("lyrics"), placemark.getProperty("name")));
                                 break;
                             case "#notboring":
-                                MarkerWordMap.put(mMap.addMarker(new MarkerOptions()
+                                marker = mMap.addMarker(new MarkerOptions()
                                         .position(latLng)
                                         .icon(BitmapDescriptorFactory.fromResource(R.mipmap.yellow_circle))
-                                        .title("not boring")), findLyric(getIntent().getStringExtra("lyrics"), placemark.getProperty("name")));
+                                        .title("not boring"));
+                                marker.setTag(new MarkerInfo("not boring", false));
+                                MarkerWordMap.put(marker, findLyric(getIntent().getStringExtra("lyrics"), placemark.getProperty("name")));
                                 break;
                             case "#interesting":
-                                MarkerWordMap.put(mMap.addMarker(new MarkerOptions()
+                                marker = mMap.addMarker(new MarkerOptions()
                                         .position(latLng)
                                         .icon(BitmapDescriptorFactory.fromResource(R.mipmap.orange_diamond))
-                                        .title("interesting")), findLyric(getIntent().getStringExtra("lyrics"), placemark.getProperty("name")));
+                                        .title("interesting"));
+                                marker.setTag(new MarkerInfo("interesting", false));
+                                MarkerWordMap.put(marker, findLyric(getIntent().getStringExtra("lyrics"), placemark.getProperty("name")));
                                 break;
                             case "#veryinteresting":
-                                MarkerWordMap.put(mMap.addMarker(new MarkerOptions()
+                                marker = mMap.addMarker(new MarkerOptions()
                                         .position(latLng)
                                         .icon(BitmapDescriptorFactory.fromResource(R.mipmap.red_stars))
-                                        .title("very interesting")), findLyric(getIntent().getStringExtra("lyrics"), placemark.getProperty("name")));
+                                        .title("very interesting"));
+                                marker.setTag(new MarkerInfo("very interesting", false));
+                                MarkerWordMap.put(marker, findLyric(getIntent().getStringExtra("lyrics"), placemark.getProperty("name")));
                                 break;
                         }
                     }
                 }
             }
+            Log.e("list", String.valueOf(MarkerWordMap.keySet()));
             kmlLayer.removeLayerFromMap();
         }
     }
@@ -369,9 +400,41 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
         String result = null;
         String[] lines = lyrics.split("[0-9]+\t");
         result = lines[Integer.parseInt(coordinates[0])].split("\\s")[Integer.parseInt(coordinates[1]) - 1];
-        Log.e("result", result);
         return result;
     }
+
+    public int getMarkerStyle(MarkerInfo markerInfo){
+        String key = markerInfo.key;
+        int result = 0;
+        switch (key){
+            case "unclassified":
+                result = R.mipmap.white_blank;
+                break;
+            case "boring":
+                result = R.mipmap.yellow_blank;
+                break;
+            case "not boring":
+                result = R.mipmap.yellow_circle;
+                break;
+            case "interesting":
+                result = R.mipmap.orange_diamond;
+                break;
+            case "very interesting":
+                result = R.mipmap.red_stars;
+                break;
+        }
+        return result;
+    }
+
+    public class MarkerInfo{
+        private String key;
+        private boolean isGreen;
+        MarkerInfo(String key, boolean isGreen){
+            this.key = key;
+            this.isGreen = isGreen;
+        }
+    }
+
     /*
     private class parseXMLTask extends AsyncTask<String, Void, ArrayList<KMLParser.Placemark>> {
         @Override
