@@ -55,7 +55,7 @@ public class ChooseDifficultyFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 Intent kmlIntent = new Intent(getActivity(), NetworkActivity.class);
-                kmlIntent.putExtra("url", url + "map1.kml");
+                kmlIntent.putExtra("url", url + "map5.kml");
                 kmlIntent.putExtra("number", number);
                 kmlIntent.putExtra("title", title);
                 getActivity().startActivityForResult(kmlIntent, LOAD_KML_REQUEST);
@@ -66,7 +66,7 @@ public class ChooseDifficultyFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 Intent kmlIntent = new Intent(getActivity(), NetworkActivity.class);
-                kmlIntent.putExtra("url", url + "map2.kml");
+                kmlIntent.putExtra("url", url + "map4.kml");
                 kmlIntent.putExtra("number", number);
                 kmlIntent.putExtra("title", title);
                 getActivity().startActivityForResult(kmlIntent, LOAD_KML_REQUEST);
@@ -88,7 +88,7 @@ public class ChooseDifficultyFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 Intent kmlIntent = new Intent(getActivity(), NetworkActivity.class);
-                kmlIntent.putExtra("url", url + "map4.kml");
+                kmlIntent.putExtra("url", url + "map2.kml");
                 kmlIntent.putExtra("number", number);
                 kmlIntent.putExtra("title", title);
                 getActivity().startActivityForResult(kmlIntent, LOAD_KML_REQUEST);
@@ -99,7 +99,7 @@ public class ChooseDifficultyFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 Intent kmlIntent = new Intent(getActivity(), NetworkActivity.class);
-                kmlIntent.putExtra("url", url + "map5.kml");
+                kmlIntent.putExtra("url", url + "map1.kml");
                 kmlIntent.putExtra("number", number);
                 kmlIntent.putExtra("title", title);
                 getActivity().startActivityForResult(kmlIntent, LOAD_KML_REQUEST);
