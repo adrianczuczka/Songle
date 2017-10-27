@@ -3,6 +3,7 @@ package com.adrianczuczka.songle;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -111,10 +112,11 @@ public class ChooseSong extends AppCompatActivity {
         TextView artistView = (TextView) view.findViewById(R.id.Artist);
         TextView titleView = (TextView) view.findViewById(R.id.Title);
         Intent kmlIntent = new Intent(ChooseSong.this, NetworkActivity.class);
-        kmlIntent.putExtra("url", "http://www.inf.ed.ac.uk/teaching/courses/selp/data/songs/" + String.valueOf(numberView.getText()) + "/map3.kml");
+        kmlIntent.putExtra("url", "http://www.inf.ed.ac.uk/teaching/courses/selp/data/songs/" + String.valueOf(numberView.getText()) + "/");
         kmlIntent.putExtra("number", String.valueOf(numberView.getText()));
         kmlIntent.putExtra("title", String.valueOf(titleView.getText()));
-        startActivityForResult(kmlIntent, LOAD_KML_REQUEST);
+        DialogFragment chooseDifficultyFragment = ChooseDifficultyFragment.newInstance(kmlIntent);
+        chooseDifficultyFragment.show(getSupportFragmentManager(), "hello");
     }
 
     public void onClickRandom(View view) {
