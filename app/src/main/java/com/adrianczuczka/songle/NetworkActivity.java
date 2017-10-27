@@ -54,6 +54,9 @@ public class NetworkActivity extends FragmentActivity implements DownloadCallbac
         if (getIntent().hasExtra("kml")){
             resultIntent.putExtra("kml", getIntent().getStringExtra("kml"));
         }
+        if (getIntent().hasExtra("title")){
+            resultIntent.putExtra("title", getIntent().getStringExtra("title"));
+        }
         setResult(Activity.RESULT_OK, resultIntent);
         finish();
     }

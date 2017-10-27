@@ -85,8 +85,10 @@ public class ChooseSong extends AppCompatActivity {
                 Intent lyricIntent = new Intent(ChooseSong.this, NetworkActivity.class);
                 String kml = data.getStringExtra("string");
                 String number = data.getStringExtra("number");
+                String title = data.getStringExtra("title");
                 lyricIntent.putExtra("url", "http://www.inf.ed.ac.uk/teaching/courses/selp/data/songs/" + number + "/words.txt");
                 lyricIntent.putExtra("kml", kml);
+                lyricIntent.putExtra("title", title);
                 startActivityForResult(lyricIntent, LOAD_LYRICS_REQUEST);
             }
         }
@@ -95,8 +97,10 @@ public class ChooseSong extends AppCompatActivity {
                 Intent mapIntent = new Intent(ChooseSong.this, GameUI.class);
                 String lyrics = data.getStringExtra("string");
                 String kml = data.getStringExtra("kml");
+                String title = data.getStringExtra("title");
                 mapIntent.putExtra("lyrics", lyrics);
                 mapIntent.putExtra("kml", kml);
+                mapIntent.putExtra("title", title);
                 startActivity(mapIntent);
             }
         }
@@ -109,6 +113,7 @@ public class ChooseSong extends AppCompatActivity {
         Intent kmlIntent = new Intent(ChooseSong.this, NetworkActivity.class);
         kmlIntent.putExtra("url", "http://www.inf.ed.ac.uk/teaching/courses/selp/data/songs/" + String.valueOf(numberView.getText()) + "/map3.kml");
         kmlIntent.putExtra("number", String.valueOf(numberView.getText()));
+        kmlIntent.putExtra("title", String.valueOf(titleView.getText()));
         startActivityForResult(kmlIntent, LOAD_KML_REQUEST);
     }
 

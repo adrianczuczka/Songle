@@ -1,6 +1,8 @@
 package com.adrianczuczka.songle;
 
 import android.Manifest;
+import android.app.ActionBar;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
@@ -9,13 +11,28 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
+import android.support.v4.widget.NestedScrollView;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.widget.RelativeLayout;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+
 
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.CommonStatusCodes;
@@ -55,7 +72,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class GameUI extends FragmentActivity implements OnMapReadyCallback {
     private FusedLocationProviderClient mFusedLocationClient;
@@ -70,6 +89,8 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
     private HashMap<Marker, String> MarkerWordMap = new HashMap<>();
     private HashMap<Marker, String> SuccessWordMap = new HashMap<>();
     private String lyrics = null;
+    private ArrayList<String> SuccessList = new ArrayList<>();
+
 
     private void startLocationUpdates() {
         try {
@@ -79,7 +100,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                 mRequestingLocationUpdates = true;
             }
         } catch (SecurityException e) {
-
+            e.printStackTrace();
         }
     }
 
@@ -93,7 +114,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
         try {
             mMap.setMyLocationEnabled(true);
             mRequestingLocationUpdates = false;
-            mFusedLocationClient.getLastLocation()
+            /*mFusedLocationClient.getLastLocation()
                     .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                         @Override
                         public void onSuccess(Location location) {
@@ -104,6 +125,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                             }
                         }
                     });
+            */
             SettingsClient client = LocationServices.getSettingsClient(this);
             Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
             task.addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
@@ -156,6 +178,16 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_ui);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        /*EXPERIMENTAL
+
+        viewPager = (ViewPager) findViewById(R.id.viewpager);
+        setupViewPager(viewPager);
+
+        tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(viewPager);
+
+        EXPERIMENTAL*/
+
         final SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -176,14 +208,13 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                             location1.setLatitude(latitude);
                             location1.setLongitude(longitude);
                             double locDistance = Double.parseDouble(String.valueOf(location.distanceTo(location1)));
-                            if (locDistance < 50){
-                                if (!markerInfo.isGreen){
+                            if (locDistance < 50) {
+                                if (!markerInfo.isGreen) {
                                     marker.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.success_marker));
                                     markerInfo.isGreen = true;
                                 }
-                            }
-                            else{
-                                if (markerInfo.isGreen){
+                            } else {
+                                if (markerInfo.isGreen) {
                                     marker.setIcon(BitmapDescriptorFactory.fromResource(getMarkerStyle(markerInfo)));
                                     markerInfo.isGreen = false;
                                 }
@@ -203,10 +234,34 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                 }
             }
         };
-        RelativeLayout view = (RelativeLayout) findViewById(R.id.pullup);
+        LinearLayout view = (LinearLayout) findViewById(R.id.pullup);
         mBottomSheetBehavior = BottomSheetBehavior.from(view);
-        mBottomSheetBehavior.setPeekHeight(200);
+        mBottomSheetBehavior.setPeekHeight(144);
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        Button showList = (Button) findViewById(R.id.show_list);
+        showList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DialogFragment wordListFragment = WordListFragment.newInstance(SuccessList);
+                wordListFragment.show(getSupportFragmentManager(), "hello");
+            }
+        });
+        Button guessSong = (Button) findViewById(R.id.guess_song);
+        guessSong.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditText answerInput = (EditText) findViewById(R.id.guess_song_input);
+                String answer = answerInput.getText().toString();
+                String title = getIntent().getStringExtra("title");
+                Log.e("levDistance", String.valueOf(levDistance(answer, title)));
+                if(levDistance(answer, title) <= 2){
+                    Log.e("success", "SUCCESS");
+                }
+                else{
+                    Log.e("incorrect", "still success");
+                }
+            }
+        });
 
         /*
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab);
@@ -219,6 +274,73 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                 */
     }
 
+    private int levDistance(String a, String b) {
+        a = a.toLowerCase();
+        b = b.toLowerCase();
+        // i == 0
+        int [] costs = new int [b.length() + 1];
+        for (int j = 0; j < costs.length; j++)
+            costs[j] = j;
+        for (int i = 1; i <= a.length(); i++) {
+            // j == 0; nw = lev(i - 1, j)
+            costs[0] = i;
+            int nw = i - 1;
+            for (int j = 1; j <= b.length(); j++) {
+                int cj = Math.min(1 + Math.min(costs[j], costs[j - 1]), a.charAt(i - 1) == b.charAt(j - 1) ? nw : nw + 1);
+                nw = costs[j];
+                costs[j] = cj;
+            }
+        }
+        return costs[b.length()];
+    }
+
+    /*
+    private void setupViewPager(ViewPager viewPager) {
+        for(int i= 0; i < 100; i++){
+            test.add("hello");
+        }
+        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        viewPagerAdapter.addFragment(new WordListFragment().newInstance(test), "Test");
+        viewPagerAdapter.addFragment(new WordListFragment().newInstance(test), "Test");
+        viewPagerAdapter.addFragment(new WordListFragment().newInstance(test), "Test");
+        /*viewPagerAdapter.addFragment(new WorldCharts(), "World Charts");
+        viewPagerAdapter.addFragment(new NewMusic(), "New Music");
+        viewPagerAdapter.addFragment(new AfricaHot(), "Africa Hot");
+        viewPagerAdapter.addFragment(new Playlists(), "Playlists");
+        viewPagerAdapter.addFragment(new Recommended(), "Recommended");
+        viewPager.setAdapter(viewPagerAdapter);
+    }
+
+    private class ViewPagerAdapter extends FragmentPagerAdapter {
+
+        List<Fragment> fragmentList = new ArrayList<>();
+        List<String> fragmentTitles = new ArrayList<>();
+
+        public ViewPagerAdapter(FragmentManager fragmentManager) {
+            super(fragmentManager);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return fragmentList.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            return fragmentList.size();
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return fragmentTitles.get(position);
+        }
+
+        public void addFragment(Fragment fragment, String name) {
+            fragmentList.add(fragment);
+            fragmentTitles.add(name);
+        }
+    }
+    */
     protected void onPause() {
         super.onPause();
         stopLocationUpdates();
@@ -277,9 +399,11 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
             @Override
             public boolean onMarkerClick(Marker marker) {
                 MarkerInfo markerInfo = (MarkerInfo) marker.getTag();
-                if(markerInfo.isGreen){
+                SuccessList.add(MarkerWordMap.get(marker));
+                if (markerInfo.isGreen) {
                     //success!
                     SuccessWordMap.put(marker, MarkerWordMap.get(marker));
+                    SuccessList.add(MarkerWordMap.get(marker));
                     MarkerWordMap.remove(marker);
                     marker.remove();
                 }
@@ -390,7 +514,6 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                     }
                 }
             }
-            Log.e("list", String.valueOf(MarkerWordMap.keySet()));
             kmlLayer.removeLayerFromMap();
         }
     }
@@ -403,10 +526,10 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
         return result;
     }
 
-    public int getMarkerStyle(MarkerInfo markerInfo){
+    public int getMarkerStyle(MarkerInfo markerInfo) {
         String key = markerInfo.key;
         int result = 0;
-        switch (key){
+        switch (key) {
             case "unclassified":
                 result = R.mipmap.white_blank;
                 break;
@@ -426,10 +549,11 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
         return result;
     }
 
-    public class MarkerInfo{
+    public class MarkerInfo {
         private String key;
         private boolean isGreen;
-        MarkerInfo(String key, boolean isGreen){
+
+        MarkerInfo(String key, boolean isGreen) {
             this.key = key;
             this.isGreen = isGreen;
         }
