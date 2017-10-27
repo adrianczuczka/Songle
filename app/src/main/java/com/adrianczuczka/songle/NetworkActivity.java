@@ -1,7 +1,6 @@
 package com.adrianczuczka.songle;
 
 import android.app.Activity;
-import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -9,12 +8,6 @@ import android.net.NetworkInfo;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
-
-import com.google.maps.android.data.kml.KmlLayer;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
 
 public class NetworkActivity extends FragmentActivity implements DownloadCallback<String> {
 
@@ -73,8 +66,7 @@ public class NetworkActivity extends FragmentActivity implements DownloadCallbac
     public NetworkInfo getActiveNetworkInfo() {
         ConnectivityManager connectivityManager =
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        return networkInfo;
+        return connectivityManager.getActiveNetworkInfo();
     }
 
     @Override

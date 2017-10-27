@@ -8,13 +8,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -30,7 +28,7 @@ import javax.net.ssl.HttpsURLConnection;
  * create an instance of this fragment.
  */
 public class NetworkFragment extends Fragment {
-    public static final String TAG = "NetworkFragment";
+    private static final String TAG = "NetworkFragment";
 
     private static final String URL_KEY = "UrlKey";
 
@@ -219,13 +217,12 @@ public class NetworkFragment extends Fragment {
         }
 
         public String readStream(InputStream stream, int maxReadSize)
-                throws IOException, UnsupportedEncodingException {
-            Reader reader = null;
+                throws IOException {
+            Reader reader;
             reader = new InputStreamReader(stream, "UTF-8");
             char[] rawBuffer = new char[maxReadSize];
             int readSize;
-            int count = 0;
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
             while (((readSize = reader.read(rawBuffer)) != -1) && maxReadSize > 0) {
                 if (readSize > maxReadSize) {
                     readSize = maxReadSize;

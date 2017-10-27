@@ -43,7 +43,7 @@ public class XMLParser {
     }
 
     private ArrayList<Song> readFeed(XmlPullParser parser) throws XmlPullParserException, IOException {
-        ArrayList<Song> songs = new ArrayList<Song>();
+        ArrayList<Song> songs = new ArrayList<>();
         //Log.e("GameUI", "made it to readfeed");
         parser.require(XmlPullParser.START_TAG, ns, "Songs");
         while (parser.next() != XmlPullParser.END_TAG) {
@@ -73,16 +73,22 @@ public class XMLParser {
                 continue;
             }
             String tagName = parser.getName();
-            if (tagName.equals("Number")) {
-                number = readNumber(parser);
-            } else if (tagName.equals("Artist")) {
-                artist = readArtist(parser);
-            } else if (tagName.equals("Title")) {
-                title = readTitle(parser);
-            } else if (tagName.equals("Link")) {
-                link = readLink(parser);
-            } else {
-                skip(parser);
+            switch (tagName) {
+                case "Number":
+                    number = readNumber(parser);
+                    break;
+                case "Artist":
+                    artist = readArtist(parser);
+                    break;
+                case "Title":
+                    title = readTitle(parser);
+                    break;
+                case "Link":
+                    link = readLink(parser);
+                    break;
+                default:
+                    skip(parser);
+                    break;
             }
         }
         return new Song(number, artist, title, link);

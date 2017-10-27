@@ -3,13 +3,11 @@ package com.adrianczuczka.songle;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 
-import java.security.PublicKey;
 import java.util.ArrayList;
 
 /**
@@ -17,7 +15,7 @@ import java.util.ArrayList;
  */
 
 public class WordListFragment extends DialogFragment {
-    ArrayList<String> wordList = new ArrayList<>();
+    private ArrayList<String> wordList = new ArrayList<>();
     public static WordListFragment newInstance(ArrayList<String> list){
         WordListFragment wordListFragment = new WordListFragment();
         Bundle args = new Bundle();

@@ -6,7 +6,13 @@
     <string name="medium">Medium</string>
     <string name="hard">Hard</string>
     <string name="extreme">EXTREME</string>
-
+    <string name="show_list">Show List of Words Found</string>
+    <string name="guess_song_hint">Can you guess the song?</string>
+    <string name="guess_song">Guess the Song</string>
+    <string name="welcome_title">SONGLE</string>
+    <string name="welcome_play_button">PLAY</string>
+    <string name="welcome_settings_button">SETTINGS</string>
+    <string name="random">Random</string>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_choose_song">ChooseSong</string>

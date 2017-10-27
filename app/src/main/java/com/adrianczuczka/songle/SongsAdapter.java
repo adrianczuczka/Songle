@@ -1,10 +1,9 @@
 package com.adrianczuczka.songle;
 
-/**
- * Created by s1550570 on 08/10/17.
+/*
+  Created by s1550570 on 08/10/17.
  */
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,10 +13,12 @@ import java.util.List;
 
 public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.MyViewHolder> {
 
-    private List<XMLParser.Song> songsList;
+    private final List<XMLParser.Song> songsList;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView number,artist,title;
+        public final TextView number;
+        public final TextView artist;
+        public final TextView title;
         public MyViewHolder(View view) {
             super(view);
             number = (TextView) view.findViewById(R.id.Number);

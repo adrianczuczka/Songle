@@ -1,6 +1,5 @@
 package com.adrianczuczka.songle;
 
-import android.util.Log;
 import android.util.Xml;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -9,7 +8,6 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by adria_000 on 07/10/2017.
@@ -42,7 +40,7 @@ public class KMLParser {
     }
 
     private ArrayList<Placemark> readFeed(XmlPullParser parser) throws XmlPullParserException, IOException {
-        ArrayList<Placemark> placemarks = new ArrayList<Placemark>();
+        ArrayList<Placemark> placemarks = new ArrayList<>();
         //Log.e("GameUI", "made it to readfeed");
         parser.require(XmlPullParser.START_TAG, ns, "kml");
         while (parser.next() != XmlPullParser.END_TAG) {
@@ -71,14 +69,19 @@ public class KMLParser {
                 continue;
             }
             String tagName = parser.getName();
-            if (tagName.equals("name")) {
-                name = readName(parser);
-            } else if (tagName.equals("description")) {
-                description = readDescription(parser);
-            } else if (tagName.equals("Point")) {
-                coordinates = readPoint(parser);
-            } else {
-                skip(parser);
+            switch (tagName) {
+                case "name":
+                    name = readName(parser);
+                    break;
+                case "description":
+                    description = readDescription(parser);
+                    break;
+                case "Point":
+                    coordinates = readPoint(parser);
+                    break;
+                default:
+                    skip(parser);
+                    break;
             }
         }
         //Log.e("GameUI",name + description + String.valueOf(coordinates) );

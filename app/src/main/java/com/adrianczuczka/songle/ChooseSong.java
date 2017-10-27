@@ -9,9 +9,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.xmlpull.v1.XmlPullParserException;
@@ -26,10 +24,9 @@ import java.util.concurrent.ThreadLocalRandom;
 public class ChooseSong extends AppCompatActivity {
     private ArrayList<XMLParser.Song> songList = new ArrayList<>();
     private RecyclerView recyclerView;
-    private SongsAdapter mAdapter;
-    static final int LOAD_KML_REQUEST = 1;
-    static final int LOAD_XML_REQUEST = 2;
-    static final int LOAD_LYRICS_REQUEST = 3;
+    private static final int LOAD_KML_REQUEST = 1;
+    private static final int LOAD_XML_REQUEST = 2;
+    private static final int LOAD_LYRICS_REQUEST = 3;
 
 
     @Override
@@ -38,8 +35,9 @@ public class ChooseSong extends AppCompatActivity {
         setContentView(R.layout.activity_choose_song);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if(getSupportActionBar() != null){
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
         //mAdapter = new SongsAdapter(songList);
@@ -67,7 +65,7 @@ public class ChooseSong extends AppCompatActivity {
         @Override
         protected void onPostExecute(ArrayList<XMLParser.Song> songs) {
             songList = songs;
-            mAdapter = new SongsAdapter(songList);
+            SongsAdapter mAdapter = new SongsAdapter(songList);
             recyclerView.setAdapter(mAdapter);
             mAdapter.notifyDataSetChanged();
         }
@@ -109,7 +107,6 @@ public class ChooseSong extends AppCompatActivity {
 
     public void onClickSong(View view) {
         TextView numberView = (TextView) view.findViewById(R.id.Number);
-        TextView artistView = (TextView) view.findViewById(R.id.Artist);
         TextView titleView = (TextView) view.findViewById(R.id.Title);
         Intent kmlIntent = new Intent(ChooseSong.this, NetworkActivity.class);
         kmlIntent.putExtra("url", "http://www.inf.ed.ac.uk/teaching/courses/selp/data/songs/" + String.valueOf(numberView.getText()) + "/");
@@ -121,7 +118,6 @@ public class ChooseSong extends AppCompatActivity {
 
     public void onClickRandom(View view) {
         int randomNum = ThreadLocalRandom.current().nextInt(0, songList.size() + 1);
-        TextView textView = (TextView) recyclerView.findViewHolderForLayoutPosition(randomNum).itemView.findViewById(R.id.Title);
         recyclerView.findViewHolderForAdapterPosition(randomNum).itemView.callOnClick();
     }
 }

@@ -1,8 +1,6 @@
 package com.adrianczuczka.songle;
 
 import android.Manifest;
-import android.app.ActionBar;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
@@ -11,22 +9,12 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Looper;
 import android.support.annotation.NonNull;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v4.widget.NestedScrollView;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -74,22 +62,19 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class GameUI extends FragmentActivity implements OnMapReadyCallback {
     private FusedLocationProviderClient mFusedLocationClient;
     private GoogleMap mMap;
-    private Looper looper = Looper.getMainLooper();
-    private LocationRequest mLocationRequest = new LocationRequest();
-    LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
+    private final Looper looper = Looper.getMainLooper();
+    private final LocationRequest mLocationRequest = new LocationRequest();
+    private final LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
     private boolean mRequestingLocationUpdates;
     private LocationCallback mLocationCallback;
-    static final int LOAD_KML_REQUEST = 1;
-    private BottomSheetBehavior mBottomSheetBehavior = null;
-    private HashMap<Marker, String> MarkerWordMap = new HashMap<>();
-    private HashMap<Marker, String> SuccessWordMap = new HashMap<>();
-    private String lyrics = null;
-    private ArrayList<String> SuccessList = new ArrayList<>();
+    private static final int LOAD_KML_REQUEST = 1;
+    private final HashMap<Marker, String> MarkerWordMap = new HashMap<>();
+    private final HashMap<Marker, String> SuccessWordMap = new HashMap<>();
+    private final ArrayList<String> SuccessList = new ArrayList<>();
 
 
     private void startLocationUpdates() {
@@ -104,7 +89,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
         }
     }
 
-    protected void createLocationRequest(LocationRequest locReq) {
+    private void createLocationRequest(LocationRequest locReq) {
         locReq.setInterval(10000);
         locReq.setFastestInterval(5000);
         locReq.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -209,11 +194,13 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                             location1.setLongitude(longitude);
                             double locDistance = Double.parseDouble(String.valueOf(location.distanceTo(location1)));
                             if (locDistance < 50) {
+                                assert markerInfo != null;
                                 if (!markerInfo.isGreen) {
                                     marker.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.success_marker));
                                     markerInfo.isGreen = true;
                                 }
                             } else {
+                                assert markerInfo != null;
                                 if (markerInfo.isGreen) {
                                     marker.setIcon(BitmapDescriptorFactory.fromResource(getMarkerStyle(markerInfo)));
                                     markerInfo.isGreen = false;
@@ -222,12 +209,9 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                             if (minDistance < 0) {
                                 minDistance = locDistance;
                                 minMarker = marker;
-                            } else {
-                                if (minDistance <= locDistance) {
-                                } else {
-                                    minDistance = locDistance;
-                                    minMarker = marker;
-                                }
+                            } else if (minDistance > locDistance) {
+                                minDistance = locDistance;
+                                minMarker = marker;
                             }
                         }
                     }
@@ -235,7 +219,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
             }
         };
         LinearLayout view = (LinearLayout) findViewById(R.id.pullup);
-        mBottomSheetBehavior = BottomSheetBehavior.from(view);
+        BottomSheetBehavior mBottomSheetBehavior = BottomSheetBehavior.from(view);
         mBottomSheetBehavior.setPeekHeight(144);
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         Button showList = (Button) findViewById(R.id.show_list);
@@ -254,10 +238,9 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                 String answer = answerInput.getText().toString();
                 String title = getIntent().getStringExtra("title");
                 Log.e("levDistance", String.valueOf(levDistance(answer, title)));
-                if(levDistance(answer, title) <= 2){
+                if (levDistance(answer, title) <= 2) {
                     Log.e("success", "SUCCESS");
-                }
-                else{
+                } else {
                     Log.e("incorrect", "still success");
                 }
             }
@@ -278,7 +261,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
         a = a.toLowerCase();
         b = b.toLowerCase();
         // i == 0
-        int [] costs = new int [b.length() + 1];
+        int[] costs = new int[b.length() + 1];
         for (int j = 0; j < costs.length; j++)
             costs[j] = j;
         for (int i = 1; i <= a.length(); i++) {
@@ -346,7 +329,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
         stopLocationUpdates();
     }
 
-    protected void stopLocationUpdates() {
+    private void stopLocationUpdates() {
         mFusedLocationClient.removeLocationUpdates(mLocationCallback);
         mRequestingLocationUpdates = false;
     }
@@ -400,6 +383,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
             public boolean onMarkerClick(Marker marker) {
                 MarkerInfo markerInfo = (MarkerInfo) marker.getTag();
                 SuccessList.add(MarkerWordMap.get(marker));
+                assert markerInfo != null;
                 if (markerInfo.isGreen) {
                     //success!
                     SuccessWordMap.put(marker, MarkerWordMap.get(marker));
@@ -414,7 +398,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+                                           @NonNull String permissions[], @NonNull int[] grantResults) {
         switch (requestCode) {
             case 1: {
                 if (permissions.length == 1 &&
@@ -447,8 +431,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
         protected KmlLayer doInBackground(String... params) {
             try {
                 InputStream stream = new ByteArrayInputStream(params[0].getBytes(StandardCharsets.UTF_8.name()));
-                KmlLayer layer = new KmlLayer(mMap, stream, GameUI.this);
-                return layer;
+                return new KmlLayer(mMap, stream, GameUI.this);
             } catch (XmlPullParserException | IOException e) {
                 return null;
             }
@@ -458,9 +441,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
         protected void onPostExecute(KmlLayer kmlLayer) {
             try {
                 kmlLayer.addLayerToMap();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (XmlPullParserException e) {
+            } catch (IOException | XmlPullParserException e) {
                 e.printStackTrace();
             }
             for (KmlContainer containers : kmlLayer.getContainers()) {
@@ -518,15 +499,15 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
         }
     }
 
-    public String findLyric(String lyrics, String wordLoc) {
+    private String findLyric(String lyrics, String wordLoc) {
         String[] coordinates = wordLoc.split(":");
-        String result = null;
+        String result;
         String[] lines = lyrics.split("[0-9]+\t");
         result = lines[Integer.parseInt(coordinates[0])].split("\\s")[Integer.parseInt(coordinates[1]) - 1];
         return result;
     }
 
-    public int getMarkerStyle(MarkerInfo markerInfo) {
+    private int getMarkerStyle(MarkerInfo markerInfo) {
         String key = markerInfo.key;
         int result = 0;
         switch (key) {
@@ -550,7 +531,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
     }
 
     public class MarkerInfo {
-        private String key;
+        private final String key;
         private boolean isGreen;
 
         MarkerInfo(String key, boolean isGreen) {

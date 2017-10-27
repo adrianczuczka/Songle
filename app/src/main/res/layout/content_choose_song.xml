@@ -27,7 +27,7 @@
             android:layout_marginTop="16dp"
             android:onClick="onClickRandom"
             android:scrollbars="vertical"
-            android:text="Random"
+            android:text="@string/random"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

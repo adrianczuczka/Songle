@@ -20,38 +20,37 @@
         tools:context="com.adrianczuczka.songle.GameUI" />
 
     <LinearLayout
-        android:id="@+id/pullup"
+        android:id="@+id/game_ui_bottom_sheet"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:orientation="vertical"
-        app:layout_behavior="android.support.design.widget.BottomSheetBehavior"
         android:background="@color/green"
-        >
+        android:orientation="vertical"
+        app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
 
         <Button
             android:id="@+id/show_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Show List" />
+            android:text="@string/show_list" />
 
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
             <EditText
                 android:id="@+id/guess_song_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:inputType="textNoSuggestions"
-                android:hint="Can you guess the song?"
-                />
+                android:hint="@string/guess_song_hint"
+                android:inputType="textNoSuggestions" />
 
             <Button
                 android:id="@+id/guess_song"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Guess the Song" />
+                android:text="@string/guess_song" />
         </LinearLayout>
     </LinearLayout>
 
