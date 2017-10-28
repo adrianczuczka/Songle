@@ -218,7 +218,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                 }
             }
         };
-        LinearLayout view = (LinearLayout) findViewById(R.id.pullup);
+        LinearLayout view = (LinearLayout) findViewById(R.id.game_ui_bottom_sheet);
         BottomSheetBehavior mBottomSheetBehavior = BottomSheetBehavior.from(view);
         mBottomSheetBehavior.setPeekHeight(144);
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);

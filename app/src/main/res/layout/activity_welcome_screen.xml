@@ -5,37 +5,45 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.adrianczuczka.songle.WelcomeScreen"
-    android:background="@color/green"
+    android:background="@drawable/george_square"
     >
 
     <TextView
         android:id="@+id/MainTitle"
         android:layout_width="311dp"
         android:layout_height="103dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="100dp"
-        android:fontFamily="casual"
+        android:clickable="false"
+        android:fontFamily="@font/sniglet_extrabold"
+        android:shadowColor="@color/artist"
+        android:shadowDx="0.0"
+        android:shadowDy="0.0"
+        android:shadowRadius="20.0"
         android:text="@string/welcome_title"
         android:textAlignment="center"
-        android:textSize="50sp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginLeft="8dp"
-        app:layout_constraintLeft_toLeftOf="parent"
+        android:textColor="@android:color/holo_blue_dark"
+        android:textSize="70sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
 
     <Button
         android:id="@+id/PlayButton"
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="60dp"
+        android:fontFamily="@font/sniglet_extrabold"
         android:onClick="startChooseSong"
         android:text="@string/welcome_play_button"
+        android:textSize="40sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -50,7 +58,9 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="20dp"
+        android:width="100dp"
         android:elevation="0dp"
+        android:fontFamily="@font/sniglet_extrabold"
         android:text="@string/welcome_settings_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -58,4 +68,51 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/PlayButton"
         app:layout_constraintVertical_bias="0.0" />
+
+    <ImageView
+        android:id="@+id/joyEmoji"
+        android:layout_width="161dp"
+        android:layout_height="83dp"
+        android:layout_marginEnd="80dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:rotation="-30"
+        app:layout_constraintEnd_toStartOf="@+id/surpriseEmoji"
+        app:layout_constraintHorizontal_bias="0.444"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@mipmap/joy_emoji" />
+
+    <ImageView
+        android:id="@+id/surpriseEmoji"
+        android:layout_width="69dp"
+        android:layout_height="54dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="48dp"
+        android:rotation="30"
+        app:layout_constraintBottom_toTopOf="@+id/MainTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@mipmap/surprise_emoji" />
+
+    <ImageView
+        android:id="@+id/thinkingEmoji"
+        android:layout_width="82dp"
+        android:layout_height="76dp"
+        android:layout_marginBottom="24dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@mipmap/thinking_emoji" />
+
+    <ImageView
+        android:id="@+id/musicEmoji"
+        android:rotation="-20"
+        android:layout_width="80dp"
+        android:layout_height="76dp"
+        android:layout_marginBottom="48dp"
+        android:layout_marginStart="36dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@mipmap/music_emoji" />
+
 </android.support.constraint.ConstraintLayout>
