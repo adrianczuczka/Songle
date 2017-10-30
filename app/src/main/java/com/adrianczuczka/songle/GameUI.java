@@ -456,7 +456,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                                         .position(latLng)
                                         .icon(BitmapDescriptorFactory.fromResource(R.mipmap.white_blank))
                                         .title("unclassified"));
-                                marker.setTag(new MarkerInfo("unclassified", false));
+                                marker.setTag(new MarkerInfo("unclassified"));
                                 MarkerWordMap.put(marker, findLyric(getIntent().getStringExtra("lyrics"), placemark.getProperty("name")));
                                 break;
                             case "#boring":
@@ -464,7 +464,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                                         .position(latLng)
                                         .icon(BitmapDescriptorFactory.fromResource(R.mipmap.yellow_blank))
                                         .title("boring"));
-                                marker.setTag(new MarkerInfo("boring", false));
+                                marker.setTag(new MarkerInfo("boring"));
                                 MarkerWordMap.put(marker, findLyric(getIntent().getStringExtra("lyrics"), placemark.getProperty("name")));
                                 break;
                             case "#notboring":
@@ -472,7 +472,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                                         .position(latLng)
                                         .icon(BitmapDescriptorFactory.fromResource(R.mipmap.yellow_circle))
                                         .title("not boring"));
-                                marker.setTag(new MarkerInfo("not boring", false));
+                                marker.setTag(new MarkerInfo("not boring"));
                                 MarkerWordMap.put(marker, findLyric(getIntent().getStringExtra("lyrics"), placemark.getProperty("name")));
                                 break;
                             case "#interesting":
@@ -480,7 +480,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                                         .position(latLng)
                                         .icon(BitmapDescriptorFactory.fromResource(R.mipmap.orange_diamond))
                                         .title("interesting"));
-                                marker.setTag(new MarkerInfo("interesting", false));
+                                marker.setTag(new MarkerInfo("interesting"));
                                 MarkerWordMap.put(marker, findLyric(getIntent().getStringExtra("lyrics"), placemark.getProperty("name")));
                                 break;
                             case "#veryinteresting":
@@ -488,7 +488,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                                         .position(latLng)
                                         .icon(BitmapDescriptorFactory.fromResource(R.mipmap.red_stars))
                                         .title("very interesting"));
-                                marker.setTag(new MarkerInfo("very interesting", false));
+                                marker.setTag(new MarkerInfo("very interesting"));
                                 MarkerWordMap.put(marker, findLyric(getIntent().getStringExtra("lyrics"), placemark.getProperty("name")));
                                 break;
                         }
@@ -534,9 +534,9 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
         private final String key;
         private boolean isGreen;
 
-        MarkerInfo(String key, boolean isGreen) {
+        MarkerInfo(String key) {
             this.key = key;
-            this.isGreen = isGreen;
+            this.isGreen = false;
         }
     }
 

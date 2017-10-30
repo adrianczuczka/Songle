@@ -11,6 +11,7 @@
     android:paddingRight="16dp"
     android:paddingTop="10dp"
     android:onClick="onClickSong"
+    android:visibility="gone"
     >
 
     <TextView

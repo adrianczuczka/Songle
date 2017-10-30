@@ -19,7 +19,6 @@
         android:descendantFocusability="beforeDescendants"
         android:focusableInTouchMode="true">
 
-
         <Button
             android:id="@+id/RandomButton"
             android:layout_width="320dp"

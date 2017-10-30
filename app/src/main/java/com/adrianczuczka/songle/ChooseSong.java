@@ -33,11 +33,11 @@ public class ChooseSong extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_song);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        /*Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if(getSupportActionBar() != null){
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
+        }*/
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
         //mAdapter = new SongsAdapter(songList);
@@ -51,6 +51,7 @@ public class ChooseSong extends AppCompatActivity {
     }
 
     private class parseXMLTask extends AsyncTask<String, Void, ArrayList<XMLParser.Song>> {
+
         @Override
         protected ArrayList<XMLParser.Song> doInBackground(String... strings) {
             try {

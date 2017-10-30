@@ -4,9 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/cyan"
     tools:context="com.adrianczuczka.songle.WelcomeScreen"
-    android:background="@drawable/george_square"
-    >
+    tools:layout_editor_absoluteX="0dp"
+    tools:layout_editor_absoluteY="81dp">
 
     <TextView
         android:id="@+id/MainTitle"
@@ -21,10 +22,10 @@
         android:shadowColor="@color/artist"
         android:shadowDx="0.0"
         android:shadowDy="0.0"
-        android:shadowRadius="20.0"
+        android:shadowRadius="10.0"
         android:text="@string/welcome_title"
         android:textAlignment="center"
-        android:textColor="@android:color/holo_blue_dark"
+        android:textColor="@color/green"
         android:textSize="70sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -36,38 +37,32 @@
         android:id="@+id/PlayButton"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="16dp"
         android:fontFamily="@font/sniglet_extrabold"
         android:onClick="startChooseSong"
         android:text="@string/welcome_play_button"
         android:textSize="40sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/MainTitle"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toBottomOf="@+id/MainTitle" />
 
     <Button
         android:id="@+id/SettingsButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="12dp"
         android:width="100dp"
         android:elevation="0dp"
         android:fontFamily="@font/sniglet_extrabold"
         android:text="@string/welcome_settings_button"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/PlayButton"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toBottomOf="@+id/PlayButton" />
 
     <ImageView
         android:id="@+id/joyEmoji"
@@ -98,21 +93,90 @@
         android:id="@+id/thinkingEmoji"
         android:layout_width="82dp"
         android:layout_height="76dp"
-        android:layout_marginBottom="24dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="216dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.969"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/PlayButton"
+        app:layout_constraintVertical_bias="0.0"
         app:srcCompat="@mipmap/thinking_emoji" />
 
     <ImageView
         android:id="@+id/musicEmoji"
-        android:rotation="-20"
         android:layout_width="80dp"
         android:layout_height="76dp"
-        android:layout_marginBottom="48dp"
-        android:layout_marginStart="36dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:rotation="-20"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.018"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/thinkingEmoji"
+        app:layout_constraintVertical_bias="0.105"
         app:srcCompat="@mipmap/music_emoji" />
+
+    <ImageView
+        android:id="@+id/welcome_disk"
+        android:layout_width="0dp"
+        android:layout_height="177dp"
+        android:src="@drawable/record_disk"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/orange_on_disk"
+        android:layout_width="57dp"
+        android:layout_height="64dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:rotation="-60"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.069"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/welcome_disk"
+        app:layout_constraintVertical_bias="0.917"
+        app:srcCompat="@mipmap/orange_diamond" />
+
+    <ImageView
+        android:id="@+id/yellow_on_disk"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:rotation="-20"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.371"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.838"
+        app:srcCompat="@mipmap/yellow_blank" />
+
+    <ImageView
+        android:id="@+id/red_on_disk"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:rotation="70"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.89"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/welcome_disk"
+        app:layout_constraintVertical_bias="0.955"
+        app:srcCompat="@mipmap/red_stars" />
 
 </android.support.constraint.ConstraintLayout>
