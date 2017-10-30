@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     tools:context="com.adrianczuczka.songle.ChooseSong"
-    android:background="@color/green"
+    android:background="@color/cyan"
     >
 
     <include

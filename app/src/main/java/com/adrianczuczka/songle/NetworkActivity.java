@@ -66,6 +66,7 @@ public class NetworkActivity extends FragmentActivity implements DownloadCallbac
     public NetworkInfo getActiveNetworkInfo() {
         ConnectivityManager connectivityManager =
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        assert connectivityManager != null;
         return connectivityManager.getActiveNetworkInfo();
     }
 
