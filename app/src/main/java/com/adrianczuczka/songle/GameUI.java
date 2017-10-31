@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
 
@@ -46,6 +47,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.maps.model.TileOverlay;
+import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -53,6 +56,7 @@ import com.google.maps.android.data.kml.KmlContainer;
 import com.google.maps.android.data.kml.KmlLayer;
 import com.google.maps.android.data.kml.KmlPlacemark;
 import com.google.maps.android.data.kml.KmlPoint;
+import com.google.maps.android.heatmaps.HeatmapTileProvider;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -75,7 +79,11 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
     private final HashMap<Marker, String> MarkerWordMap = new HashMap<>();
     private final HashMap<Marker, String> SuccessWordMap = new HashMap<>();
     private final ArrayList<String> SuccessList = new ArrayList<>();
-
+    private final ArrayList<LatLng> latLngList = new ArrayList<>();
+    private Boolean isHeatmap = false;
+    private Boolean isMarkers = true;
+    HeatmapTileProvider mProvider;
+    TileOverlay mOverlay;
 
     private void startLocationUpdates() {
         try {
@@ -181,7 +189,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
-                if (!MarkerWordMap.isEmpty()) {
+                if (!MarkerWordMap.isEmpty() && isMarkers) {
                     double minDistance = -1;
                     Marker minMarker = null;
                     for (Location location : locationResult.getLocations()) {
@@ -394,6 +402,42 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                 return false;
             }
         });
+        ImageButton heatmapButton = (ImageButton) findViewById(R.id.heatmap_button);
+        heatmapButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!isHeatmap) {
+                    isHeatmap = true;
+                    mProvider = new HeatmapTileProvider.Builder()
+                            .data(latLngList)
+                            .build();
+                    // Add a tile overlay to the map, using the heat map tile provider.
+                    mOverlay = mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
+                }
+                else {
+                    isHeatmap = false;
+                    mOverlay.remove();
+                }
+            }
+        });
+        ImageButton markerButton = (ImageButton) findViewById(R.id.marker_button);
+        markerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!isMarkers) {
+                    isMarkers = true;
+                    for (Marker marker : MarkerWordMap.keySet()) {
+                        marker.setVisible(true);
+                    }
+                }
+                else {
+                    isMarkers = false;
+                    for (Marker marker : MarkerWordMap.keySet()) {
+                        marker.setVisible(false);
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -449,6 +493,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                     if (placemark.getGeometry().getGeometryType().equals("Point")) {
                         KmlPoint point = (KmlPoint) placemark.getGeometry();
                         LatLng latLng = new LatLng(point.getGeometryObject().latitude, point.getGeometryObject().longitude);
+                        latLngList.add(latLng);
                         Marker marker;
                         switch (placemark.getStyleId()) {
                             case "#unclassified":
