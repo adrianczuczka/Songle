@@ -24,12 +24,14 @@
             android:layout_width="320dp"
             android:layout_height="51dp"
             android:layout_marginTop="16dp"
+            android:fontFamily="@font/sniglet_extrabold"
             android:onClick="onClickRandom"
             android:scrollbars="vertical"
-            android:text="@string/random"
+            android:text= "@string/random"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_view"
@@ -38,6 +40,43 @@
             android:layout_marginTop="36dp"
             android:scrollbars="vertical"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/more_songs_text"
+            tools:layout_editor_absoluteX="8dp" />
+
+        <ImageView
+            android:id="@+id/more_songs_arrow_left"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/RandomButton"
+            app:srcCompat="@android:drawable/arrow_down_float" />
+
+        <ImageView
+            android:id="@+id/more_songs_arrow_right"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/RandomButton"
+            app:srcCompat="@android:drawable/arrow_down_float" />
+
+        <TextView
+            android:id="@+id/more_songs_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="2dp"
+            android:fontFamily="@font/sniglet_extrabold"
+            android:text="REPLAY GUESSED SONGS!"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:layout_constraintLeft_toRightOf="@+id/more_songs_arrow_left"
+            app:layout_constraintRight_toLeftOf="@+id/more_songs_arrow_right"
             app:layout_constraintTop_toBottomOf="@+id/RandomButton"
             />
 

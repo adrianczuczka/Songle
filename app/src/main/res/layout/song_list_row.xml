@@ -17,7 +17,8 @@
         android:id="@+id/Number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:fontFamily="@font/sniglet_extrabold"/>
 
     <TextView
         android:id="@+id/Title"
@@ -26,12 +27,14 @@
         android:layout_alignParentTop="true"
         android:textSize="16sp"
         android:textColor="@color/title"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:fontFamily="@font/sniglet_extrabold"/>
 
     <TextView
         android:id="@+id/Artist"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/Title"
-        android:textColor="@color/artist"/>
+        android:textColor="@color/artist"
+        android:fontFamily="@font/sniglet_extrabold"/>
 </RelativeLayout>

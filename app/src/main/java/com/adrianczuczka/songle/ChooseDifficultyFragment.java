@@ -11,6 +11,9 @@ import android.widget.Button;
 
 import java.util.ArrayList;
 
+import static android.R.attr.targetActivity;
+import static android.R.attr.width;
+
 /**
  * Created by adria_000 on 27/10/2017.
  */
