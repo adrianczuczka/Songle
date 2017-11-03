@@ -58,6 +58,7 @@
         android:width="100dp"
         android:elevation="0dp"
         android:fontFamily="@font/sniglet_extrabold"
+        android:onClick="startSettings"
         android:text="@string/welcome_settings_button"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintLeft_toLeftOf="parent"

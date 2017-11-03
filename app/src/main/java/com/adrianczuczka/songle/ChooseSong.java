@@ -44,13 +44,12 @@ public class ChooseSong extends AppCompatActivity {
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         //recyclerView.setAdapter(mAdapter);
-        Intent kmlIntent = new Intent(ChooseSong.this, NetworkActivity.class);
-        kmlIntent.putExtra("url", "http://www.inf.ed.ac.uk/teaching/courses/selp/data/songs/songs.xml");
-        startActivityForResult(kmlIntent, LOAD_XML_REQUEST);
+        Intent xmlIntent = new Intent(ChooseSong.this, NetworkActivity.class);
+        xmlIntent.putExtra("url", "http://www.inf.ed.ac.uk/teaching/courses/selp/data/songs/songs.xml");
+        startActivityForResult(xmlIntent, LOAD_XML_REQUEST);
     }
 
     private class parseXMLTask extends AsyncTask<String, Void, ArrayList<XMLParser.Song>> {
-
         @Override
         protected ArrayList<XMLParser.Song> doInBackground(String... strings) {
             try {

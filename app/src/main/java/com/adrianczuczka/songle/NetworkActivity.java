@@ -5,9 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v4.app.FragmentActivity;
 
 public class NetworkActivity extends FragmentActivity implements DownloadCallback<String> {
 
@@ -40,7 +39,6 @@ public class NetworkActivity extends FragmentActivity implements DownloadCallbac
         // Update your UI here based on result of download.
         Intent resultIntent = new Intent();
         resultIntent.putExtra("string", result);
-        Log.e("gameUI", String.valueOf(getIntent().hasExtra("number")));
         if(getIntent().hasExtra("number")){
             resultIntent.putExtra("number", getIntent().getStringExtra("number"));
         }
