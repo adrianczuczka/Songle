@@ -20,27 +20,13 @@ public class SetTimerPreference extends DialogPreference {
     private TextView hoursWarning = null, minutesWarning = null, secondsWarning = null;
 
     public SetTimerPreference(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
-    }
-
-    public SetTimerPreference(Context context) {
-        this(context, null);
-    }
-
-    public SetTimerPreference(Context context, AttributeSet attrs,
-                              int defStyleAttr) {
-        this(context, attrs, defStyleAttr, defStyleAttr);
-    }
-
-    public SetTimerPreference(Context context, AttributeSet attrs,
-                              int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
+        super(context, attrs);
         setDialogLayoutResource(R.layout.pref_set_time);
         setPositiveButtonText("Set");
         setNegativeButtonText("Cancel");
         setDialogIcon(null);
     }
-
+    
     public int getTotal() {
         return total;
     }

@@ -16,10 +16,15 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
+import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 
 import java.util.List;
 
@@ -183,7 +188,14 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // guidelines.
             //bindPreferenceSummaryToValue(findPreference("set_timer_switch"));
             //bindPreferenceSummaryToValue(findPreference("set_timer_amount"));
-            
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+            View view = super.onCreateView(inflater, container, savedInstanceState);
+            view.setBackgroundColor(ContextCompat.getColor(getActivity(),R.color.cyan));
+
+            return view;
         }
 
         @Override
