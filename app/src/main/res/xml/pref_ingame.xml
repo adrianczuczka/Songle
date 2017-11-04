@@ -20,7 +20,8 @@
         android:key="example_list"
         android:negativeButtonText="Ok"
         android:positiveButtonText="Cancel"
-        android:title="@string/pref_title_choose_map_type" />
+        android:title="@string/pref_title_choose_map_type"
+        android:summary="" />
 
     <SwitchPreference
         android:defaultValue="false"
@@ -28,4 +29,9 @@
         android:summary="@string/pref_description_set_extreme_mode"
         android:title="@string/pref_title_set_extreme_mode"/>
 
+    <EditTextPreference
+        android:key="try_amount"
+        android:title="@string/pref_title_try_amount"
+        android:summary="@string/pref_description_try_amount"
+        android:inputType="number" />
 </PreferenceScreen>

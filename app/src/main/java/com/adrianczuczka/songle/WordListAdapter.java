@@ -37,8 +37,10 @@ public class WordListAdapter extends BaseAdapter{
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        TextView dummyTextView = new TextView(mContext);
-        dummyTextView.setText(getItem(position));
-        return dummyTextView;
+        TextView view = new TextView(mContext);
+        view.setText(getItem(position));
+        view.setTextSize(Float.valueOf("20"));
+        view.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        return view;
     }
 }

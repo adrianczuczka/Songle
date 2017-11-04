@@ -4,15 +4,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
 import java.util.ArrayList;
-
-import static android.R.attr.targetActivity;
-import static android.R.attr.width;
 
 /**
  * Created by adria_000 on 27/10/2017.
@@ -107,6 +105,9 @@ public class ChooseDifficultyFragment extends DialogFragment {
                 dismiss();
             }
         });
+        DisplayMetrics displaymetrics = getResources().getDisplayMetrics();
+        int width = displaymetrics.widthPixels;
+        view.setMinimumWidth(width - 200);
         return view;
     }
 }

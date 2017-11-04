@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -44,8 +43,6 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -227,7 +224,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
         };
         LinearLayout view = (LinearLayout) findViewById(R.id.game_ui_bottom_sheet);
         BottomSheetBehavior mBottomSheetBehavior = BottomSheetBehavior.from(view);
-        mBottomSheetBehavior.setPeekHeight(144);
+        mBottomSheetBehavior.setPeekHeight(130);
 
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         Button showList = (Button) findViewById(R.id.show_list);
@@ -382,10 +379,6 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
         LatLng southWestLatLng = new LatLng(55.942617, -3.192473);
         LatLng centralLatLng = new LatLng(55.944425, -3.188396);
         CameraPosition central = new CameraPosition(centralLatLng, 15, 0, 0);
-        Polyline polyline = mMap.addPolyline(new PolylineOptions()
-                .add(northEastLatLng, northWestLatLng, southWestLatLng, southEastLatLng, northEastLatLng)
-                .width(5)
-                .color(Color.RED));
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(central));
         mMap.setOnMarkerClickListener(new OnMarkerClickListener() {
             @Override

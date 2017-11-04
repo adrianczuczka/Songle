@@ -123,7 +123,8 @@
     </string>
 
 
-    <string name="pref_title_choose_map_type">Choose map type</string>
+    <string name="pref_title_choose_map_type">Choose map type:</string>
+    <string name="pref_description_choose_map_type">Choose between a normal, hybrid, or satellite map</string>
     <string-array name="pref_map_types">
         <item>Normal</item>
         <item>Hybrid</item>
@@ -138,6 +139,8 @@
     <string name="pref_title_set_extreme_mode">EXTREME MODE</string>
     <string name="pref_description_set_extreme_mode">Want the ultimate challenge? 15 minute timer, the hardest maps for every song, only one guess!</string>
 
+    <string name="pref_title_try_amount">Set amount of times you can guess:</string>
+    <string name="pref_description_try_amount">Set the amount of times you can try to guess the song, before it\'s game over</string>
     <!-- Example settings for Data & Sync -->
     <string name="pref_header_data_sync">Data and Sync</string>
 

@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <GridView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/grid"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:numColumns="2"
-    android:background="@color/green"
-    >
-</GridView>
+    android:layout_height="wrap_content"
+    android:background="@drawable/bottom_sheet_border"
+    android:gravity="center"
+    android:numColumns="2" />
