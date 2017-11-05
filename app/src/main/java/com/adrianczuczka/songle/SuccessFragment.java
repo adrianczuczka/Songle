@@ -1,9 +1,8 @@
 package com.adrianczuczka.songle;
 
-import android.support.v4.app.DialogFragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
+import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,13 +13,14 @@ import android.widget.TextView;
  */
 
 public class SuccessFragment extends DialogFragment {
-    int tries, time, hours, minutes, seconds;
+    int tries;
+    long time, hours, minutes, seconds;
 
-    public static SuccessFragment newInstance(int tries, int time) {
+    public static SuccessFragment newInstance(int tries, long time) {
         SuccessFragment successFragment = new SuccessFragment();
         Bundle args = new Bundle();
         args.putInt("tries", tries);
-        args.putInt("time", time);
+        args.putLong("time", time);
         successFragment.setArguments(args);
         return successFragment;
     }
@@ -30,14 +30,10 @@ public class SuccessFragment extends DialogFragment {
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
         tries = args.getInt("tries");
-        time = args.getInt("time");
-        Log.e("time", String.valueOf(time));
+        time = args.getLong("time");
         hours = time / 3600000;
-        Log.e("hours", String.valueOf(hours));
         minutes = (time % 3600000) / 60000;
-        Log.e("minutes", String.valueOf(minutes));
         seconds = (time % 60000) / 1000;
-        Log.e("seconds", String.valueOf(seconds));
     }
 
     @Nullable
@@ -49,15 +45,30 @@ public class SuccessFragment extends DialogFragment {
         TextView timeTaken = view.findViewById(R.id.time_taken);
         congratsText.setText("You finished this map!");
         triesAmount.setText("Attempts needed: " + tries);
-        timeTaken.setText("Time taken: " + format(hours) + ":" + format(minutes) + ":" + format(seconds));
+        timeTaken.setText("Time taken: " + formatTime(time));
         return view;
     }
 
-    private String format(int amount) {
-        if (amount < 10) {
-            return "0" + String.valueOf(amount);
+    private String formatTime(long millis) {
+        long hours = millis / 3600000;
+        long minutes = (millis % 3600000) / 60000;
+        long seconds = (millis % 60000) / 1000;
+        String hoursString, minutesString, secondsString;
+        if (hours < 10) {
+            hoursString = "0" + String.valueOf(hours);
         } else {
-            return String.valueOf(amount);
+            hoursString = String.valueOf(hours);
         }
+        if (minutes < 10) {
+            minutesString = "0" + String.valueOf(minutes);
+        } else {
+            minutesString = String.valueOf(minutes);
+        }
+        if (seconds < 10) {
+            secondsString = "0" + String.valueOf(seconds);
+        } else {
+            secondsString = String.valueOf(seconds);
+        }
+        return hoursString + ":" + minutesString + ":" + secondsString;
     }
 }

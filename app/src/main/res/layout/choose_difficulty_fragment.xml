@@ -8,39 +8,39 @@
         android:id="@+id/very_easy_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/very_easy"
-        android:fontFamily="@font/sniglet_extrabold" />
+        android:fontFamily="@font/sniglet"
+        android:text="@string/very_easy" />
 
     <Button
         android:id="@+id/easy_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/easy"
-        android:fontFamily="@font/sniglet_extrabold" />
+        android:fontFamily="@font/sniglet"
+        android:text="@string/easy" />
 
     <Button
         android:id="@+id/medium_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/medium"
-        android:fontFamily="@font/sniglet_extrabold" />
+        android:fontFamily="@font/sniglet"
+        android:text="@string/medium" />
 
     <Button
         android:id="@+id/hard_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/hard"
-        android:fontFamily="@font/sniglet_extrabold" />
+        android:fontFamily="@font/sniglet"
+        android:text="@string/hard" />
 
     <Button
         android:id="@+id/extreme_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/extreme"
-        android:textColor="@color/red"
+        android:fontFamily="@font/sniglet"
         android:shadowColor="@color/red"
         android:shadowDx="0.0"
         android:shadowDy="0.0"
         android:shadowRadius="5.0"
-        android:fontFamily="@font/sniglet_extrabold" />
+        android:text="@string/extreme"
+        android:textColor="@color/red" />
 </LinearLayout>

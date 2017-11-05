@@ -10,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -116,8 +117,13 @@ public class ChooseSong extends AppCompatActivity {
     }
 
     public void onClickRandom(View view) {
-        int randomNum = ThreadLocalRandom.current().nextInt(0, songList.size() + 1);
-        recyclerView.findViewHolderForAdapterPosition(randomNum).itemView.callOnClick();
+        int randomNum = ThreadLocalRandom.current().nextInt(0, songList.size());
+        try {
+            recyclerView.findViewHolderForAdapterPosition(randomNum).itemView.callOnClick();
+        } catch (NullPointerException e) {
+            Toast toast = Toast.makeText(ChooseSong.this, "Songs have not finished loading yet", Toast.LENGTH_LONG);
+            toast.show();
+        }
     }
 }
 

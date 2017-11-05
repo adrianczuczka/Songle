@@ -1,13 +1,11 @@
 package com.adrianczuczka.songle;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.preference.DialogPreference;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -26,6 +24,7 @@ public class SetTimerPreference extends DialogPreference {
         setDialogLayoutResource(R.layout.pref_set_time);
         setPositiveButtonText("Set");
         setNegativeButtonText("Cancel");
+        setDefaultValue(1800000);
         setDialogIcon(null);
     }
     
@@ -98,6 +97,7 @@ public class SetTimerPreference extends DialogPreference {
             setSummary("currently " + format(hours) + ":" + format(minutes) + ":" + format(seconds));
             if (callChangeListener(total)) {
                 setTotal(total);
+                setDefaultValue(total);
             }
         }
     }

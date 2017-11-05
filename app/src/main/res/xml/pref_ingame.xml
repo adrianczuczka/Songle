@@ -7,6 +7,7 @@
 
 
     <com.adrianczuczka.songle.SetTimerPreference
+        android:defaultValue="1800000"
         android:key="set_timer_amount"
         android:summary="@string/pref_description_set_timer_amount"
         android:title="@string/pref_title_set_timer_amount" />
@@ -17,11 +18,10 @@
         android:defaultValue="1"
         android:entries="@array/pref_map_types"
         android:entryValues="@array/pref_map_type_values"
-        android:key="example_list"
-        android:negativeButtonText="Ok"
-        android:positiveButtonText="Cancel"
+        android:key="set_map_type_list"
+        android:negativeButtonText="Cancel"
         android:title="@string/pref_title_choose_map_type"
-        android:summary="" />
+        android:summary="Choose between normal, hybrid and satellite" />
 
     <SwitchPreference
         android:defaultValue="false"
@@ -29,8 +29,16 @@
         android:summary="@string/pref_description_set_extreme_mode"
         android:title="@string/pref_title_set_extreme_mode"/>
 
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="set_try_switch"
+        android:title="@string/pref_title_try_switch"
+        android:summary="@string/pref_description_try_switch" />
+
+
     <EditTextPreference
-        android:key="try_amount"
+        android:defaultValue="5"
+        android:key="set_try_amount"
         android:title="@string/pref_title_try_amount"
         android:summary="@string/pref_description_try_amount"
         android:inputType="number" />

@@ -1,28 +1,28 @@
 package com.adrianczuczka.songle;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Looper;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.CommonStatusCodes;
@@ -64,9 +64,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
-public class GameUI extends FragmentActivity implements OnMapReadyCallback {
+public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
     private FusedLocationProviderClient mFusedLocationClient;
     private GoogleMap mMap;
     private final Looper looper = Looper.getMainLooper();
@@ -84,7 +85,10 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
     HeatmapTileProvider mProvider;
     TileOverlay mOverlay;
     int tries = 0;
-    int maxTries = -1;
+    boolean isTries, isTimer;
+    int maxTries, timerAmount, timeTaken = 0;
+    long timeStarted;
+    String mapType;
 
     private void startLocationUpdates() {
         try {
@@ -159,6 +163,33 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                     }
                 }
             });
+            mapType = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("set_map_type_list", "1");
+            switch (mapType) {
+                case "1":
+                    break;
+                case "0":
+                    mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                    break;
+                case "-1":
+                    mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+            }
+            isTimer = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("set_timer_switch", false);
+            timerAmount = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getInt("set_timer_amount", 1800000);
+            final TextView timerView = findViewById(R.id.game_ui_timer_view);
+            if (isTimer) {
+                timerView.setVisibility(View.VISIBLE);
+                CountDownTimer countDownTimer = new CountDownTimer(timerAmount, 1000) {
+                    @Override
+                    public void onTick(long l) {
+                        timerView.setText(formatTime(l));
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        //timer done
+                    }
+                }.start();
+            }
             /*Intent kmlIntent = new Intent(GameUI.this, NetworkActivity.class);
             kmlIntent.putExtra("url", "http://www.inf.ed.ac.uk/teaching/courses/selp/data/songs/01/map1.kml");
             startActivityForResult(kmlIntent, LOAD_KML_REQUEST);*/
@@ -181,7 +212,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
         tabLayout.setupWithViewPager(viewPager);
 
         EXPERIMENTAL*/
-
+        timeStarted = new Date().getTime();
         final SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -227,9 +258,11 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                 }
             }
         };
+        isTries = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("set_try_switch", false);
+        maxTries = Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("set_try_amount", "5"));
         LinearLayout view = (LinearLayout) findViewById(R.id.game_ui_bottom_sheet);
         BottomSheetBehavior mBottomSheetBehavior = BottomSheetBehavior.from(view);
-        mBottomSheetBehavior.setPeekHeight(130);
+        mBottomSheetBehavior.setPeekHeight(125);
 
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         Button showList = (Button) findViewById(R.id.show_list);
@@ -245,14 +278,35 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
             @Override
             public void onClick(View v) {
                 EditText answerInput = (EditText) findViewById(R.id.guess_song_input);
+                final TextView triesView = findViewById(R.id.game_ui_tries_amount);
                 String answer = answerInput.getText().toString();
                 String title = getIntent().getStringExtra("title");
                 Log.e("levDistance", String.valueOf(levDistance(answer, title)));
                 if (levDistance(answer, title) <= 2) {
-                    SuccessFragment successFragment = SuccessFragment.newInstance(5, 1800000);
-                    successFragment.show(getSupportFragmentManager(), "hello");
+                    SuccessFragment successFragment = SuccessFragment.newInstance(tries, new Date().getTime() - timeStarted);
+                    successFragment.show(getSupportFragmentManager(), "success");
                 } else {
-                    Log.e("incorrect", "still success");
+                    tries++;
+                    if (isTries) {
+                        if (tries < maxTries) {
+                            triesView.setText("Attempts left: " + (maxTries - tries));
+                        } else {
+                            //game over
+                        }
+                    } else {
+                        triesView.setVisibility(View.VISIBLE);
+                        new CountDownTimer(5000, 1000) {
+                            @Override
+                            public void onTick(long l) {
+
+                            }
+
+                            @Override
+                            public void onFinish() {
+                                triesView.setVisibility(View.GONE);
+                            }
+                        }.start();
+                    }
                 }
             }
         });
@@ -266,6 +320,52 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
                 .addLocationRequest(mLocationRequest);
                 */
+    }
+
+    private String formatTime(int millis) {
+        int hours = millis / 3600000;
+        int minutes = (millis % 3600000) / 60000;
+        int seconds = (millis % 60000) / 1000;
+        String hoursString, minutesString, secondsString;
+        if (hours < 10) {
+            hoursString = "0" + String.valueOf(hours);
+        } else {
+            hoursString = String.valueOf(hours);
+        }
+        if (minutes < 10) {
+            minutesString = "0" + String.valueOf(minutes);
+        } else {
+            minutesString = String.valueOf(minutes);
+        }
+        if (seconds < 10) {
+            secondsString = "0" + String.valueOf(seconds);
+        } else {
+            secondsString = String.valueOf(seconds);
+        }
+        return hoursString + ":" + minutesString + ":" + secondsString;
+    }
+
+    private String formatTime(long millis) {
+        long hours = millis / 3600000;
+        long minutes = (millis % 3600000) / 60000;
+        long seconds = (millis % 60000) / 1000;
+        String hoursString, minutesString, secondsString;
+        if (hours < 10) {
+            hoursString = "0" + String.valueOf(hours);
+        } else {
+            hoursString = String.valueOf(hours);
+        }
+        if (minutes < 10) {
+            minutesString = "0" + String.valueOf(minutes);
+        } else {
+            minutesString = String.valueOf(minutes);
+        }
+        if (seconds < 10) {
+            secondsString = "0" + String.valueOf(seconds);
+        } else {
+            secondsString = String.valueOf(seconds);
+        }
+        return hoursString + ":" + minutesString + ":" + secondsString;
     }
 
     private int levDistance(String a, String b) {
@@ -378,6 +478,13 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
             //}
         } else {
             mapReadyFunction();
+        }
+        TextView triesView = findViewById(R.id.game_ui_tries_amount);
+        if (isTries) {
+            triesView.setText("Attempts left: " + maxTries);
+        } else {
+            triesView.setVisibility(View.GONE);
+            triesView.setText("Incorrect! Try again");
         }
         Log.e("defaultprefs", PreferenceManager.getDefaultSharedPreferences(GameUI.this).getAll().toString());
         LatLng northWestLatLng = new LatLng(55.946233, -3.192473);

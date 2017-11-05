@@ -11,13 +11,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
-        android:inputType="number"
-        android:hint="Hours" />
+        android:fontFamily="@font/sniglet"
+        android:hint="Hours"
+        android:inputType="number" />
 
     <TextView
         android:id="@+id/hours_warning"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/sniglet"
         android:gravity="center"
         android:text="Please enter a value between 0 and 99."
         android:textColor="@android:color/holo_red_dark"
@@ -28,13 +30,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
-        android:inputType="number"
-        android:hint="Minutes" />
+        android:fontFamily="@font/sniglet"
+        android:hint="Minutes"
+        android:inputType="number" />
 
     <TextView
         android:id="@+id/minutes_warning"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/sniglet"
         android:gravity="center"
         android:text="Please enter a value between 0 and 59."
         android:textColor="@android:color/holo_red_dark"
@@ -45,13 +49,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
-        android:inputType="number"
-        android:hint="Seconds" />
+        android:fontFamily="@font/sniglet"
+        android:hint="Seconds"
+        android:inputType="number" />
 
     <TextView
         android:id="@+id/seconds_warning"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/sniglet"
         android:gravity="center"
         android:text="Please enter a value between 0 and 59."
         android:textColor="@android:color/holo_red_dark"

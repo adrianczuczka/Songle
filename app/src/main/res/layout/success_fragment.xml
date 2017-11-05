@@ -1,38 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bottom_sheet_border"
     android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <Button
-        android:id="@+id/finish_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="260dp"
-        android:text="FINISH"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/congrats_title" />
+    android:padding="20dp"
+    tools:layout_editor_absoluteX="0dp"
+    tools:layout_editor_absoluteY="0dp">
 
     <TextView
         android:id="@+id/congrats_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="88dp"
         android:fontFamily="@font/sniglet_extrabold"
-        android:text="CONGRATULATIONS"
-        android:textSize="30sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="CONGRATULATIONS!"
+        android:textColor="@color/green"
+        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.134" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/congrats_text"
@@ -42,7 +31,8 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="TextView"
+        android:fontFamily="@font/sniglet"
+        android:text=""
         app:layout_constraintBottom_toTopOf="@+id/finish_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -57,7 +47,8 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="TextView"
+        android:fontFamily="@font/sniglet"
+        android:text=""
         app:layout_constraintBottom_toTopOf="@+id/time_taken"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -70,8 +61,42 @@
         android:layout_marginBottom="48dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:text="TextView"
+        android:fontFamily="@font/sniglet"
+        android:text=""
         app:layout_constraintBottom_toTopOf="@+id/finish_button"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/finish_button"
+        android:layout_width="150dp"
+        android:layout_height="60dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="260dp"
+        android:text="finish"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/congrats_title" />
+
+    <ImageView
+        android:id="@+id/success_fragment_party_emoji_2"
+        android:layout_width="74dp"
+        android:layout_height="55dp"
+        android:layout_marginBottom="12dp"
+        android:layout_marginEnd="16dp"
+        android:src="@mipmap/party_emoji"
+        app:layout_constraintBottom_toTopOf="@+id/congrats_title"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageView
+        android:id="@+id/success_fragment_party_emoji_1"
+        android:layout_width="76dp"
+        android:layout_height="57dp"
+        android:layout_marginBottom="32dp"
+        android:layout_marginStart="16dp"
+        android:scaleX="-1"
+        android:src="@mipmap/party_emoji"
+        app:layout_constraintBottom_toTopOf="@+id/congrats_title"
         app:layout_constraintStart_toStartOf="parent" />
 </android.support.constraint.ConstraintLayout>

@@ -25,22 +25,40 @@
 
         <ImageButton
             android:id="@+id/heatmap_button"
-            android:layout_width="55dp"
-            android:layout_height="55dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
+            android:background="@drawable/image_button_style"
             android:src="@mipmap/heatmap" />
 
         <ImageButton
             android:id="@+id/marker_button"
-            android:layout_width="55dp"
-            android:layout_height="55dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_alignStart="@+id/heatmap_button"
-            android:layout_alignTop="@+id/heatmap_button"
-            android:layout_marginTop="48dp"
-            android:src="@mipmap/default_marker" />
+            android:layout_below="@+id/heatmap_button"
+            android:layout_marginTop="11dp"
+            android:background="@drawable/image_button_style"
+            android:src="@mipmap/default_marker"
+            tools:ignore="ContentDescription" />
+
+        <TextView
+            android:id="@+id/game_ui_timer_view"
+            style="@style/Widget.AppCompat.ImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/marker_button"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="11dp"
+            android:background="@drawable/image_button_style"
+            android:fontFamily="@font/orbitron"
+            android:padding="5dp"
+            android:text=""
+            android:textSize="25sp"
+            android:visibility="gone" />
     </android.widget.RelativeLayout>
 
     <LinearLayout
@@ -62,19 +80,23 @@
                 android:id="@+id/game_ui_arrow_left"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:src="@drawable/arrow_down" />
+                android:src="@drawable/arrow_down"
+                tools:ignore="ContentDescription" />
 
             <ImageView
                 android:id="@+id/game_ui_arrow_right"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_alignParentEnd="true"
-                android:src="@drawable/arrow_down" />
+                android:src="@drawable/arrow_down"
+                tools:ignore="ContentDescription" />
         </RelativeLayout>
+
         <Button
             android:id="@+id/show_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/sniglet"
             android:text="@string/show_list" />
 
         <LinearLayout
@@ -87,13 +109,24 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
+                android:fontFamily="@font/sniglet"
                 android:hint="@string/guess_song_hint"
                 android:inputType="textNoSuggestions" />
+
+            <TextView
+                android:id="@+id/game_ui_tries_amount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:fontFamily="@font/sniglet"
+                android:text=""
+                android:textColor="@color/red" />
 
             <Button
                 android:id="@+id/guess_song"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/sniglet"
                 android:text="@string/guess_song" />
         </LinearLayout>
     </LinearLayout>
