@@ -1,8 +1,9 @@
 package com.adrianczuczka.songle;
 
-import android.app.DialogFragment;
+import android.support.v4.app.DialogFragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +14,7 @@ import android.widget.TextView;
  */
 
 public class SuccessFragment extends DialogFragment {
-    int tries, time;
+    int tries, time, hours, minutes, seconds;
 
     public static SuccessFragment newInstance(int tries, int time) {
         SuccessFragment successFragment = new SuccessFragment();
@@ -30,6 +31,13 @@ public class SuccessFragment extends DialogFragment {
         Bundle args = getArguments();
         tries = args.getInt("tries");
         time = args.getInt("time");
+        Log.e("time", String.valueOf(time));
+        hours = time / 3600000;
+        Log.e("hours", String.valueOf(hours));
+        minutes = (time % 3600000) / 60000;
+        Log.e("minutes", String.valueOf(minutes));
+        seconds = (time % 60000) / 1000;
+        Log.e("seconds", String.valueOf(seconds));
     }
 
     @Nullable
@@ -41,7 +49,15 @@ public class SuccessFragment extends DialogFragment {
         TextView timeTaken = view.findViewById(R.id.time_taken);
         congratsText.setText("You finished this map!");
         triesAmount.setText("Attempts needed: " + tries);
-        timeTaken.setText("Time taken: " + time);
+        timeTaken.setText("Time taken: " + format(hours) + ":" + format(minutes) + ":" + format(seconds));
         return view;
+    }
+
+    private String format(int amount) {
+        if (amount < 10) {
+            return "0" + String.valueOf(amount);
+        } else {
+            return String.valueOf(amount);
+        }
     }
 }

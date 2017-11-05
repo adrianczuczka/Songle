@@ -1,6 +1,7 @@
 package com.adrianczuczka.songle;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
@@ -8,6 +9,8 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Looper;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.ActivityCompat;
@@ -80,6 +83,8 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
     private Boolean isMarkers = true;
     HeatmapTileProvider mProvider;
     TileOverlay mOverlay;
+    int tries = 0;
+    int maxTries = -1;
 
     private void startLocationUpdates() {
         try {
@@ -244,7 +249,8 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
                 String title = getIntent().getStringExtra("title");
                 Log.e("levDistance", String.valueOf(levDistance(answer, title)));
                 if (levDistance(answer, title) <= 2) {
-                    Log.e("success", "SUCCESS");
+                    SuccessFragment successFragment = SuccessFragment.newInstance(5, 1800000);
+                    successFragment.show(getSupportFragmentManager(), "hello");
                 } else {
                     Log.e("incorrect", "still success");
                 }
@@ -373,6 +379,7 @@ public class GameUI extends FragmentActivity implements OnMapReadyCallback {
         } else {
             mapReadyFunction();
         }
+        Log.e("defaultprefs", PreferenceManager.getDefaultSharedPreferences(GameUI.this).getAll().toString());
         LatLng northWestLatLng = new LatLng(55.946233, -3.192473);
         LatLng northEastLatLng = new LatLng(55.946233, -3.184319);
         LatLng southEastLatLng = new LatLng(55.942617, -3.184319);
