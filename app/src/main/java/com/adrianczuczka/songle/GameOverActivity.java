@@ -16,9 +16,9 @@ public class GameOverActivity extends AppCompatActivity {
         setContentView(R.layout.activity_game_over);
         TextView reason = findViewById(R.id.game_over_reason);
         if (getIntent().hasExtra("timer")) {
-            reason.setText("You ran out of time.");
+            reason.setText("You ran out of time!");
         } else if (getIntent().hasExtra("tries")) {
-            reason.setText("You ran out of attempts");
+            reason.setText("You ran out of attempts!");
         }
     }
 }
