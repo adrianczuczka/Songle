@@ -34,7 +34,7 @@ public class WordListFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.word_list_fragment, container, false);
-        GridView grid = (GridView) view.findViewById(R.id.grid);
+        GridView grid = view.findViewById(R.id.grid);
         WordListAdapter wordListAdapter = new WordListAdapter(getActivity(), wordList);
         grid.setAdapter(wordListAdapter);
         return view;

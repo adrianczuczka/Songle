@@ -13,7 +13,6 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -68,20 +67,14 @@ import java.util.Date;
 import java.util.HashMap;
 
 public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
-    private FusedLocationProviderClient mFusedLocationClient;
-    private GoogleMap mMap;
+    private static final int LOAD_KML_REQUEST = 1;
     private final Looper looper = Looper.getMainLooper();
     private final LocationRequest mLocationRequest = new LocationRequest();
     private final LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
-    private boolean mRequestingLocationUpdates;
-    private LocationCallback mLocationCallback;
-    private static final int LOAD_KML_REQUEST = 1;
     private final HashMap<Marker, String> MarkerWordMap = new HashMap<>();
     private final HashMap<Marker, String> SuccessWordMap = new HashMap<>();
     private final ArrayList<String> SuccessList = new ArrayList<>();
     private final ArrayList<LatLng> latLngList = new ArrayList<>();
-    private Boolean isHeatmap = false;
-    private Boolean isMarkers = true;
     HeatmapTileProvider mProvider;
     TileOverlay mOverlay;
     int tries = 0;
@@ -89,6 +82,12 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
     int maxTries, timerAmount, timeTaken = 0;
     long timeStarted;
     String mapType;
+    private FusedLocationProviderClient mFusedLocationClient;
+    private GoogleMap mMap;
+    private boolean mRequestingLocationUpdates;
+    private LocationCallback mLocationCallback;
+    private Boolean isHeatmap = false;
+    private Boolean isMarkers = true;
 
     private void startLocationUpdates() {
         try {
@@ -186,6 +185,9 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
 
                     @Override
                     public void onFinish() {
+                        Intent intent = new Intent(GameUI.this, GameOverActivity.class);
+                        intent.putExtra("timer", "timer");
+                        startActivity(intent);
                         //timer done
                     }
                 }.start();
@@ -260,24 +262,24 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         };
         isTries = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("set_try_switch", false);
         maxTries = Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("set_try_amount", "5"));
-        LinearLayout view = (LinearLayout) findViewById(R.id.game_ui_bottom_sheet);
+        LinearLayout view = findViewById(R.id.game_ui_bottom_sheet);
         BottomSheetBehavior mBottomSheetBehavior = BottomSheetBehavior.from(view);
         mBottomSheetBehavior.setPeekHeight(125);
 
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        Button showList = (Button) findViewById(R.id.show_list);
+        Button showList = findViewById(R.id.show_list);
         showList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DialogFragment wordListFragment = WordListFragment.newInstance(SuccessList);
+                WordListFragment wordListFragment = WordListFragment.newInstance(SuccessList);
                 wordListFragment.show(getSupportFragmentManager(), "hello");
             }
         });
-        Button guessSong = (Button) findViewById(R.id.guess_song);
+        Button guessSong = findViewById(R.id.guess_song);
         guessSong.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EditText answerInput = (EditText) findViewById(R.id.guess_song_input);
+                EditText answerInput = findViewById(R.id.guess_song_input);
                 final TextView triesView = findViewById(R.id.game_ui_tries_amount);
                 String answer = answerInput.getText().toString();
                 String title = getIntent().getStringExtra("title");
@@ -291,7 +293,9 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                         if (tries < maxTries) {
                             triesView.setText("Attempts left: " + (maxTries - tries));
                         } else {
-                            //game over
+                            Intent intent = new Intent(GameUI.this, GameOverActivity.class);
+                            intent.putExtra("tries", "tries");
+                            startActivity(intent);
                         }
                     } else {
                         triesView.setVisibility(View.VISIBLE);
@@ -510,35 +514,33 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                 return false;
             }
         });
-        ImageButton heatmapButton = (ImageButton) findViewById(R.id.heatmap_button);
+        ImageButton heatmapButton = findViewById(R.id.heatmap_button);
         heatmapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!isHeatmap) {
+                if (!isHeatmap) {
                     isHeatmap = true;
                     mProvider = new HeatmapTileProvider.Builder()
                             .data(latLngList)
                             .build();
                     // Add a tile overlay to the map, using the heat map tile provider.
                     mOverlay = mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
-                }
-                else {
+                } else {
                     isHeatmap = false;
                     mOverlay.remove();
                 }
             }
         });
-        ImageButton markerButton = (ImageButton) findViewById(R.id.marker_button);
+        ImageButton markerButton = findViewById(R.id.marker_button);
         markerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!isMarkers) {
+                if (!isMarkers) {
                     isMarkers = true;
                     for (Marker marker : MarkerWordMap.keySet()) {
                         marker.setVisible(true);
                     }
-                }
-                else {
+                } else {
                     isMarkers = false;
                     for (Marker marker : MarkerWordMap.keySet()) {
                         marker.setVisible(false);
@@ -576,6 +578,37 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                 new createKMLtask().execute(kml);
             }
         }
+    }
+
+    private String findLyric(String lyrics, String wordLoc) {
+        String[] coordinates = wordLoc.split(":");
+        String result;
+        String[] lines = lyrics.split("[0-9]+\t");
+        result = lines[Integer.parseInt(coordinates[0])].split("\\s")[Integer.parseInt(coordinates[1]) - 1];
+        return result;
+    }
+
+    private int getMarkerStyle(MarkerInfo markerInfo) {
+        String key = markerInfo.key;
+        int result = 0;
+        switch (key) {
+            case "unclassified":
+                result = R.mipmap.white_blank;
+                break;
+            case "boring":
+                result = R.mipmap.yellow_blank;
+                break;
+            case "not boring":
+                result = R.mipmap.yellow_circle;
+                break;
+            case "interesting":
+                result = R.mipmap.orange_diamond;
+                break;
+            case "very interesting":
+                result = R.mipmap.red_stars;
+                break;
+        }
+        return result;
     }
 
     private class createKMLtask extends AsyncTask<String, Void, KmlLayer> {
@@ -650,37 +683,6 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
             }
             kmlLayer.removeLayerFromMap();
         }
-    }
-
-    private String findLyric(String lyrics, String wordLoc) {
-        String[] coordinates = wordLoc.split(":");
-        String result;
-        String[] lines = lyrics.split("[0-9]+\t");
-        result = lines[Integer.parseInt(coordinates[0])].split("\\s")[Integer.parseInt(coordinates[1]) - 1];
-        return result;
-    }
-
-    private int getMarkerStyle(MarkerInfo markerInfo) {
-        String key = markerInfo.key;
-        int result = 0;
-        switch (key) {
-            case "unclassified":
-                result = R.mipmap.white_blank;
-                break;
-            case "boring":
-                result = R.mipmap.yellow_blank;
-                break;
-            case "not boring":
-                result = R.mipmap.yellow_circle;
-                break;
-            case "interesting":
-                result = R.mipmap.orange_diamond;
-                break;
-            case "very interesting":
-                result = R.mipmap.red_stars;
-                break;
-        }
-        return result;
     }
 
     public class MarkerInfo {

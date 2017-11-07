@@ -45,11 +45,11 @@ public class ChooseDifficultyFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.choose_difficulty_fragment, container, false);
-        Button veryEasyButton = (Button) view.findViewById(R.id.very_easy_button);
-        Button easyButton = (Button) view.findViewById(R.id.easy_button);
-        Button mediumButton = (Button) view.findViewById(R.id.medium_button);
-        Button hardButton = (Button) view.findViewById(R.id.hard_button);
-        Button extremeButton = (Button) view.findViewById(R.id.extreme_button);
+        Button veryEasyButton = view.findViewById(R.id.very_easy_button);
+        Button easyButton = view.findViewById(R.id.easy_button);
+        Button mediumButton = view.findViewById(R.id.medium_button);
+        Button hardButton = view.findViewById(R.id.hard_button);
+        Button extremeButton = view.findViewById(R.id.extreme_button);
         veryEasyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -166,6 +166,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
             View view = super.onCreateView(inflater, container, savedInstanceState);
+            assert view != null;
             view.setBackgroundColor(ContextCompat.getColor(getActivity(),R.color.cyan));
 
             return view;
@@ -183,9 +184,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         }
     }
 
-    /**
-     * This fragment shows notification preferences only. It is used when the
-     * activity is showing a two-pane settings UI.
+    /*
+      This fragment shows notification preferences only. It is used when the
+      activity is showing a two-pane settings UI.
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static class NotificationPreferenceFragment extends PreferenceFragment {

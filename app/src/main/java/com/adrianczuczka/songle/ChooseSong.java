@@ -38,7 +38,7 @@ public class ChooseSong extends AppCompatActivity {
         if(getSupportActionBar() != null){
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }*/
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        recyclerView = findViewById(R.id.recycler_view);
 
         //mAdapter = new SongsAdapter(songList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -106,8 +106,8 @@ public class ChooseSong extends AppCompatActivity {
     }
 
     public void onClickSong(View view) {
-        TextView numberView = (TextView) view.findViewById(R.id.Number);
-        TextView titleView = (TextView) view.findViewById(R.id.Title);
+        TextView numberView = view.findViewById(R.id.Number);
+        TextView titleView = view.findViewById(R.id.Title);
         Intent kmlIntent = new Intent(ChooseSong.this, NetworkActivity.class);
         kmlIntent.putExtra("url", "http://www.inf.ed.ac.uk/teaching/courses/selp/data/songs/" + String.valueOf(numberView.getText()) + "/");
         kmlIntent.putExtra("number", String.valueOf(numberView.getText()));

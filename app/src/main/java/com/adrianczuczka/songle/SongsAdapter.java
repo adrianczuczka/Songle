@@ -3,11 +3,13 @@ package com.adrianczuczka.songle;
 /*
   Created by s1550570 on 08/10/17.
  */
+
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import java.util.List;
 
 
@@ -21,9 +23,9 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.MyViewHolder
         public final TextView title;
         public MyViewHolder(View view) {
             super(view);
-            number = (TextView) view.findViewById(R.id.Number);
-            artist = (TextView) view.findViewById(R.id.Artist);
-            title = (TextView) view.findViewById(R.id.Title);
+            number = view.findViewById(R.id.Number);
+            artist = view.findViewById(R.id.Artist);
+            title = view.findViewById(R.id.Title);
         }
     }
 

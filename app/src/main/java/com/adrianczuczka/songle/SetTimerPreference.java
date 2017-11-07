@@ -137,7 +137,7 @@ public class SetTimerPreference extends DialogPreference {
                     secondsWarning.setVisibility(View.GONE);
                     return null;
                 }
-            } catch (NumberFormatException nfe) {
+            } catch (NumberFormatException ignored) {
             }
             switch (view) {
                 case "editTextHours":
