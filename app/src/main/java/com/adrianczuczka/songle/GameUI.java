@@ -3,24 +3,29 @@ package com.adrianczuczka.songle;
 import android.Manifest;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Looper;
+import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.ArraySet;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ShareActionProvider;
 import android.widget.TextView;
 
 import com.google.android.gms.common.api.ApiException;
@@ -63,8 +68,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
     private static final int LOAD_KML_REQUEST = 1;
@@ -79,7 +88,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
     TileOverlay mOverlay;
     int tries = 0;
     boolean isTries, isTimer;
-    int maxTries, timerAmount, timeTaken = 0;
+    int maxTries, timerAmount;
     long timeStarted;
     String mapType;
     private FusedLocationProviderClient mFusedLocationClient;
@@ -88,6 +97,8 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
     private LocationCallback mLocationCallback;
     private Boolean isHeatmap = false;
     private Boolean isMarkers = true;
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editor;
 
     private void startLocationUpdates() {
         try {
@@ -131,8 +142,13 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                     // All location settings are satisfied. The client can initialize
                     // location requests here.
                     // ...
-                    String kml = getIntent().getStringExtra("kml");
-                    new createKMLtask().execute(kml);
+                    if(getIntent().getBooleanExtra("resumed", false)){
+                        sharedPreferences.getStringSet("successList", null);
+                    }
+                    else {
+                        String kml = getIntent().getStringExtra("kml");
+                        new createKMLtask().execute(kml);
+                    }
                     startLocationUpdates();
                 }
             });
@@ -214,6 +230,14 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         tabLayout.setupWithViewPager(viewPager);
 
         EXPERIMENTAL*/
+        Log.e("lyrics", getIntent().getStringExtra("lyrics"));
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        editor = sharedPreferences.edit();
+        editor.putString("lyrics", getIntent().getStringExtra("lyrics"));
+        editor.putString("kml", getIntent().getStringExtra("kml"));
+        editor.putString("title", getIntent().getStringExtra("title"));
+        SuccessList.addAll(sharedPreferences.getStringSet("successList", new HashSet<String>()));
+        editor.commit();
         timeStarted = new Date().getTime();
         final SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -260,12 +284,11 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                 }
             }
         };
-        isTries = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("set_try_switch", false);
-        maxTries = Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("set_try_amount", "5"));
+        isTries = sharedPreferences.getBoolean("set_try_switch", false);
+        maxTries = Integer.valueOf(sharedPreferences.getString("set_try_amount", "5"));
         LinearLayout view = findViewById(R.id.game_ui_bottom_sheet);
         BottomSheetBehavior mBottomSheetBehavior = BottomSheetBehavior.from(view);
         mBottomSheetBehavior.setPeekHeight(125);
-
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         Button showList = findViewById(R.id.show_list);
         showList.setOnClickListener(new View.OnClickListener() {
@@ -431,7 +454,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         @Override
         public CharSequence getPageTitle(int position) {
             return fragmentTitles.get(position);
-        }
+        }onback
 
         public void addFragment(Fragment fragment, String name) {
             fragmentList.add(fragment);
@@ -439,9 +462,21 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         }
     }
     */
-    protected void onPause() {
-        super.onPause();
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        mMap.clear();
         stopLocationUpdates();
+        Intent intent = new Intent(GameUI.this, WelcomeScreen.class);
+        startActivity(intent);
+        this.finish();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        finish();
     }
 
     private void stopLocationUpdates() {
@@ -502,12 +537,18 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
             @Override
             public boolean onMarkerClick(Marker marker) {
                 MarkerInfo markerInfo = (MarkerInfo) marker.getTag();
+                //DEBUGGING
                 SuccessList.add(MarkerWordMap.get(marker));
+                editor.putStringSet("successList", new HashSet<>(SuccessList));
+                editor.commit();
+                //DEBUGGING
                 assert markerInfo != null;
                 if (markerInfo.isGreen) {
                     //success!
                     SuccessWordMap.put(marker, MarkerWordMap.get(marker));
                     SuccessList.add(MarkerWordMap.get(marker));
+                    editor.putStringSet("successList", new HashSet<>(SuccessList));
+                    editor.commit();
                     MarkerWordMap.remove(marker);
                     marker.remove();
                 }
@@ -569,7 +610,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         }
     }
     //EXPERIMENTAL
-
+    /*
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == LOAD_KML_REQUEST) {
@@ -579,7 +620,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
             }
         }
     }
-
+    */
     private String findLyric(String lyrics, String wordLoc) {
         String[] coordinates = wordLoc.split(":");
         String result;
@@ -631,52 +672,58 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
             }
             for (KmlContainer containers : kmlLayer.getContainers()) {
                 for (KmlPlacemark placemark : containers.getPlacemarks()) {
+                    Log.e("successList", SuccessList.toString());
+                    Log.e("markerMap", MarkerWordMap.values().toString());
+                    Log.e("latlng", latLngList.toString());
                     if (placemark.getGeometry().getGeometryType().equals("Point")) {
                         KmlPoint point = (KmlPoint) placemark.getGeometry();
                         LatLng latLng = new LatLng(point.getGeometryObject().latitude, point.getGeometryObject().longitude);
                         latLngList.add(latLng);
-                        Marker marker;
-                        switch (placemark.getStyleId()) {
-                            case "#unclassified":
-                                marker = mMap.addMarker(new MarkerOptions()
-                                        .position(latLng)
-                                        .icon(BitmapDescriptorFactory.fromResource(R.mipmap.white_blank))
-                                        .title("unclassified"));
-                                marker.setTag(new MarkerInfo("unclassified"));
-                                MarkerWordMap.put(marker, findLyric(getIntent().getStringExtra("lyrics"), placemark.getProperty("name")));
-                                break;
-                            case "#boring":
-                                marker = mMap.addMarker(new MarkerOptions()
-                                        .position(latLng)
-                                        .icon(BitmapDescriptorFactory.fromResource(R.mipmap.yellow_blank))
-                                        .title("boring"));
-                                marker.setTag(new MarkerInfo("boring"));
-                                MarkerWordMap.put(marker, findLyric(getIntent().getStringExtra("lyrics"), placemark.getProperty("name")));
-                                break;
-                            case "#notboring":
-                                marker = mMap.addMarker(new MarkerOptions()
-                                        .position(latLng)
-                                        .icon(BitmapDescriptorFactory.fromResource(R.mipmap.yellow_circle))
-                                        .title("not boring"));
-                                marker.setTag(new MarkerInfo("not boring"));
-                                MarkerWordMap.put(marker, findLyric(getIntent().getStringExtra("lyrics"), placemark.getProperty("name")));
-                                break;
-                            case "#interesting":
-                                marker = mMap.addMarker(new MarkerOptions()
-                                        .position(latLng)
-                                        .icon(BitmapDescriptorFactory.fromResource(R.mipmap.orange_diamond))
-                                        .title("interesting"));
-                                marker.setTag(new MarkerInfo("interesting"));
-                                MarkerWordMap.put(marker, findLyric(getIntent().getStringExtra("lyrics"), placemark.getProperty("name")));
-                                break;
-                            case "#veryinteresting":
-                                marker = mMap.addMarker(new MarkerOptions()
-                                        .position(latLng)
-                                        .icon(BitmapDescriptorFactory.fromResource(R.mipmap.red_stars))
-                                        .title("very interesting"));
-                                marker.setTag(new MarkerInfo("very interesting"));
-                                MarkerWordMap.put(marker, findLyric(getIntent().getStringExtra("lyrics"), placemark.getProperty("name")));
-                                break;
+                        String lyric = findLyric(getIntent().getStringExtra("lyrics"), placemark.getProperty("name"));
+                        if(!SuccessList.contains(lyric)){
+                            Marker marker;
+                            switch (placemark.getStyleId()) {
+                                case "#unclassified":
+                                    marker = mMap.addMarker(new MarkerOptions()
+                                            .position(latLng)
+                                            .icon(BitmapDescriptorFactory.fromResource(R.mipmap.white_blank))
+                                            .title("unclassified"));
+                                    marker.setTag(new MarkerInfo("unclassified"));
+                                    MarkerWordMap.put(marker, lyric);
+                                    break;
+                                case "#boring":
+                                    marker = mMap.addMarker(new MarkerOptions()
+                                            .position(latLng)
+                                            .icon(BitmapDescriptorFactory.fromResource(R.mipmap.yellow_blank))
+                                            .title("boring"));
+                                    marker.setTag(new MarkerInfo("boring"));
+                                    MarkerWordMap.put(marker, lyric);
+                                    break;
+                                case "#notboring":
+                                    marker = mMap.addMarker(new MarkerOptions()
+                                            .position(latLng)
+                                            .icon(BitmapDescriptorFactory.fromResource(R.mipmap.yellow_circle))
+                                            .title("not boring"));
+                                    marker.setTag(new MarkerInfo("not boring"));
+                                    MarkerWordMap.put(marker, lyric);
+                                    break;
+                                case "#interesting":
+                                    marker = mMap.addMarker(new MarkerOptions()
+                                            .position(latLng)
+                                            .icon(BitmapDescriptorFactory.fromResource(R.mipmap.orange_diamond))
+                                            .title("interesting"));
+                                    marker.setTag(new MarkerInfo("interesting"));
+                                    MarkerWordMap.put(marker, lyric);
+                                    break;
+                                case "#veryinteresting":
+                                    marker = mMap.addMarker(new MarkerOptions()
+                                            .position(latLng)
+                                            .icon(BitmapDescriptorFactory.fromResource(R.mipmap.red_stars))
+                                            .title("very interesting"));
+                                    marker.setTag(new MarkerInfo("very interesting"));
+                                    MarkerWordMap.put(marker, lyric);
+                                    break;
+                            }
                         }
                     }
                 }

@@ -101,6 +101,7 @@ public class ChooseSong extends AppCompatActivity {
                 mapIntent.putExtra("kml", kml);
                 mapIntent.putExtra("title", title);
                 startActivity(mapIntent);
+                finish();
             }
         }
     }

@@ -57,7 +57,7 @@
         android:layout_marginRight="8dp"
         android:text="@string/welcome_resume_button"
         android:fontFamily="@font/sniglet_extrabold"
-        android:onClick="startChooseSong"
+        android:onClick="startResumeSong"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintHorizontal_bias="0.502"
