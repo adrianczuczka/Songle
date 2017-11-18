@@ -1,12 +1,12 @@
 package com.adrianczuczka.songle;
 
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.support.annotation.Nullable;
 
 import java.io.IOException;

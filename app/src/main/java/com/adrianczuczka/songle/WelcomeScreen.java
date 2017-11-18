@@ -52,9 +52,6 @@ public class WelcomeScreen extends AppCompatActivity {
             startActivity(mapIntent);
             finish();
         }
-        Log.e("false", lyrics);
-        Log.e("false", kml);
-        Log.e("false", title);
     }
 
     public void startSettings(View view) {
