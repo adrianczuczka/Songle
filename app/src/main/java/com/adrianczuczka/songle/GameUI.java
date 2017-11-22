@@ -301,7 +301,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                 String title = getIntent().getStringExtra("title");
                 Log.e("levDistance", String.valueOf(levDistance(answer, title)));
                 if (levDistance(answer, title) <= 2) {
-                    SuccessFragment successFragment = SuccessFragment.newInstance(tries, new Date().getTime() - timeStarted);
+                    SuccessFragment successFragment = SuccessFragment.newInstance(tries, new Date().getTime() - timeStarted, getIntent().getStringExtra("title"), SuccessList.size(), latLngList.size());
                     successFragment.show(getSupportFragmentManager(), "success");
                 } else {
                     tries++;
@@ -518,7 +518,6 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
             triesView.setVisibility(View.GONE);
             triesView.setText("Incorrect! Try again");
         }
-        Log.e("defaultprefs", PreferenceManager.getDefaultSharedPreferences(GameUI.this).getAll().toString());
         LatLng northWestLatLng = new LatLng(55.946233, -3.192473);
         LatLng northEastLatLng = new LatLng(55.946233, -3.184319);
         LatLng southEastLatLng = new LatLng(55.942617, -3.184319);
@@ -665,9 +664,6 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
             }
             for (KmlContainer containers : kmlLayer.getContainers()) {
                 for (KmlPlacemark placemark : containers.getPlacemarks()) {
-                    Log.e("successList", SuccessList.toString());
-                    Log.e("markerMap", MarkerWordMap.values().toString());
-                    Log.e("latlng", latLngList.toString());
                     if (placemark.getGeometry().getGeometryType().equals("Point")) {
                         KmlPoint point = (KmlPoint) placemark.getGeometry();
                         LatLng latLng = new LatLng(point.getGeometryObject().latitude, point.getGeometryObject().longitude);

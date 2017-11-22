@@ -45,7 +45,6 @@ public class WelcomeScreen extends AppCompatActivity {
         String kml = sharedPreferences.getString("kml", "null");
         String title = sharedPreferences.getString("title", "null");
         if(!(lyrics.equals("null")||kml.equals("null")||title.equals("null"))){
-            Log.e("true", "true");
             mapIntent.putExtra("lyrics", lyrics);
             mapIntent.putExtra("kml", kml);
             mapIntent.putExtra("title", title);

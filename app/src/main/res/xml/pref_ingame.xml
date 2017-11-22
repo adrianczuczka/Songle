@@ -1,4 +1,4 @@
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" android:key="preference_screen">
     <SwitchPreference
         android:defaultValue="false"
         android:key="set_timer_switch"

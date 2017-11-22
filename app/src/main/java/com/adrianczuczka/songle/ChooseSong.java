@@ -38,7 +38,7 @@ public class ChooseSong extends AppCompatActivity {
         if(getSupportActionBar() != null){
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }*/
-        recyclerView = findViewById(R.id.recycler_view);
+        recyclerView = findViewById(R.id.content_choose_song_recycler_view);
 
         //mAdapter = new SongsAdapter(songList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
