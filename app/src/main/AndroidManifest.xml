@@ -15,7 +15,7 @@
         android:allowBackup="true"
         android:fullBackupContent="@xml/backup_descriptor"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:label="@string/songle"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
@@ -36,7 +36,7 @@
             android:resource="@array/preloaded_fonts" />
         <activity
             android:name=".GameUI"
-            android:label="@string/title_activity_game_ui" />
+            android:label="@string/map" />
         <activity android:name=".NetworkActivity" />
         <activity android:name=".WelcomeScreen">
             <intent-filter>
@@ -47,8 +47,7 @@
         <activity
             android:name=".ChooseSong"
             android:label="@string/title_activity_choose_song"
-            android:parentActivityName=".WelcomeScreen"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:parentActivityName=".WelcomeScreen">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.adrianczuczka.songle.WelcomeScreen" />

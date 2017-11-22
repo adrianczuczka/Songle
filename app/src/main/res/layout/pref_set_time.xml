@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
         android:fontFamily="@font/sniglet"
-        android:hint="Hours"
+        android:hint="@string/hours"
         android:inputType="number" />
 
     <TextView
@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/sniglet"
         android:gravity="center"
-        android:text="Please enter a value between 0 and 99."
+        android:text="@string/enter_between_0_and_99"
         android:textColor="@android:color/holo_red_dark"
         android:visibility="gone" />
 
@@ -31,7 +31,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
         android:fontFamily="@font/sniglet"
-        android:hint="Minutes"
+        android:hint="@string/minutes"
         android:inputType="number" />
 
     <TextView
@@ -40,7 +40,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/sniglet"
         android:gravity="center"
-        android:text="Please enter a value between 0 and 59."
+        android:text="@string/enter_between_0_and_59"
         android:textColor="@android:color/holo_red_dark"
         android:visibility="gone" />
 
@@ -50,7 +50,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
         android:fontFamily="@font/sniglet"
-        android:hint="Seconds"
+        android:hint="@string/seconds"
         android:inputType="number" />
 
     <TextView
@@ -59,7 +59,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/sniglet"
         android:gravity="center"
-        android:text="Please enter a value between 0 and 59."
+        android:text="@string/enter_between_0_and_59"
         android:textColor="@android:color/holo_red_dark"
         android:visibility="gone" />
 </LinearLayout>

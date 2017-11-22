@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/cyan"
@@ -14,7 +13,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="121dp"
         android:fontFamily="@font/sniglet"
-        android:text="GAME OVER"
+        android:text="@string/game_over"
         android:textSize="50sp" />
 
     <TextView
@@ -34,7 +33,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="103dp"
         android:fontFamily="@font/sniglet"
-        android:text="RETURN TO MENU"
+        android:text="@string/return_to_menu"
         android:textSize="35sp" />
 
     <ImageView
@@ -45,7 +44,8 @@
         android:layout_alignStart="@+id/game_over_return_button"
         android:layout_marginTop="45dp"
         android:rotation="-20"
-        app:srcCompat="@mipmap/crying_emoji" />
+        android:src="@mipmap/crying_emoji"
+        android:contentDescription="@string/crying_emoji" />
 
     <ImageView
         android:id="@+id/game_over_confused_emoji"
@@ -54,5 +54,6 @@
         android:layout_alignEnd="@+id/game_over_return_button"
         android:layout_alignParentTop="true"
         android:layout_marginTop="18dp"
-        app:srcCompat="@mipmap/confused_emoji" />
+        android:src="@mipmap/confused_emoji"
+        android:contentDescription="@string/confused_emoji"/>
 </RelativeLayout>
