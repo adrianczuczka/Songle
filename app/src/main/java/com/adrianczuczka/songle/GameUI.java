@@ -10,22 +10,17 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Looper;
-import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.ArraySet;
-import android.util.Log;
-import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.ShareActionProvider;
 import android.widget.TextView;
 
 import com.google.android.gms.common.api.ApiException;
@@ -68,12 +63,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 
 public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
     private static final int LOAD_KML_REQUEST = 1;
@@ -142,13 +134,8 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                     // All location settings are satisfied. The client can initialize
                     // location requests here.
                     // ...
-                    if(getIntent().getBooleanExtra("resumed", false)){
-                        sharedPreferences.getStringSet("successList", null);
-                    }
-                    else {
-                        String kml = getIntent().getStringExtra("kml");
-                        new createKMLtask().execute(kml);
-                    }
+                    String kml = getIntent().getStringExtra("kml");
+                    new createKMLtask().execute(kml);
                     startLocationUpdates();
                 }
             });
@@ -188,12 +175,12 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                 case "-1":
                     mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
             }
-            isTimer = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("set_timer_switch", false);
-            timerAmount = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getInt("set_timer_amount", 1800000);
             final TextView timerView = findViewById(R.id.game_ui_timer_view);
-            if (isTimer) {
+            if (sharedPreferences.getBoolean("set_extreme_mode_switch", false)) {
+                isTries = true;
+                maxTries = 1;
                 timerView.setVisibility(View.VISIBLE);
-                CountDownTimer countDownTimer = new CountDownTimer(timerAmount, 1000) {
+                CountDownTimer countDownTimer = new CountDownTimer(900000, 1000) {
                     @Override
                     public void onTick(long l) {
                         timerView.setText(formatTime(l));
@@ -207,6 +194,28 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                         //timer done
                     }
                 }.start();
+            } else {
+                isTries = sharedPreferences.getBoolean("set_try_switch", false);
+                maxTries = Integer.valueOf(sharedPreferences.getString("set_try_amount", "5"));
+                isTimer = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("set_timer_switch", false);
+                timerAmount = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getInt("set_timer_amount", 1800000);
+                if (isTimer) {
+                    timerView.setVisibility(View.VISIBLE);
+                    CountDownTimer countDownTimer = new CountDownTimer(timerAmount, 1000) {
+                        @Override
+                        public void onTick(long l) {
+                            timerView.setText(formatTime(l));
+                        }
+
+                        @Override
+                        public void onFinish() {
+                            Intent intent = new Intent(GameUI.this, GameOverActivity.class);
+                            intent.putExtra("timer", "timer");
+                            startActivity(intent);
+                            //timer done
+                        }
+                    }.start();
+                }
             }
             /*Intent kmlIntent = new Intent(GameUI.this, NetworkActivity.class);
             kmlIntent.putExtra("url", "http://www.inf.ed.ac.uk/teaching/courses/selp/data/songs/01/map1.kml");
@@ -228,16 +237,14 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
-
         EXPERIMENTAL*/
-        Log.e("lyrics", getIntent().getStringExtra("lyrics"));
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         editor = sharedPreferences.edit();
         editor.putString("lyrics", getIntent().getStringExtra("lyrics"));
         editor.putString("kml", getIntent().getStringExtra("kml"));
         editor.putString("title", getIntent().getStringExtra("title"));
         SuccessList.addAll(sharedPreferences.getStringSet("successList", new HashSet<String>()));
-        editor.commit();
+        editor.apply();
         timeStarted = new Date().getTime();
         final SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -248,8 +255,6 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 if (!MarkerWordMap.isEmpty() && isMarkers) {
-                    double minDistance = -1;
-                    Marker minMarker = null;
                     for (Location location : locationResult.getLocations()) {
                         for (Marker marker : MarkerWordMap.keySet()) {
                             MarkerInfo markerInfo = (MarkerInfo) marker.getTag();
@@ -259,7 +264,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                             location1.setLatitude(latitude);
                             location1.setLongitude(longitude);
                             double locDistance = Double.parseDouble(String.valueOf(location.distanceTo(location1)));
-                            if (locDistance < 50) {
+                            if (locDistance < 40) {
                                 assert markerInfo != null;
                                 if (!markerInfo.isGreen) {
                                     marker.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.success_marker));
@@ -272,20 +277,12 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                                     markerInfo.isGreen = false;
                                 }
                             }
-                            if (minDistance < 0) {
-                                minDistance = locDistance;
-                                minMarker = marker;
-                            } else if (minDistance > locDistance) {
-                                minDistance = locDistance;
-                                minMarker = marker;
-                            }
                         }
                     }
                 }
             }
         };
-        isTries = sharedPreferences.getBoolean("set_try_switch", false);
-        maxTries = Integer.valueOf(sharedPreferences.getString("set_try_amount", "5"));
+
         LinearLayout view = findViewById(R.id.game_ui_bottom_sheet);
         BottomSheetBehavior mBottomSheetBehavior = BottomSheetBehavior.from(view);
         mBottomSheetBehavior.setPeekHeight(125);
@@ -306,7 +303,6 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                 final TextView triesView = findViewById(R.id.game_ui_tries_amount);
                 String answer = answerInput.getText().toString();
                 String title = getIntent().getStringExtra("title");
-                Log.e("levDistance", String.valueOf(levDistance(answer, title)));
                 if (levDistance(answer, title) <= 2) {
                     SuccessFragment successFragment = SuccessFragment.newInstance(tries, new Date().getTime() - timeStarted);
                     successFragment.show(getSupportFragmentManager(), "success");
@@ -348,6 +344,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                 .addLocationRequest(mLocationRequest);
                 */
     }
+
 
     private String formatTime(int millis) {
         int hours = millis / 3600000;
@@ -415,54 +412,6 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         return costs[b.length()];
     }
 
-    /*
-    private void setupViewPager(ViewPager viewPager) {
-        for(int i= 0; i < 100; i++){
-            test.add("hello");
-        }
-        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
-        viewPagerAdapter.addFragment(new WordListFragment().newInstance(test), "Test");
-        viewPagerAdapter.addFragment(new WordListFragment().newInstance(test), "Test");
-        viewPagerAdapter.addFragment(new WordListFragment().newInstance(test), "Test");
-        /*viewPagerAdapter.addFragment(new WorldCharts(), "World Charts");
-        viewPagerAdapter.addFragment(new NewMusic(), "New Music");
-        viewPagerAdapter.addFragment(new AfricaHot(), "Africa Hot");
-        viewPagerAdapter.addFragment(new Playlists(), "Playlists");
-        viewPagerAdapter.addFragment(new Recommended(), "Recommended");
-        viewPager.setAdapter(viewPagerAdapter);
-    }
-
-    private class ViewPagerAdapter extends FragmentPagerAdapter {
-
-        List<Fragment> fragmentList = new ArrayList<>();
-        List<String> fragmentTitles = new ArrayList<>();
-
-        public ViewPagerAdapter(FragmentManager fragmentManager) {
-            super(fragmentManager);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            return fragmentList.get(position);
-        }
-
-        @Override
-        public int getCount() {
-            return fragmentList.size();
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return fragmentTitles.get(position);
-        }onback
-
-        public void addFragment(Fragment fragment, String name) {
-            fragmentList.add(fragment);
-            fragmentTitles.add(name);
-        }
-    }
-    */
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -471,12 +420,6 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         Intent intent = new Intent(GameUI.this, WelcomeScreen.class);
         startActivity(intent);
         this.finish();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        finish();
     }
 
     private void stopLocationUpdates() {
@@ -525,7 +468,6 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
             triesView.setVisibility(View.GONE);
             triesView.setText("Incorrect! Try again");
         }
-        Log.e("defaultprefs", PreferenceManager.getDefaultSharedPreferences(GameUI.this).getAll().toString());
         LatLng northWestLatLng = new LatLng(55.946233, -3.192473);
         LatLng northEastLatLng = new LatLng(55.946233, -3.184319);
         LatLng southEastLatLng = new LatLng(55.942617, -3.184319);
@@ -546,7 +488,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                 if (markerInfo.isGreen) {
                     //success!
                     SuccessWordMap.put(marker, MarkerWordMap.get(marker));
-                    SuccessList.add(MarkerWordMap.get(marker));
+                    //SuccessList.add(MarkerWordMap.get(marker));
                     editor.putStringSet("successList", new HashSet<>(SuccessList));
                     editor.commit();
                     MarkerWordMap.remove(marker);
@@ -609,6 +551,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
             // permissions this app might request
         }
     }
+
     //EXPERIMENTAL
     /*
     @Override
@@ -672,15 +615,12 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
             }
             for (KmlContainer containers : kmlLayer.getContainers()) {
                 for (KmlPlacemark placemark : containers.getPlacemarks()) {
-                    Log.e("successList", SuccessList.toString());
-                    Log.e("markerMap", MarkerWordMap.values().toString());
-                    Log.e("latlng", latLngList.toString());
                     if (placemark.getGeometry().getGeometryType().equals("Point")) {
                         KmlPoint point = (KmlPoint) placemark.getGeometry();
                         LatLng latLng = new LatLng(point.getGeometryObject().latitude, point.getGeometryObject().longitude);
                         latLngList.add(latLng);
                         String lyric = findLyric(getIntent().getStringExtra("lyrics"), placemark.getProperty("name"));
-                        if(!SuccessList.contains(lyric)){
+                        if (!SuccessList.contains(lyric)) {
                             Marker marker;
                             switch (placemark.getStyleId()) {
                                 case "#unclassified":

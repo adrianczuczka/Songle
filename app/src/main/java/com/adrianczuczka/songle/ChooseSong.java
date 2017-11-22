@@ -72,6 +72,14 @@ public class ChooseSong extends AppCompatActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(ChooseSong.this, WelcomeScreen.class);
+        startActivity(intent);
+        finish();
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == LOAD_XML_REQUEST) {
             if (resultCode == RESULT_OK) {

@@ -2,6 +2,7 @@ package com.adrianczuczka.songle;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.util.DisplayMetrics;
@@ -38,6 +39,14 @@ public class ChooseDifficultyFragment extends DialogFragment {
             url = args.getString("url");
             number = args.getString("number");
             title = args.getString("title");
+        }
+        if (PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).getBoolean("set_extreme_mode_switch", false)) {
+            Intent kmlIntent = new Intent(getActivity(), NetworkActivity.class);
+            kmlIntent.putExtra("url", url + "map1.kml");
+            kmlIntent.putExtra("number", number);
+            kmlIntent.putExtra("title", title);
+            getActivity().startActivityForResult(kmlIntent, LOAD_KML_REQUEST);
+            dismiss();
         }
     }
 
