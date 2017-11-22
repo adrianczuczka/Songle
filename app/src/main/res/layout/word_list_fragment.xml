@@ -3,6 +3,6 @@
     android:id="@+id/grid"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/bottom_sheet_border"
+    android:background="@drawable/fragment_background"
     android:gravity="center"
     android:numColumns="2" />

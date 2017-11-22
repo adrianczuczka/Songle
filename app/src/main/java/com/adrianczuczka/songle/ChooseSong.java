@@ -13,7 +13,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -83,18 +82,12 @@ public class ChooseSong extends AppCompatActivity {
                     notGuessedList.add(songList.get(name));
                 }
             }
+            successList.add(songList.get("Song 2"));
+            successList.add(songList.get("Bad Romance"));
             SongsAdapter mAdapter = new SongsAdapter(successList, getApplicationContext());
             recyclerView.setAdapter(mAdapter);
             mAdapter.notifyDataSetChanged();
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        Intent intent = new Intent(ChooseSong.this, WelcomeScreen.class);
-        startActivity(intent);
-        finish();
     }
 
     @Override
