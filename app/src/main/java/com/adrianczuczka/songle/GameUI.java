@@ -16,6 +16,7 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -63,9 +64,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
     private static final int LOAD_KML_REQUEST = 1;
@@ -76,21 +80,22 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
     private final HashMap<Marker, String> SuccessWordMap = new HashMap<>();
     private final ArrayList<String> SuccessList = new ArrayList<>();
     private final ArrayList<LatLng> latLngList = new ArrayList<>();
-    HeatmapTileProvider mProvider;
-    TileOverlay mOverlay;
-    int tries = 0;
-    boolean isTries, isTimer;
-    int maxTries, timerAmount;
-    long timeStarted;
-    String mapType;
+    private HeatmapTileProvider mProvider;
+    private TileOverlay mOverlay;
+    private int tries = 0;
+    private boolean isTries, isTimer;
+    private int maxTries;
+    private int timerAmount;
+    private long timeStarted;
+    private String mapType;
     private FusedLocationProviderClient mFusedLocationClient;
     private GoogleMap mMap;
     private boolean mRequestingLocationUpdates;
     private LocationCallback mLocationCallback;
     private Boolean isHeatmap = false;
     private Boolean isMarkers = true;
-    SharedPreferences sharedPreferences;
-    SharedPreferences.Editor editor;
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
 
     private void startLocationUpdates() {
         try {
@@ -112,6 +117,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
 
     private void mapReadyFunction() {
         try {
+            mMap.getUiSettings().setMapToolbarEnabled(false);
             mMap.setMyLocationEnabled(true);
             mRequestingLocationUpdates = false;
             /*mFusedLocationClient.getLastLocation()
@@ -214,7 +220,8 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                             startActivity(intent);
                             //timer done
                         }
-                    }.start();
+                    };
+                    countDownTimer.start();
                 }
             }
             /*Intent kmlIntent = new Intent(GameUI.this, NetworkActivity.class);
@@ -304,13 +311,13 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                 String answer = answerInput.getText().toString();
                 String title = getIntent().getStringExtra("title");
                 if (levDistance(answer, title) <= 2) {
-                    SuccessFragment successFragment = SuccessFragment.newInstance(tries, new Date().getTime() - timeStarted);
+                    SuccessFragment successFragment = SuccessFragment.newInstance(tries, new Date().getTime() - timeStarted, getIntent().getStringExtra("title"), SuccessList.size(), latLngList.size());
                     successFragment.show(getSupportFragmentManager(), "success");
                 } else {
                     tries++;
                     if (isTries) {
                         if (tries < maxTries) {
-                            triesView.setText("Attempts left: " + (maxTries - tries));
+                            triesView.setText(getResources().getString(R.string.attempts_left, (maxTries - tries)));
                         } else {
                             Intent intent = new Intent(GameUI.this, GameOverActivity.class);
                             intent.putExtra("tries", "tries");
@@ -344,7 +351,6 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                 .addLocationRequest(mLocationRequest);
                 */
     }
-
 
     private String formatTime(int millis) {
         int hours = millis / 3600000;
@@ -463,10 +469,10 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         }
         TextView triesView = findViewById(R.id.game_ui_tries_amount);
         if (isTries) {
-            triesView.setText("Attempts left: " + maxTries);
+            triesView.setText(getResources().getString(R.string.attempts_left, maxTries));
         } else {
             triesView.setVisibility(View.GONE);
-            triesView.setText("Incorrect! Try again");
+            triesView.setText(getResources().getString(R.string.incorrect_try_again));
         }
         LatLng northWestLatLng = new LatLng(55.946233, -3.192473);
         LatLng northEastLatLng = new LatLng(55.946233, -3.184319);

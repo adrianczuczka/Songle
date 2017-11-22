@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">Songle</string>
-    <string name="title_activity_game_ui">Map</string>
+    <string name="songle">Songle</string>
+    <string name="map">Map</string>
     <string name="very_easy">Very Easy</string>
     <string name="easy">Easy</string>
     <string name="medium">Medium</string>
@@ -14,6 +14,33 @@
     <string name="welcome_resume_button">RESUME GAME</string>
     <string name="welcome_settings_button">SETTINGS</string>
     <string name="random">Guess a random song</string>
+    <string name="game_over">GAME OVER</string>
+    <string name="return_to_menu">RETURN TO MENU</string>
+    <string name="replay_guessed_songs">REPLAY GUESSED SONGS!</string>
+    <string name="congratulations">CONGRATULATIONS!</string>
+    <string name="finish">FINISH</string>
+    <string name="you_ran_out_of_time">You ran out of time!</string>
+    <string name="you_ran_out_of_attempts">You ran out of attempts!</string>
+    <string name="attempts_left">Attempts left: %1$d</string>
+    <string name="attemps_needed">Attempts needed: %1$d</string>
+    <string name="time_taken">Time taken: %1$s</string>
+    <plurals name="markers_found">
+        <item quantity="one">Found %1$d marker, %2$s %% of markers</item>
+        <item quantity="other">Found %1$d markers, %2$s %% of markers</item>
+    </plurals>
+    <string name="incorrect_try_again">Incorrect! Try again</string>
+    <string name="you_guessed_it">You guessed it! The song was %1$s</string>
+    <string name="hours">Hours</string>
+    <string name="minutes">Minutes</string>
+    <string name="seconds">Seconds</string>
+    <string name="enter_between_0_and_99">Please enter a value between 0 and 99.</string>
+    <string name="enter_between_0_and_59">Please enter a value between 0 and 59.</string>
+
+    <!-- Content Descriptions -->
+    <string name="crying_emoji">Crying emoji</string>
+    <string name="confused_emoji">Confused emoji</string>
+    <string name="party_emoji">Party emoji</string>
+    <string name="turn_heatmap_on_and_off">Turn heatmap on and off</string>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_choose_song">ChooseSong</string>

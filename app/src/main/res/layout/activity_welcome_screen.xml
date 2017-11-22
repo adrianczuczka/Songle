@@ -10,7 +10,7 @@
     tools:layout_editor_absoluteY="81dp">
 
     <TextView
-        android:id="@+id/MainTitle"
+        android:id="@+id/welcome_screen_main_title"
         android:layout_width="311dp"
         android:layout_height="103dp"
         android:layout_marginBottom="8dp"
@@ -34,7 +34,7 @@
         app:layout_constraintVertical_bias="0.0" />
 
     <Button
-        android:id="@+id/PlayButton"
+        android:id="@+id/welcome_screen_play_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
@@ -47,10 +47,10 @@
         app:layout_constraintHorizontal_bias="0.503"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/MainTitle" />
+        app:layout_constraintTop_toBottomOf="@+id/welcome_screen_main_title" />
 
     <Button
-        android:id="@+id/ResumeButton"
+        android:id="@+id/welcome_screen_resume_button"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
@@ -62,10 +62,10 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintHorizontal_bias="0.502"
         android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@+id/PlayButton" />
+        app:layout_constraintTop_toBottomOf="@+id/welcome_screen_play_button" />
 
     <Button
-        android:id="@+id/SettingsButton"
+        android:id="@+id/welcome_screen_settings_game"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
@@ -79,17 +79,17 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@+id/ResumeButton" />
+        app:layout_constraintTop_toBottomOf="@+id/welcome_screen_resume_button" />
 
     <ImageView
-        android:id="@+id/joyEmoji"
+        android:id="@+id/welcome_screen_joy_emoji"
         android:layout_width="161dp"
         android:layout_height="83dp"
         android:layout_marginEnd="80dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:rotation="-30"
-        app:layout_constraintEnd_toStartOf="@+id/surpriseEmoji"
+        app:layout_constraintEnd_toStartOf="@+id/welcome_screen_surprise_emoji"
         app:layout_constraintHorizontal_bias="0.444"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -97,19 +97,19 @@
         tools:ignore="ContentDescription" />
 
     <ImageView
-        android:id="@+id/surpriseEmoji"
+        android:id="@+id/welcome_screen_surprise_emoji"
         android:layout_width="69dp"
         android:layout_height="54dp"
         android:layout_marginBottom="16dp"
         android:layout_marginEnd="48dp"
         android:rotation="30"
-        app:layout_constraintBottom_toTopOf="@+id/MainTitle"
+        app:layout_constraintBottom_toTopOf="@+id/welcome_screen_main_title"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@mipmap/surprise_emoji"
         tools:ignore="ContentDescription" />
 
     <ImageView
-        android:id="@+id/thinkingEmoji"
+        android:id="@+id/welcome_screen_thinking_emoji"
         android:layout_width="82dp"
         android:layout_height="76dp"
         android:layout_marginBottom="216dp"
@@ -119,13 +119,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.969"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/PlayButton"
+        app:layout_constraintTop_toBottomOf="@+id/welcome_screen_play_button"
         app:layout_constraintVertical_bias="0.0"
         app:srcCompat="@mipmap/thinking_emoji"
         tools:ignore="ContentDescription" />
 
     <ImageView
-        android:id="@+id/musicEmoji"
+        android:id="@+id/welcome_screen_music_emoji"
         android:layout_width="80dp"
         android:layout_height="76dp"
         android:layout_marginBottom="8dp"
@@ -135,13 +135,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.018"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/thinkingEmoji"
+        app:layout_constraintTop_toTopOf="@+id/welcome_screen_thinking_emoji"
         app:layout_constraintVertical_bias="0.105"
         app:srcCompat="@mipmap/music_emoji"
         tools:ignore="ContentDescription" />
 
     <ImageView
-        android:id="@+id/welcome_disk"
+        android:id="@+id/welcome_screen_disk"
         android:layout_width="0dp"
         android:layout_height="177dp"
         android:src="@drawable/record_disk"
@@ -152,7 +152,7 @@
         tools:ignore="ContentDescription" />
 
     <ImageView
-        android:id="@+id/orange_on_disk"
+        android:id="@+id/welcome_screen_orange_on_disk"
         android:layout_width="57dp"
         android:layout_height="64dp"
         android:layout_marginBottom="8dp"
@@ -164,13 +164,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.069"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/welcome_disk"
+        app:layout_constraintTop_toTopOf="@+id/welcome_screen_disk"
         app:layout_constraintVertical_bias="0.917"
         app:srcCompat="@mipmap/orange_diamond"
         tools:ignore="ContentDescription" />
 
     <ImageView
-        android:id="@+id/yellow_on_disk"
+        android:id="@+id/welcome_screen_yellow_on_disk"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
@@ -188,7 +188,7 @@
         tools:ignore="ContentDescription" />
 
     <ImageView
-        android:id="@+id/red_on_disk"
+        android:id="@+id/welcome_screen_red_on_disk"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
@@ -199,7 +199,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.89"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/welcome_disk"
+        app:layout_constraintTop_toTopOf="@+id/welcome_screen_disk"
         app:layout_constraintVertical_bias="0.955"
         app:srcCompat="@mipmap/red_stars"
         tools:ignore="ContentDescription" />

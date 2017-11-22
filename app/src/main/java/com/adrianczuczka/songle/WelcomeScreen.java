@@ -8,6 +8,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -50,8 +51,8 @@ public class WelcomeScreen extends AppCompatActivity {
         String lyrics = sharedPreferences.getString("lyrics", "null");
         String kml = sharedPreferences.getString("kml", "null");
         String title = sharedPreferences.getString("title", "null");
-        if (!(lyrics.equals("null") || kml.equals("null") || title.equals("null"))) {
-            //mapIntent.putExtra("resumed", true);
+        if(!(lyrics.equals("null")||kml.equals("null")||title.equals("null"))){
+                    //mapIntent.putExtra("resumed", true);
             mapIntent.putExtra("lyrics", lyrics);
             mapIntent.putExtra("kml", kml);
             mapIntent.putExtra("title", title);

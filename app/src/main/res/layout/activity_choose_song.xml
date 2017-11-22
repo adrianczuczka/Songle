@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_choose_song_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/cyan"
     android:fitsSystemWindows="true"
-    tools:context="com.adrianczuczka.songle.ChooseSong"
-    android:background="@color/cyan">
+    tools:context="com.adrianczuczka.songle.ChooseSong">
 
     <include
         layout="@layout/content_choose_song"
