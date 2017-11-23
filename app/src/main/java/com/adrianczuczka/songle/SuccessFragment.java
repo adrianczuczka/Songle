@@ -1,5 +1,6 @@
 package com.adrianczuczka.songle;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -59,6 +60,7 @@ public class SuccessFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.success_fragment, container, false);
+        getDialog().setCanceledOnTouchOutside(false);
         TextView congratsText = view.findViewById(R.id.congrats_text);
         TextView triesAmount = view.findViewById(R.id.tries_amount);
         TextView timeTaken = view.findViewById(R.id.time_taken);
@@ -101,12 +103,36 @@ public class SuccessFragment extends DialogFragment {
         return hoursString + ":" + minutesString + ":" + secondsString;
     }
 
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        super.onDismiss(dialog);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+        editor = sharedPreferences.edit();
+        finishedSongsList = sharedPreferences.getStringSet("finishedSongsList", new HashSet<String>());
+        finishedSongsList.add(name);
+        editor.putStringSet("finishedSongsList", finishedSongsList);
+        editor.remove("successList");
+        editor.remove("title");
+        editor.remove("kml");
+        editor.remove("lyrics");
+        editor.apply();
+        Intent intent = new Intent(getActivity(), WelcomeScreen.class);
+        getActivity().startActivity(intent);
+        getActivity().finish();
+        dismiss();
+    }
+
+
     public void onFinishClick(View view){
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
         editor = sharedPreferences.edit();
         finishedSongsList = sharedPreferences.getStringSet("finishedSongsList", new HashSet<String>());
         finishedSongsList.add(name);
         editor.putStringSet("finishedSongsList", finishedSongsList);
+        editor.remove("successList");
+        editor.remove("title");
+        editor.remove("kml");
+        editor.remove("lyrics");
         editor.apply();
         Intent intent = new Intent(getActivity(), WelcomeScreen.class);
         getActivity().startActivity(intent);

@@ -306,6 +306,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         guessSong.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                tries++;
                 EditText answerInput = findViewById(R.id.guess_song_input);
                 final TextView triesView = findViewById(R.id.game_ui_tries_amount);
                 String answer = answerInput.getText().toString();
@@ -314,7 +315,6 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                     SuccessFragment successFragment = SuccessFragment.newInstance(tries, new Date().getTime() - timeStarted, getIntent().getStringExtra("title"), SuccessList.size(), latLngList.size());
                     successFragment.show(getSupportFragmentManager(), "success");
                 } else {
-                    tries++;
                     if (isTries) {
                         if (tries < maxTries) {
                             triesView.setText(getResources().getString(R.string.attempts_left, (maxTries - tries)));

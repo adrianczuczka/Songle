@@ -1,4 +1,10 @@
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" android:key="preference_screen">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <Preference
+        android:selectable="false"
+        android:enabled="true"
+        android:key="settings_new_game_text"
+        android:summary="These settings will be implemented when you start a new game"/>
+
     <SwitchPreference
         android:defaultValue="false"
         android:key="set_timer_switch"

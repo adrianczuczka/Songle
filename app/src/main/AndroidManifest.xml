@@ -55,6 +55,7 @@
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
+            android:theme="@style/SettingStyle"
             android:parentActivityName=".WelcomeScreen"/>
         <activity
             android:name=".GameOverActivity"

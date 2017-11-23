@@ -39,18 +39,17 @@
         android:id="@+id/tries_amount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:fontFamily="@font/sniglet"
         android:text=""
+        app:layout_constraintBottom_toTopOf="@+id/marker_amount"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteX="115dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/marker_amount"
-        android:layout_marginTop="8dp"
         app:layout_constraintTop_toBottomOf="@+id/time_taken"
-        app:layout_constraintVertical_bias="0.706" />
+        app:layout_constraintVertical_bias="0.6" />
 
     <TextView
         android:id="@+id/time_taken"
@@ -58,12 +57,11 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="50dp"
         android:fontFamily="@font/sniglet"
         android:text=""
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteX="115dp"
-        android:layout_marginTop="66dp"
         app:layout_constraintTop_toBottomOf="@+id/congrats_text" />
 
     <Button

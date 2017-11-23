@@ -33,6 +33,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="103dp"
         android:fontFamily="@font/sniglet"
+        android:onClick="onReturnClick"
         android:text="@string/return_to_menu"
         android:textSize="35sp" />
 

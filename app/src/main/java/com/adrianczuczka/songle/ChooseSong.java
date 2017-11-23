@@ -39,19 +39,12 @@ public class ChooseSong extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_song);
-        /*Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        if(getSupportActionBar() != null){
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }*/
         recyclerView = findViewById(R.id.content_choose_song_recycler_view);
         ViewCompat.setNestedScrollingEnabled(recyclerView, false);
-        //mAdapter = new SongsAdapter(songList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        //recyclerView.setAdapter(mAdapter);
         Intent xmlIntent = new Intent(ChooseSong.this, NetworkActivity.class);
         xmlIntent.putExtra("url", "http://www.inf.ed.ac.uk/teaching/courses/selp/data/songs/songs.xml");
         startActivityForResult(xmlIntent, LOAD_XML_REQUEST);
@@ -74,6 +67,8 @@ public class ChooseSong extends AppCompatActivity {
             for(XMLParser.Song song : songs) {
                 songList.put(song.Title, song);
             }
+            successList.add(songList.get("Song 2"));
+            successList.add(songList.get("Bad Romance"));
             for(String name : songList.keySet()){
                 if(sharedPreferences.getStringSet("finishedSongsList", new HashSet<String>()).contains(name)){
                     successList.add(songList.get(name));
@@ -82,8 +77,6 @@ public class ChooseSong extends AppCompatActivity {
                     notGuessedList.add(songList.get(name));
                 }
             }
-            successList.add(songList.get("Song 2"));
-            successList.add(songList.get("Bad Romance"));
             SongsAdapter mAdapter = new SongsAdapter(successList, getApplicationContext());
             recyclerView.setAdapter(mAdapter);
             mAdapter.notifyDataSetChanged();

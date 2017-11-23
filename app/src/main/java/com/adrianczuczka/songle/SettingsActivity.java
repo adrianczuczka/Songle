@@ -167,7 +167,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             View view = super.onCreateView(inflater, container, savedInstanceState);
             assert view != null;
             view.setBackgroundColor(ContextCompat.getColor(getActivity(),R.color.cyan));
-
             return view;
         }
 

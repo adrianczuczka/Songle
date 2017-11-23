@@ -58,6 +58,10 @@ public class SetTimerPreference extends DialogPreference {
     protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
         setTotal(restorePersistedValue ?
                 getPersistedInt(total) : (int) defaultValue);
+        hours = total / 3600000;
+        minutes = (total % 3600000) / 60000;
+        seconds = (total % 60000) / 1000;
+        setSummary("Currently " + format(hours) + ":" + format(minutes) + ":" + format(seconds));
     }
 
     @Override
@@ -94,7 +98,7 @@ public class SetTimerPreference extends DialogPreference {
                 seconds = Integer.parseInt(editTextSeconds.getText().toString());
             }
             total = (hours * 3600000) + (minutes * 60000) + (seconds * 1000);
-            setSummary("currently " + format(hours) + ":" + format(minutes) + ":" + format(seconds));
+            setSummary("Currently " + format(hours) + ":" + format(minutes) + ":" + format(seconds));
             if (callChangeListener(total)) {
                 setTotal(total);
                 setDefaultValue(total);

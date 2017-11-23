@@ -35,13 +35,26 @@ public class WelcomeScreen extends AppCompatActivity {
             toast.show();
         }
         else {
-            Intent intent = new Intent(WelcomeScreen.this, ChooseSong.class);
-            sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-            editor = sharedPreferences.edit();
-            editor.remove("successList");
-            editor.apply();
-            startActivity(intent);
-            finish();
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            String lyrics = sharedPreferences.getString("lyrics", "null");
+            String kml = sharedPreferences.getString("kml", "null");
+            String title = sharedPreferences.getString("title", "null");
+            if(!(lyrics.equals("null")||kml.equals("null")||title.equals("null"))){
+                AreYouSureFragment areYouSureFragment = AreYouSureFragment.newInstance();
+                areYouSureFragment.show(getSupportFragmentManager(), "are you sure");
+            }
+            else {
+                Intent intent = new Intent(WelcomeScreen.this, ChooseSong.class);
+                sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                editor = sharedPreferences.edit();
+                editor.remove("successList");
+                editor.remove("title");
+                editor.remove("kml");
+                editor.remove("lyrics");
+                editor.apply();
+                startActivity(intent);
+                finish();
+            }
         }
     }
 
