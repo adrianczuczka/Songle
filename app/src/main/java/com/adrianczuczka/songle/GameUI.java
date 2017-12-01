@@ -16,7 +16,6 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -64,12 +63,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 
 public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
     private static final int LOAD_KML_REQUEST = 1;
@@ -224,9 +220,6 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                     countDownTimer.start();
                 }
             }
-            /*Intent kmlIntent = new Intent(GameUI.this, NetworkActivity.class);
-            kmlIntent.putExtra("url", "http://www.inf.ed.ac.uk/teaching/courses/selp/data/songs/01/map1.kml");
-            startActivityForResult(kmlIntent, LOAD_KML_REQUEST);*/
         } catch (SecurityException e) {
             //warning
         }
@@ -236,15 +229,6 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_ui);
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        /*EXPERIMENTAL
-
-        viewPager = (ViewPager) findViewById(R.id.viewpager);
-        setupViewPager(viewPager);
-
-        tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(viewPager);
-        EXPERIMENTAL*/
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         editor = sharedPreferences.edit();
         editor.putString("lyrics", getIntent().getStringExtra("lyrics"));
@@ -273,15 +257,15 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                             double locDistance = Double.parseDouble(String.valueOf(location.distanceTo(location1)));
                             if (locDistance < 40) {
                                 assert markerInfo != null;
-                                if (!markerInfo.isGreen) {
+                                if (!markerInfo.getGreen()) {
                                     marker.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.success_marker));
-                                    markerInfo.isGreen = true;
+                                    markerInfo.setGreen(true);
                                 }
                             } else {
                                 assert markerInfo != null;
-                                if (markerInfo.isGreen) {
+                                if (markerInfo.getGreen()) {
                                     marker.setIcon(BitmapDescriptorFactory.fromResource(getMarkerStyle(markerInfo)));
-                                    markerInfo.isGreen = false;
+                                    markerInfo.setGreen(false);
                                 }
                             }
                         }
@@ -340,16 +324,6 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                 }
             }
         });
-
-        /*
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab);
-        tabLayout.addTab(tabLayout.newTab().setText("Lyrics"));
-        tabLayout.addTab(tabLayout.newTab().setText("Guess"));
-        tabLayout.addTab(tabLayout.newTab().setText("Settings"));*/
-                /*
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
-                .addLocationRequest(mLocationRequest);
-                */
     }
 
     private String formatTime(int millis) {
@@ -432,14 +406,6 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         mFusedLocationClient.removeLocationUpdates(mLocationCallback);
         mRequestingLocationUpdates = false;
     }
-
-    /*
-    @Override
-    protected void onResume() {
-        super.onResume();
-        startLocationUpdates();
-    }
-    */
 
     /**
      * Manipulates the map once available.
@@ -558,18 +524,6 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         }
     }
 
-    //EXPERIMENTAL
-    /*
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == LOAD_KML_REQUEST) {
-            if (resultCode == RESULT_OK) {
-                String kml = data.getStringExtra("kml");
-                new createKMLtask().execute(kml);
-            }
-        }
-    }
-    */
     private String findLyric(String lyrics, String wordLoc) {
         String[] coordinates = wordLoc.split(":");
         String result;
@@ -678,7 +632,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         }
     }
 
-    public class MarkerInfo {
+    private class MarkerInfo {
         private final String key;
         private boolean isGreen;
 
@@ -686,54 +640,13 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
             this.key = key;
             this.isGreen = false;
         }
+
+        public void setGreen(boolean green) {
+            isGreen = green;
+        }
+
+        public Boolean getGreen() {
+            return isGreen;
+        }
     }
-
-    /*
-    private class parseXMLTask extends AsyncTask<String, Void, ArrayList<KMLParser.Placemark>> {
-        @Override
-        protected ArrayList<KMLParser.Placemark> doInBackground(String... params) {
-            try {
-                InputStream stream = new ByteArrayInputStream(params[0].getBytes(StandardCharsets.UTF_8.name()));
-                KMLParser parser = new KMLParser();
-                KmlLayer layer = new KmlLayer(mMap, stream, GameUI.this);
-                return parser.parse(stream);
-            } catch (XmlPullParserException | IOException e) {
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<KMLParser.Placemark> list) {
-            IconGenerator unclassified = new IconGenerator(GameUI.this);
-            unclassified.setStyle(IconGenerator.STYLE_WHITE);
-            IconGenerator boring = new IconGenerator(GameUI.this);
-            boring.setStyle();
-            for (int i = 0; i < list.size(); i++) {
-                KMLParser.Placemark placemark = list.get(i);
-                switch (list.get(i).description) {
-                    case "unclassified":
-                        mMap.addMarker(new MarkerOptions()
-                                .position(new LatLng(placemark.coordinates[1], placemark.coordinates[0]))
-                                .title(placemark.name))
-                                .setIcon(BitmapDescriptorFactory.fromBitmap(unclassified.makeIcon()));
-                        break;
-                    case "boring":
-                        mMap.addMarker(new MarkerOptions()
-                                .position(new LatLng(placemark.coordinates[1], placemark.coordinates[0]))
-                                .title(placemark.name))
-                                .setIcon(BitmapDescriptorFactory.defaultMarker());
-                        break;
-                    case "notboring":
-                        mMap.addMarker(new MarkerOptions()
-                                .position(new LatLng(placemark.coordinates[1], placemark.coordinates[0]))
-                                .title(placemark.name))
-                                .setIcon(BitmapDescriptorFactory.defaultMarker());
-                }
-                mMap.addMarker(new MarkerOptions()
-                        .position(new LatLng(placemark.coordinates[1], placemark.coordinates[0]))
-                        .title(placemark.name));
-
-            }
-        }
-    }*/
 }
