@@ -149,9 +149,10 @@
     </string>
 
     <string name="pref_title_set_timer_amount">Set amount of time:</string>
-    <string name="pref_description_set_timer_amount">Set the amount of time for the timer
-    </string>
+    <string name="pref_description_set_timer_amount">Set the amount of time for the timer</string>
 
+    <string name="pref_title_set_timer_background">Timer runs in background:</string>
+    <string name="pref_description_set_timer_background">Choose whether the timer should keep running even if Songle is closed.</string>
 
     <string name="pref_title_choose_map_type">Choose map type:</string>
     <string name="pref_description_choose_map_type">Choose between a normal, hybrid, or satellite map</string>

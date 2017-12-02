@@ -1,13 +1,11 @@
 package com.adrianczuczka.songle;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -103,7 +101,7 @@ public class SuccessFragment extends DialogFragment {
         return hoursString + ":" + minutesString + ":" + secondsString;
     }
 
-    @Override
+    /*@Override
     public void onDismiss(DialogInterface dialog) {
         super.onDismiss(dialog);
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
@@ -119,8 +117,7 @@ public class SuccessFragment extends DialogFragment {
         Intent intent = new Intent(getActivity(), WelcomeScreen.class);
         getActivity().startActivity(intent);
         getActivity().finish();
-        dismiss();
-    }
+    }*/
 
 
     public void onFinishClick(View view){

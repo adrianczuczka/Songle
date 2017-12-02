@@ -48,4 +48,10 @@
         android:title="@string/pref_title_try_amount"
         android:summary="@string/pref_description_try_amount"
         android:inputType="number" />
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="set_timer_background"
+        android:title="@string/pref_title_set_timer_background"
+        android:summary="@string/pref_description_set_timer_background" />
 </PreferenceScreen>

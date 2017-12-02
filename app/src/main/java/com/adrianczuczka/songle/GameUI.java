@@ -16,6 +16,7 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -92,6 +93,9 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
     private Boolean isMarkers = true;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
+    private CountDownTimer normalCountdownTimer;
+    private int timerAmountResumed;
+    private TextView timerView;
 
     private void startLocationUpdates() {
         try {
@@ -167,7 +171,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                     }
                 }
             });
-            mapType = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("set_map_type_list", "1");
+            mapType = sharedPreferences.getString("set_map_type_list", "1");
             switch (mapType) {
                 case "1":
                     break;
@@ -177,49 +181,24 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                 case "-1":
                     mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
             }
-            final TextView timerView = findViewById(R.id.game_ui_timer_view);
             if (sharedPreferences.getBoolean("set_extreme_mode_switch", false)) {
                 isTries = true;
                 maxTries = 1;
                 timerView.setVisibility(View.VISIBLE);
-                CountDownTimer countDownTimer = new CountDownTimer(900000, 1000) {
-                    @Override
-                    public void onTick(long l) {
-                        timerView.setText(formatTime(l));
-                    }
-
-                    @Override
-                    public void onFinish() {
-                        Intent intent = new Intent(GameUI.this, GameOverActivity.class);
-                        intent.putExtra("timer", "timer");
-                        startActivity(intent);
-                        //timer done
-                    }
-                }.start();
+                timerAmount = getIntent().hasExtra("resumed") ? sharedPreferences.getInt("set_timer_amount_resumed", 900000) : 900000;
+                Log.e("asidaiso", "asoidj");
+                normalCountdownTimer = startTimer(timerAmount);
             } else {
                 isTries = sharedPreferences.getBoolean("set_try_switch", false);
                 maxTries = Integer.valueOf(sharedPreferences.getString("set_try_amount", "5"));
-                isTimer = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("set_timer_switch", false);
-                timerAmount = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getInt("set_timer_amount", 1800000);
+                isTimer = sharedPreferences.getBoolean("set_timer_switch", false);
+                timerAmount = getIntent().hasExtra("resumed") ? sharedPreferences.getInt("set_timer_amount_resumed", 1800000) : sharedPreferences.getInt("set_timer_amount", 1800000);
                 if (isTimer) {
                     timerView.setVisibility(View.VISIBLE);
-                    CountDownTimer countDownTimer = new CountDownTimer(timerAmount, 1000) {
-                        @Override
-                        public void onTick(long l) {
-                            timerView.setText(formatTime(l));
-                        }
-
-                        @Override
-                        public void onFinish() {
-                            Intent intent = new Intent(GameUI.this, GameOverActivity.class);
-                            intent.putExtra("timer", "timer");
-                            startActivity(intent);
-                            //timer done
-                        }
-                    };
-                    countDownTimer.start();
+                    normalCountdownTimer = startTimer(timerAmount);
                 }
             }
+
         } catch (SecurityException e) {
             //warning
         }
@@ -229,6 +208,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_ui);
+        timerView = findViewById(R.id.game_ui_timer_view);
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         editor = sharedPreferences.edit();
         editor.putString("lyrics", getIntent().getStringExtra("lyrics"));
@@ -312,9 +292,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                         new CountDownTimer(5000, 1000) {
                             @Override
                             public void onTick(long l) {
-
                             }
-
                             @Override
                             public void onFinish() {
                                 triesView.setVisibility(View.GONE);
@@ -324,6 +302,49 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                 }
             }
         });
+    }
+
+    private CountDownTimer startTimer(int time) {
+        return new CountDownTimer(time, 1000) {
+            @Override
+            public void onTick(long l) {
+                timerAmountResumed = (int) l;
+                timerView.setText(formatTime(l));
+            }
+
+            @Override
+            public void onFinish() {
+                Intent intent = new Intent(GameUI.this, GameOverActivity.class);
+                intent.putExtra("timer", "timer");
+                startActivity(intent);
+            }
+        }.start();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.e("paused", "paused");
+        Boolean timerBackground = sharedPreferences.getBoolean("set_timer_background", false);
+        if (normalCountdownTimer != null) {
+            editor.putInt("set_timer_amount_resumed", timerAmountResumed);
+            editor.commit();
+            if (!timerBackground) {
+                Log.e("canceled", "canceled");
+                normalCountdownTimer.cancel();
+            }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Boolean timerBackground = sharedPreferences.getBoolean("set_timer_background", false);
+        int amount = sharedPreferences.getInt("set_timer_amount_resumed", -1);
+        if (!timerBackground && amount != -1 && normalCountdownTimer != null) {
+            normalCountdownTimer.cancel();
+            normalCountdownTimer = startTimer(amount);
+        }
     }
 
     private String formatTime(int millis) {
