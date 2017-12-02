@@ -10,21 +10,21 @@ import android.view.View;
 import android.widget.TextView;
 
 /**
- * Created by s1550570 on 06/11/17.
+ * Activity for when the user either runs out of time, or runs out of tries while trying to guess a song. Has a return button, and shows the reason
+ * why the user lost.
  */
-
 public class GameOverActivity extends AppCompatActivity {
-    SharedPreferences sharedPreferences;
-    SharedPreferences.Editor editor;
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_over);
         TextView reason = findViewById(R.id.game_over_reason);
-        if (getIntent().hasExtra("timer")) {
+        if(getIntent().hasExtra("timer")){
             reason.setText(getResources().getString(R.string.you_ran_out_of_time));
-        } else if (getIntent().hasExtra("tries")) {
+        } else if(getIntent().hasExtra("tries")){
             reason.setText(getResources().getString(R.string.you_ran_out_of_attempts));
         }
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -41,6 +41,11 @@ public class GameOverActivity extends AppCompatActivity {
         finish();
     }
 
+    /**
+     * Button listener for the return button. When clicked, redirects to the welcome screen.
+     *
+     * @param view Should always be the return button.
+     */
     public void onReturnClick(View view) {
         Intent intent = new Intent(GameOverActivity.this, WelcomeScreen.class);
         startActivity(intent);

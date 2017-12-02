@@ -16,7 +16,8 @@ import java.util.ArrayList;
 
 public class WordListFragment extends DialogFragment {
     private ArrayList<String> wordList = new ArrayList<>();
-    public static WordListFragment newInstance(ArrayList<String> list){
+
+    public static WordListFragment newInstance(ArrayList<String> list) {
         WordListFragment wordListFragment = new WordListFragment();
         Bundle args = new Bundle();
         args.putStringArrayList("wordList", list);

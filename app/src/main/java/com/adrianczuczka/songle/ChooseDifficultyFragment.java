@@ -14,13 +14,19 @@ import android.widget.Button;
 import java.util.ArrayList;
 
 /**
- * Created by adria_000 on 27/10/2017.
+ * Fragment where the user can choose the difficulty of the song he wishes to play.
  */
-
 public class ChooseDifficultyFragment extends DialogFragment {
+
     private static final int LOAD_KML_REQUEST = 1;
-    private String url,number,title;
-    public static ChooseDifficultyFragment newInstance(Intent kmlIntent){
+    private String url, number, title;
+
+    /**
+     * Method for creating new instance.
+     *
+     * @return A new ChooseDifficultyFragment.
+     */
+    public static ChooseDifficultyFragment newInstance(Intent kmlIntent) {
         ChooseDifficultyFragment fragment = new ChooseDifficultyFragment();
         Bundle args = kmlIntent.getExtras();
         fragment.setArguments(args);
@@ -40,7 +46,7 @@ public class ChooseDifficultyFragment extends DialogFragment {
             number = args.getString("number");
             title = args.getString("title");
         }
-        if (PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).getBoolean("set_extreme_mode_switch", false)) {
+        if(PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).getBoolean("set_extreme_mode_switch", false)){
             Intent kmlIntent = new Intent(getActivity(), NetworkActivity.class);
             kmlIntent.putExtra("url", url + "map1.kml");
             kmlIntent.putExtra("number", number);
@@ -119,4 +125,5 @@ public class ChooseDifficultyFragment extends DialogFragment {
         view.setMinimumWidth(width - 200);
         return view;
     }
+
 }

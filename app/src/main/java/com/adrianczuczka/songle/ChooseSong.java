@@ -25,6 +25,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Activity for choosing the song the user will play. Can be random or from a list of already guessed songs.
+ */
 public class ChooseSong extends AppCompatActivity {
     private HashMap<String, XMLParser.Song> songList = new HashMap<>();
     private RecyclerView recyclerView;
@@ -53,18 +56,18 @@ public class ChooseSong extends AppCompatActivity {
     private class parseXMLTask extends AsyncTask<String, Void, ArrayList<XMLParser.Song>> {
         @Override
         protected ArrayList<XMLParser.Song> doInBackground(String... strings) {
-            try {
+            try{
                 InputStream stream = new ByteArrayInputStream(strings[0].getBytes(StandardCharsets.UTF_8.name()));
                 XMLParser parser = new XMLParser();
                 return parser.parse(stream);
-            } catch (XmlPullParserException | IOException e) {
+            } catch(XmlPullParserException | IOException e){
                 return null;
             }
         }
 
         @Override
         protected void onPostExecute(ArrayList<XMLParser.Song> songs) {
-            for(XMLParser.Song song : songs) {
+            for(XMLParser.Song song : songs){
                 songList.put(song.Title, song);
             }
             successList.add(songList.get("Song 2"));
@@ -72,12 +75,11 @@ public class ChooseSong extends AppCompatActivity {
             for(String name : songList.keySet()){
                 if(sharedPreferences.getStringSet("finishedSongsList", new HashSet<String>()).contains(name)){
                     successList.add(songList.get(name));
-                }
-                else {
+                } else{
                     notGuessedList.add(songList.get(name));
                 }
             }
-            SongsAdapter mAdapter = new SongsAdapter(successList, getApplicationContext());
+            SongsAdapter mAdapter = new SongsAdapter(successList);
             recyclerView.setAdapter(mAdapter);
             mAdapter.notifyDataSetChanged();
         }
@@ -85,14 +87,13 @@ public class ChooseSong extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == LOAD_XML_REQUEST) {
-            if (resultCode == RESULT_OK) {
+        if(requestCode == LOAD_XML_REQUEST){
+            if(resultCode == RESULT_OK){
                 String xml = data.getStringExtra("string");
                 new parseXMLTask().execute(xml);
             }
-        }
-        else if(requestCode == LOAD_KML_REQUEST){
-            if (resultCode == RESULT_OK){
+        } else if(requestCode == LOAD_KML_REQUEST){
+            if(resultCode == RESULT_OK){
                 Intent lyricIntent = new Intent(ChooseSong.this, NetworkActivity.class);
                 String kml = data.getStringExtra("string");
                 String number = data.getStringExtra("number");
@@ -102,9 +103,8 @@ public class ChooseSong extends AppCompatActivity {
                 lyricIntent.putExtra("title", title);
                 startActivityForResult(lyricIntent, LOAD_LYRICS_REQUEST);
             }
-        }
-        else if (requestCode == LOAD_LYRICS_REQUEST){
-            if (resultCode == RESULT_OK){
+        } else if(requestCode == LOAD_LYRICS_REQUEST){
+            if(resultCode == RESULT_OK){
                 Intent mapIntent = new Intent(ChooseSong.this, GameUI.class);
                 String lyrics = data.getStringExtra("string");
                 String kml = data.getStringExtra("kml");
@@ -126,6 +126,11 @@ public class ChooseSong extends AppCompatActivity {
         finish();
     }
 
+    /**
+     * Listener for the list of already guessed songs. When a song is clicked, a ChooseDifficultyFragment will be shown for the song.
+     *
+     * @param view The clicked song.
+     */
     public void onClickSong(View view) {
         TextView numberView = view.findViewById(R.id.Number);
         TextView titleView = view.findViewById(R.id.Title);
@@ -137,6 +142,12 @@ public class ChooseSong extends AppCompatActivity {
         chooseDifficultyFragment.show(getSupportFragmentManager(), "hello");
     }
 
+    /**
+     * Listener for the random button. When clicked, a random song will be picked from the list of not yet guessed ones, then a
+     * ChooseDifficultyFragment will be shown for the song.
+     *
+     * @param view Should always be random button.
+     */
     public void onClickRandom(View view) {
         int randomNum = ThreadLocalRandom.current().nextInt(0, notGuessedList.size());
         Intent kmlIntent = new Intent(ChooseSong.this, NetworkActivity.class);

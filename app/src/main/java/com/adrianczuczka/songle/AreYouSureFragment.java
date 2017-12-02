@@ -12,16 +12,21 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 /**
- * Created by adria_000 on 23/11/2017.
+ * Fragment for asking user whether he wants to start new game when a game already exists. Has a Proceed and a Go Back button.
  */
-
 public class AreYouSureFragment extends DialogFragment {
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
 
-    public static AreYouSureFragment newInstance(){
+    /**
+     * Method for creating new instance.
+     *
+     * @return A new AreYouSureFragment.
+     */
+    public static AreYouSureFragment newInstance() {
         return new AreYouSureFragment();
     }
+
 
     @Nullable
     @Override
@@ -44,7 +49,12 @@ public class AreYouSureFragment extends DialogFragment {
         return view;
     }
 
-    public void onYesClick(View view){
+    /**
+     * Proceed button listener. Erases existing game data, then closes this fragment and redirects to the choose song screen.
+     *
+     * @param view should always be proceed button.
+     */
+    public void onYesClick(View view) {
         Intent intent = new Intent(getActivity(), ChooseSong.class);
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
         editor = sharedPreferences.edit();
@@ -58,7 +68,12 @@ public class AreYouSureFragment extends DialogFragment {
         dismiss();
     }
 
-    public void onNoClick(View view){
+    /**
+     * Go back button listener. Does nothing except close the fragment.
+     *
+     * @param view should always be go back button.
+     */
+    public void onNoClick(View view) {
         dismiss();
     }
 }

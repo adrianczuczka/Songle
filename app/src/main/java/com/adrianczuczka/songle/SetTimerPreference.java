@@ -11,14 +11,18 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 /**
- * Created by s1550570 on 02/11/17.
+ * Preference class which allows the user to set the timer by hours, minutes and seconds. Contains three input fields, a cancel button, and a confirm
+ * button.
  */
-
 public class SetTimerPreference extends DialogPreference {
     private int hours, minutes, seconds, total;
     private EditText editTextHours = null, editTextMinutes = null, editTextSeconds = null;
     private TextView hoursWarning = null, minutesWarning = null, secondsWarning = null;
 
+    /**
+     * @param context
+     * @param attrs
+     */
     public SetTimerPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
         setDialogLayoutResource(R.layout.pref_set_time);
@@ -27,7 +31,7 @@ public class SetTimerPreference extends DialogPreference {
         setDefaultValue(1800000);
         setDialogIcon(null);
     }
-    
+
     public int getTotal() {
         return total;
     }
@@ -81,25 +85,25 @@ public class SetTimerPreference extends DialogPreference {
     @Override
     protected void onDialogClosed(boolean positiveResult) {
         super.onDialogClosed(positiveResult);
-        if (positiveResult) {
-            if (editTextHours.getText().toString().equals("")) {
+        if(positiveResult){
+            if(editTextHours.getText().toString().equals("")){
                 hours = 0;
-            } else {
+            } else{
                 hours = Integer.parseInt(editTextHours.getText().toString());
             }
-            if (editTextMinutes.getText().toString().equals("")) {
+            if(editTextMinutes.getText().toString().equals("")){
                 minutes = 0;
-            } else {
+            } else{
                 minutes = Integer.parseInt(editTextMinutes.getText().toString());
             }
-            if (editTextSeconds.getText().toString().equals("")) {
+            if(editTextSeconds.getText().toString().equals("")){
                 seconds = 0;
-            } else {
+            } else{
                 seconds = Integer.parseInt(editTextSeconds.getText().toString());
             }
             total = (hours * 3600000) + (minutes * 60000) + (seconds * 1000);
             setSummary("Currently " + format(hours) + ":" + format(minutes) + ":" + format(seconds));
-            if (callChangeListener(total)) {
+            if(callChangeListener(total)){
                 setTotal(total);
                 setDefaultValue(total);
             }
@@ -107,9 +111,9 @@ public class SetTimerPreference extends DialogPreference {
     }
 
     private String format(int amount) {
-        if (amount < 10) {
+        if(amount < 10){
             return "0" + String.valueOf(amount);
-        } else {
+        } else{
             return String.valueOf(amount);
         }
     }
@@ -133,17 +137,17 @@ public class SetTimerPreference extends DialogPreference {
 
         @Override
         public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
-            try {
+            try{
                 int input = Integer.parseInt(dest.toString() + source.toString());
-                if (isInRange(mIntMin, mIntMax, input)) {
+                if(isInRange(mIntMin, mIntMax, input)){
                     hoursWarning.setVisibility(View.GONE);
                     minutesWarning.setVisibility(View.GONE);
                     secondsWarning.setVisibility(View.GONE);
                     return null;
                 }
-            } catch (NumberFormatException ignored) {
+            } catch(NumberFormatException ignored){
             }
-            switch (view) {
+            switch(view){
                 case "editTextHours":
                     hoursWarning.setVisibility(View.VISIBLE);
                     break;

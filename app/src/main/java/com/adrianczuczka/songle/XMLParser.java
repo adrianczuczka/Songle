@@ -10,9 +10,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 
 /**
- * Created by s1550570 on 08/10/17.
+ * Parser for the XML file containing the list of songs available.
  */
-
 public class XMLParser {
     public class Song {
         public final String Number;
@@ -31,13 +30,13 @@ public class XMLParser {
     private final String ns = null;
 
     public ArrayList<Song> parse(InputStream in) throws XmlPullParserException, IOException {
-        try {
+        try{
             XmlPullParser parser = Xml.newPullParser();
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
             parser.setInput(in, null);
             parser.nextTag();
             return readFeed(parser);
-        } finally {
+        } finally{
             in.close();
         }
     }
@@ -46,15 +45,15 @@ public class XMLParser {
         ArrayList<Song> songs = new ArrayList<>();
         //Log.e("GameUI", "made it to readfeed");
         parser.require(XmlPullParser.START_TAG, ns, "Songs");
-        while (parser.next() != XmlPullParser.END_TAG) {
-            if (parser.getEventType() != XmlPullParser.START_TAG) {
+        while(parser.next() != XmlPullParser.END_TAG){
+            if(parser.getEventType() != XmlPullParser.START_TAG){
                 continue;
             }
             String name = parser.getName();
             // Starts by looking for the entry tag
-            if (name.equals("Song")) {
+            if(name.equals("Song")){
                 songs.add(readSong(parser));
-            } else {
+            } else{
                 skip(parser);
             }
         }
@@ -68,12 +67,12 @@ public class XMLParser {
         String artist = null;
         String title = null;
         String link = null;
-        while (parser.next() != XmlPullParser.END_TAG) {
-            if (parser.getEventType() != XmlPullParser.START_TAG) {
+        while(parser.next() != XmlPullParser.END_TAG){
+            if(parser.getEventType() != XmlPullParser.START_TAG){
                 continue;
             }
             String tagName = parser.getName();
-            switch (tagName) {
+            switch(tagName){
                 case "Number":
                     number = readNumber(parser);
                     break;
@@ -124,7 +123,7 @@ public class XMLParser {
 
     private String readText(XmlPullParser parser) throws IOException, XmlPullParserException {
         String result = "";
-        if (parser.next() == XmlPullParser.TEXT) {
+        if(parser.next() == XmlPullParser.TEXT){
             result = parser.getText();
             parser.nextTag();
         }
@@ -132,12 +131,12 @@ public class XMLParser {
     }
 
     private void skip(XmlPullParser parser) throws XmlPullParserException, IOException {
-        if (parser.getEventType() != XmlPullParser.START_TAG) {
+        if(parser.getEventType() != XmlPullParser.START_TAG){
             throw new IllegalStateException();
         }
         int depth = 1;
-        while (depth != 0) {
-            switch (parser.next()) {
+        while(depth != 0){
+            switch(parser.next()){
                 case XmlPullParser.END_TAG:
                     depth--;
                     break;

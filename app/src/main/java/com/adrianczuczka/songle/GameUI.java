@@ -68,8 +68,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 
+/**
+ * Songle's main activity. Shows the map with markers on it. Also has a bottom sheet containing a "show list of markers found" button, an input
+ * field where the user can type in the song's name, and a confirm button that lets the user guess the song based on the input field.
+ */
 public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
-    private static final int LOAD_KML_REQUEST = 1;
     private final Looper looper = Looper.getMainLooper();
     private final LocationRequest mLocationRequest = new LocationRequest();
     private final LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
@@ -98,13 +101,13 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
     private TextView timerView;
 
     private void startLocationUpdates() {
-        try {
-            if (!mRequestingLocationUpdates) {
+        try{
+            if(! mRequestingLocationUpdates){
                 mFusedLocationClient.requestLocationUpdates(mLocationRequest,
                         mLocationCallback, looper);
                 mRequestingLocationUpdates = true;
             }
-        } catch (SecurityException e) {
+        } catch(SecurityException e){
             e.printStackTrace();
         }
     }
@@ -116,22 +119,10 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
     }
 
     private void mapReadyFunction() {
-        try {
+        try{
             mMap.getUiSettings().setMapToolbarEnabled(false);
             mMap.setMyLocationEnabled(true);
             mRequestingLocationUpdates = false;
-            /*mFusedLocationClient.getLastLocation()
-                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
-                            // Got last known location. In some rare situations this can be null.
-                            if (location != null) {
-                                // Logic to handle location object
-                                //startLocationUpdates();
-                            }
-                        }
-                    });
-            */
             SettingsClient client = LocationServices.getSettingsClient(this);
             Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
             task.addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
@@ -150,17 +141,17 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                 public void onFailure(@NonNull Exception e) {
                     int REQUEST_CHECK_SETTINGS = 1;
                     int statusCode = ((ApiException) e).getStatusCode();
-                    switch (statusCode) {
+                    switch(statusCode){
                         case CommonStatusCodes.RESOLUTION_REQUIRED:
                             // Location settings are not satisfied, but this can be fixed
                             // by showing the user a dialog.
-                            try {
+                            try{
                                 // Show the dialog by calling startResolutionForResult(),
                                 // and check the result in onActivityResult().
                                 ResolvableApiException resolvable = (ResolvableApiException) e;
                                 resolvable.startResolutionForResult(GameUI.this,
                                         REQUEST_CHECK_SETTINGS);
-                            } catch (IntentSender.SendIntentException sendEx) {
+                            } catch(IntentSender.SendIntentException sendEx){
                                 // Ignore the error.
                             }
                             break;
@@ -172,7 +163,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                 }
             });
             mapType = sharedPreferences.getString("set_map_type_list", "1");
-            switch (mapType) {
+            switch(mapType){
                 case "1":
                     break;
                 case "0":
@@ -181,25 +172,26 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                 case "-1":
                     mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
             }
-            if (sharedPreferences.getBoolean("set_extreme_mode_switch", false)) {
+            if(sharedPreferences.getBoolean("set_extreme_mode_switch", false)){
                 isTries = true;
                 maxTries = 1;
                 timerView.setVisibility(View.VISIBLE);
                 timerAmount = getIntent().hasExtra("resumed") ? sharedPreferences.getInt("set_timer_amount_resumed", 900000) : 900000;
                 Log.e("asidaiso", "asoidj");
                 normalCountdownTimer = startTimer(timerAmount);
-            } else {
+            } else{
                 isTries = sharedPreferences.getBoolean("set_try_switch", false);
                 maxTries = Integer.valueOf(sharedPreferences.getString("set_try_amount", "5"));
                 isTimer = sharedPreferences.getBoolean("set_timer_switch", false);
-                timerAmount = getIntent().hasExtra("resumed") ? sharedPreferences.getInt("set_timer_amount_resumed", 1800000) : sharedPreferences.getInt("set_timer_amount", 1800000);
-                if (isTimer) {
+                timerAmount = getIntent().hasExtra("resumed") ? sharedPreferences.getInt("set_timer_amount_resumed", 1800000) : sharedPreferences
+                        .getInt("set_timer_amount", 1800000);
+                if(isTimer){
                     timerView.setVisibility(View.VISIBLE);
                     normalCountdownTimer = startTimer(timerAmount);
                 }
             }
 
-        } catch (SecurityException e) {
+        } catch(SecurityException e){
             //warning
         }
     }
@@ -225,9 +217,9 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
-                if (!MarkerWordMap.isEmpty() && isMarkers) {
-                    for (Location location : locationResult.getLocations()) {
-                        for (Marker marker : MarkerWordMap.keySet()) {
+                if(! MarkerWordMap.isEmpty() && isMarkers){
+                    for(Location location : locationResult.getLocations()){
+                        for(Marker marker : MarkerWordMap.keySet()){
                             MarkerInfo markerInfo = (MarkerInfo) marker.getTag();
                             Location location1 = new Location("location");
                             Double latitude = marker.getPosition().latitude;
@@ -235,15 +227,15 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                             location1.setLatitude(latitude);
                             location1.setLongitude(longitude);
                             double locDistance = Double.parseDouble(String.valueOf(location.distanceTo(location1)));
-                            if (locDistance < 40) {
+                            if(locDistance < 40){
                                 assert markerInfo != null;
-                                if (!markerInfo.getGreen()) {
+                                if(! markerInfo.getGreen()){
                                     marker.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.success_marker));
                                     markerInfo.setGreen(true);
                                 }
-                            } else {
+                            } else{
                                 assert markerInfo != null;
-                                if (markerInfo.getGreen()) {
+                                if(markerInfo.getGreen()){
                                     marker.setIcon(BitmapDescriptorFactory.fromResource(getMarkerStyle(markerInfo)));
                                     markerInfo.setGreen(false);
                                 }
@@ -275,24 +267,26 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                 final TextView triesView = findViewById(R.id.game_ui_tries_amount);
                 String answer = answerInput.getText().toString();
                 String title = getIntent().getStringExtra("title");
-                if (levDistance(answer, title) <= 2) {
-                    SuccessFragment successFragment = SuccessFragment.newInstance(tries, new Date().getTime() - timeStarted, getIntent().getStringExtra("title"), SuccessList.size(), latLngList.size());
+                if(levDistance(answer, title) <= 2){
+                    SuccessFragment successFragment = SuccessFragment.newInstance(tries, new Date().getTime() - timeStarted, getIntent()
+                            .getStringExtra("title"), SuccessList.size(), latLngList.size());
                     successFragment.show(getSupportFragmentManager(), "success");
-                } else {
-                    if (isTries) {
-                        if (tries < maxTries) {
+                } else{
+                    if(isTries){
+                        if(tries < maxTries){
                             triesView.setText(getResources().getString(R.string.attempts_left, (maxTries - tries)));
-                        } else {
+                        } else{
                             Intent intent = new Intent(GameUI.this, GameOverActivity.class);
                             intent.putExtra("tries", "tries");
                             startActivity(intent);
                         }
-                    } else {
+                    } else{
                         triesView.setVisibility(View.VISIBLE);
                         new CountDownTimer(5000, 1000) {
                             @Override
                             public void onTick(long l) {
                             }
+
                             @Override
                             public void onFinish() {
                                 triesView.setVisibility(View.GONE);
@@ -326,10 +320,10 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         super.onPause();
         Log.e("paused", "paused");
         Boolean timerBackground = sharedPreferences.getBoolean("set_timer_background", false);
-        if (normalCountdownTimer != null) {
+        if(normalCountdownTimer != null){
             editor.putInt("set_timer_amount_resumed", timerAmountResumed);
             editor.commit();
-            if (!timerBackground) {
+            if(! timerBackground){
                 Log.e("canceled", "canceled");
                 normalCountdownTimer.cancel();
             }
@@ -340,8 +334,8 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
     protected void onResume() {
         super.onResume();
         Boolean timerBackground = sharedPreferences.getBoolean("set_timer_background", false);
-        int amount = sharedPreferences.getInt("set_timer_amount_resumed", -1);
-        if (!timerBackground && amount != -1 && normalCountdownTimer != null) {
+        int amount = sharedPreferences.getInt("set_timer_amount_resumed", - 1);
+        if(! timerBackground && amount != - 1 && normalCountdownTimer != null){
             normalCountdownTimer.cancel();
             normalCountdownTimer = startTimer(amount);
         }
@@ -352,19 +346,19 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         int minutes = (millis % 3600000) / 60000;
         int seconds = (millis % 60000) / 1000;
         String hoursString, minutesString, secondsString;
-        if (hours < 10) {
+        if(hours < 10){
             hoursString = "0" + String.valueOf(hours);
-        } else {
+        } else{
             hoursString = String.valueOf(hours);
         }
-        if (minutes < 10) {
+        if(minutes < 10){
             minutesString = "0" + String.valueOf(minutes);
-        } else {
+        } else{
             minutesString = String.valueOf(minutes);
         }
-        if (seconds < 10) {
+        if(seconds < 10){
             secondsString = "0" + String.valueOf(seconds);
-        } else {
+        } else{
             secondsString = String.valueOf(seconds);
         }
         return hoursString + ":" + minutesString + ":" + secondsString;
@@ -375,19 +369,19 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         long minutes = (millis % 3600000) / 60000;
         long seconds = (millis % 60000) / 1000;
         String hoursString, minutesString, secondsString;
-        if (hours < 10) {
+        if(hours < 10){
             hoursString = "0" + String.valueOf(hours);
-        } else {
+        } else{
             hoursString = String.valueOf(hours);
         }
-        if (minutes < 10) {
+        if(minutes < 10){
             minutesString = "0" + String.valueOf(minutes);
-        } else {
+        } else{
             minutesString = String.valueOf(minutes);
         }
-        if (seconds < 10) {
+        if(seconds < 10){
             secondsString = "0" + String.valueOf(seconds);
-        } else {
+        } else{
             secondsString = String.valueOf(seconds);
         }
         return hoursString + ":" + minutesString + ":" + secondsString;
@@ -398,13 +392,13 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         b = b.toLowerCase();
         // i == 0
         int[] costs = new int[b.length() + 1];
-        for (int j = 0; j < costs.length; j++)
+        for(int j = 0; j < costs.length; j++)
             costs[j] = j;
-        for (int i = 1; i <= a.length(); i++) {
+        for(int i = 1; i <= a.length(); i++){
             // j == 0; nw = lev(i - 1, j)
             costs[0] = i;
             int nw = i - 1;
-            for (int j = 1; j <= b.length(); j++) {
+            for(int j = 1; j <= b.length(); j++){
                 int cj = Math.min(1 + Math.min(costs[j], costs[j - 1]), a.charAt(i - 1) == b.charAt(j - 1) ? nw : nw + 1);
                 nw = costs[j];
                 costs[j] = cj;
@@ -440,9 +434,9 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        if (ContextCompat.checkSelfPermission(this,
+        if(ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
+                != PackageManager.PERMISSION_GRANTED){
             /*if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.ACCESS_FINE_LOCATION)) {
                 //show explanation
@@ -451,21 +445,17 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     1);
             //}
-        } else {
+        } else{
             mapReadyFunction();
         }
         TextView triesView = findViewById(R.id.game_ui_tries_amount);
-        if (isTries) {
+        if(isTries){
             triesView.setText(getResources().getString(R.string.attempts_left, maxTries));
-        } else {
+        } else{
             triesView.setVisibility(View.GONE);
             triesView.setText(getResources().getString(R.string.incorrect_try_again));
         }
-        LatLng northWestLatLng = new LatLng(55.946233, -3.192473);
-        LatLng northEastLatLng = new LatLng(55.946233, -3.184319);
-        LatLng southEastLatLng = new LatLng(55.942617, -3.184319);
-        LatLng southWestLatLng = new LatLng(55.942617, -3.192473);
-        LatLng centralLatLng = new LatLng(55.944425, -3.188396);
+        LatLng centralLatLng = new LatLng(55.944425, - 3.188396);
         CameraPosition central = new CameraPosition(centralLatLng, 15, 0, 0);
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(central));
         mMap.setOnMarkerClickListener(new OnMarkerClickListener() {
@@ -478,7 +468,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                 editor.commit();
                 //DEBUGGING
                 assert markerInfo != null;
-                if (markerInfo.isGreen) {
+                if(markerInfo.isGreen){
                     //success!
                     SuccessWordMap.put(marker, MarkerWordMap.get(marker));
                     //SuccessList.add(MarkerWordMap.get(marker));
@@ -494,14 +484,14 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         heatmapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!isHeatmap) {
+                if(! isHeatmap){
                     isHeatmap = true;
                     mProvider = new HeatmapTileProvider.Builder()
                             .data(latLngList)
                             .build();
                     // Add a tile overlay to the map, using the heat map tile provider.
                     mOverlay = mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
-                } else {
+                } else{
                     isHeatmap = false;
                     mOverlay.remove();
                 }
@@ -511,14 +501,14 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         markerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!isMarkers) {
+                if(! isMarkers){
                     isMarkers = true;
-                    for (Marker marker : MarkerWordMap.keySet()) {
+                    for(Marker marker : MarkerWordMap.keySet()){
                         marker.setVisible(true);
                     }
-                } else {
+                } else{
                     isMarkers = false;
-                    for (Marker marker : MarkerWordMap.keySet()) {
+                    for(Marker marker : MarkerWordMap.keySet()){
                         marker.setVisible(false);
                     }
                 }
@@ -528,14 +518,14 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String permissions[], @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case 1: {
-                if (permissions.length == 1 &&
+            @NonNull String permissions[], @NonNull int[] grantResults) {
+        switch(requestCode){
+            case 1:{
+                if(permissions.length == 1 &&
                         permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION) &&
-                        grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        grantResults[0] == PackageManager.PERMISSION_GRANTED){
                     mapReadyFunction();
-                } else {
+                } else{
                     //permission denied
                 }
             }
@@ -556,7 +546,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
     private int getMarkerStyle(MarkerInfo markerInfo) {
         String key = markerInfo.key;
         int result = 0;
-        switch (key) {
+        switch(key){
             case "unclassified":
                 result = R.mipmap.white_blank;
                 break;
@@ -579,31 +569,31 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
     private class createKMLtask extends AsyncTask<String, Void, KmlLayer> {
         @Override
         protected KmlLayer doInBackground(String... params) {
-            try {
+            try{
                 InputStream stream = new ByteArrayInputStream(params[0].getBytes(StandardCharsets.UTF_8.name()));
                 return new KmlLayer(mMap, stream, GameUI.this);
-            } catch (XmlPullParserException | IOException e) {
+            } catch(XmlPullParserException | IOException e){
                 return null;
             }
         }
 
         @Override
         protected void onPostExecute(KmlLayer kmlLayer) {
-            try {
+            try{
                 kmlLayer.addLayerToMap();
-            } catch (IOException | XmlPullParserException e) {
+            } catch(IOException | XmlPullParserException e){
                 e.printStackTrace();
             }
-            for (KmlContainer containers : kmlLayer.getContainers()) {
-                for (KmlPlacemark placemark : containers.getPlacemarks()) {
-                    if (placemark.getGeometry().getGeometryType().equals("Point")) {
+            for(KmlContainer containers : kmlLayer.getContainers()){
+                for(KmlPlacemark placemark : containers.getPlacemarks()){
+                    if(placemark.getGeometry().getGeometryType().equals("Point")){
                         KmlPoint point = (KmlPoint) placemark.getGeometry();
                         LatLng latLng = new LatLng(point.getGeometryObject().latitude, point.getGeometryObject().longitude);
                         latLngList.add(latLng);
                         String lyric = findLyric(getIntent().getStringExtra("lyrics"), placemark.getProperty("name"));
-                        if (!SuccessList.contains(lyric)) {
+                        if(! SuccessList.contains(lyric)){
                             Marker marker;
-                            switch (placemark.getStyleId()) {
+                            switch(placemark.getStyleId()){
                                 case "#unclassified":
                                     marker = mMap.addMarker(new MarkerOptions()
                                             .position(latLng)

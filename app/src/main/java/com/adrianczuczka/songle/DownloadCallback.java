@@ -2,13 +2,10 @@ package com.adrianczuczka.songle;
 
 import android.net.NetworkInfo;
 
-/**
- * Created by adria_000 on 28/09/2017.
- */
 
 public interface DownloadCallback<String> {
     interface Progress {
-        int ERROR = -1;
+        int ERROR = - 1;
         int CONNECT_SUCCESS = 0;
         int GET_INPUT_STREAM_SUCCESS = 1;
         int PROCESS_INPUT_STREAM_IN_PROGRESS = 2;

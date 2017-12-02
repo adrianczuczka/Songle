@@ -28,7 +28,7 @@ public class NetworkActivity extends FragmentActivity implements DownloadCallbac
     }
 
     private void startDownload() {
-        if (!mDownloading && mNetworkFragment != null) {
+        if(! mDownloading && mNetworkFragment != null){
             // Execute the async download.
             mNetworkFragment.startDownload(this);
             mDownloading = true;
@@ -42,10 +42,10 @@ public class NetworkActivity extends FragmentActivity implements DownloadCallbac
         if(getIntent().hasExtra("number")){
             resultIntent.putExtra("number", getIntent().getStringExtra("number"));
         }
-        if (getIntent().hasExtra("kml")){
+        if(getIntent().hasExtra("kml")){
             resultIntent.putExtra("kml", getIntent().getStringExtra("kml"));
         }
-        if (getIntent().hasExtra("title")){
+        if(getIntent().hasExtra("title")){
             resultIntent.putExtra("title", getIntent().getStringExtra("title"));
         }
         setResult(Activity.RESULT_OK, resultIntent);
@@ -70,22 +70,22 @@ public class NetworkActivity extends FragmentActivity implements DownloadCallbac
 
     @Override
     public void onProgressUpdate(int progressCode, int percentComplete) {
-        switch (progressCode) {
+        switch(progressCode){
             // You can add UI behavior for progress updates here.
             case DownloadCallback.Progress.ERROR:
-            //...
+                //...
                 break;
             case DownloadCallback.Progress.CONNECT_SUCCESS:
-            //...
+                //...
                 break;
             case DownloadCallback.Progress.GET_INPUT_STREAM_SUCCESS:
-            //...
+                //...
                 break;
             case DownloadCallback.Progress.PROCESS_INPUT_STREAM_IN_PROGRESS:
-            //...
+                //...
                 break;
             case DownloadCallback.Progress.PROCESS_INPUT_STREAM_SUCCESS:
-            //...
+                //...
                 break;
         }
     }
@@ -93,7 +93,7 @@ public class NetworkActivity extends FragmentActivity implements DownloadCallbac
     @Override
     public void finishDownloading() {
         mDownloading = false;
-        if (mNetworkFragment != null) {
+        if(mNetworkFragment != null){
             mNetworkFragment.cancelDownload();
         }
     }

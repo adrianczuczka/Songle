@@ -9,13 +9,13 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 /**
- * Created by adria_000 on 26/10/2017.
+ * Adapter for showing the list of words already found while playing a game.
  */
-
-public class WordListAdapter extends BaseAdapter{
+public class WordListAdapter extends BaseAdapter {
     private final Context mContext;
     private final ArrayList<String> wordList;
-    public WordListAdapter(Context context, ArrayList<String> wordList){
+
+    public WordListAdapter(Context context, ArrayList<String> wordList) {
         this.mContext = context;
         this.wordList = wordList;
     }

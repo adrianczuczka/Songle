@@ -92,7 +92,7 @@ public class NetworkFragment extends Fragment {
      * Cancel (and interrupt if necessary) any ongoing DownloadTask execution.
      */
     public void cancelDownload() {
-        if (mDownloadTask != null) {
+        if(mDownloadTask != null){
             mDownloadTask.cancel(true);
         }
     }
@@ -135,11 +135,11 @@ public class NetworkFragment extends Fragment {
          */
         @Override
         protected void onPreExecute() {
-            if (mCallback != null) {
+            if(mCallback != null){
                 NetworkInfo networkInfo = mCallback.getActiveNetworkInfo();
-                if (networkInfo == null || !networkInfo.isConnected() ||
+                if(networkInfo == null || ! networkInfo.isConnected() ||
                         (networkInfo.getType() != ConnectivityManager.TYPE_WIFI
-                                && networkInfo.getType() != ConnectivityManager.TYPE_MOBILE)) {
+                                && networkInfo.getType() != ConnectivityManager.TYPE_MOBILE)){
                     // If no connectivity, cancel task and update Callback with null data.
                     mCallback.updateFromDownload(null);
                     cancel(true);
@@ -153,17 +153,17 @@ public class NetworkFragment extends Fragment {
         @Override
         protected DownloadTask.Result doInBackground(String... urls) {
             Result result = null;
-            if (!isCancelled() && urls != null && urls.length > 0) {
+            if(! isCancelled() && urls != null && urls.length > 0){
                 String urlString = urls[0];
-                try {
+                try{
                     URL url = new URL(urlString);
                     String resultString = downloadUrl(url);
-                    if (resultString != null) {
+                    if(resultString != null){
                         result = new Result(resultString);
-                    } else {
+                    } else{
                         throw new IOException("No response received.");
                     }
-                } catch (Exception e) {
+                } catch(Exception e){
                     result = new Result(e);
                 }
             }
@@ -179,7 +179,7 @@ public class NetworkFragment extends Fragment {
             InputStream stream = null;
             HttpURLConnection connection = null;
             String result = null;
-            try {
+            try{
                 connection = (HttpURLConnection) url.openConnection();
                 // Timeout for reading InputStream arbitrarily set to 3000ms.
                 connection.setReadTimeout(100000);
@@ -194,22 +194,22 @@ public class NetworkFragment extends Fragment {
                 connection.connect();
                 //publishProgress(DownloadCallback.Progress.CONNECT_SUCCESS);
                 int responseCode = connection.getResponseCode();
-                if (responseCode != HttpsURLConnection.HTTP_OK) {
+                if(responseCode != HttpsURLConnection.HTTP_OK){
                     throw new IOException("HTTP error code: " + responseCode);
                 }
                 // Retrieve the response body as an InputStream.
                 stream = connection.getInputStream();
                 //publishProgress(DownloadCallback.Progress.GET_INPUT_STREAM_SUCCESS, 0);
-                if (stream != null) {
+                if(stream != null){
                     // Converts Stream to String with max length of 2000.
                     result = readStream(stream, 200000);
                 }
-            } finally {
+            } finally{
                 // Close Stream and disconnect HTTPS connection.
-                if (stream != null) {
+                if(stream != null){
                     stream.close();
                 }
-                if (connection != null) {
+                if(connection != null){
                     connection.disconnect();
                 }
             }
@@ -223,8 +223,8 @@ public class NetworkFragment extends Fragment {
             char[] rawBuffer = new char[maxReadSize];
             int readSize;
             StringBuilder buffer = new StringBuilder();
-            while (((readSize = reader.read(rawBuffer)) != -1) && maxReadSize > 0) {
-                if (readSize > maxReadSize) {
+            while(((readSize = reader.read(rawBuffer)) != - 1) && maxReadSize > 0){
+                if(readSize > maxReadSize){
                     readSize = maxReadSize;
                 }
                 buffer.append(rawBuffer, 0, readSize);
@@ -238,10 +238,10 @@ public class NetworkFragment extends Fragment {
          */
         @Override
         protected void onPostExecute(Result result) {
-            if (result != null && mCallback != null) {
-                if (result.mException != null) {
+            if(result != null && mCallback != null){
+                if(result.mException != null){
                     mCallback.updateFromDownload(result.mException.getMessage());
-                } else if (result.mResultValue != null) {
+                } else if(result.mResultValue != null){
                     mCallback.updateFromDownload(result.mResultValue);
                 }
                 mCallback.finishDownloading();
