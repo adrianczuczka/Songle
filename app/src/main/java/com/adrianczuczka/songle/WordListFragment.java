@@ -11,9 +11,8 @@ import android.widget.GridView;
 import java.util.ArrayList;
 
 /**
- * Created by adria_000 on 26/10/2017.
+ * {@link DialogFragment} that shows the list of words already found while playing a game.
  */
-
 public class WordListFragment extends DialogFragment {
     private ArrayList<String> wordList = new ArrayList<>();
 

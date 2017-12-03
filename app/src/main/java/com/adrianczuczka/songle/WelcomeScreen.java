@@ -9,40 +9,62 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 /**
- * Activity that shows the welcome screen. Has a new game button, a resume game button, and a settings button.
+ * Activity that shows the welcome screen. Has a new game button, a resume game button, and a
+ * settings button.
  */
 public class WelcomeScreen extends AppCompatActivity {
-
-    SharedPreferences sharedPreferences;
-    SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome_screen);
+        Button newGameButton = findViewById(R.id.welcome_screen_play_button);
+        newGameButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startChooseSong();
+            }
+        });
+        Button resumeGameButton = findViewById(R.id.welcome_screen_resume_button);
+        resumeGameButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startResumeSong();
+            }
+        });
+        Button settingsButton = findViewById(R.id.welcome_screen_settings_button);
+        settingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startSettings();
+            }
+        });
         boolean isOnline = isOnline();
         if(! isOnline){
-            Toast toast = Toast.makeText(WelcomeScreen.this, "No Internet Connection", Toast.LENGTH_LONG);
+            Toast toast = Toast.makeText(WelcomeScreen.this, "No Internet Connection", Toast
+                    .LENGTH_LONG);
             toast.show();
         }
     }
 
     /**
-     * {@link android.view.View.OnClickListener} for the new game button. When clicked, redirects to the choose song screen. If there is an existing
+     * {@link android.view.View.OnClickListener} for the new game button. When clicked, redirects
+     * to the choose song screen. If there is an existing
      * game already,
      * shows an {@link AreYouSureFragment} first
-     *
-     * @param view should always be new game button.
      */
-    public void startChooseSong(View view) {
+    private void startChooseSong() {
         if(! isOnline()){
-            Toast toast = Toast.makeText(WelcomeScreen.this, "No Internet Connection", Toast.LENGTH_LONG);
+            Toast toast = Toast.makeText(WelcomeScreen.this, "No Internet Connection", Toast
+                    .LENGTH_LONG);
             toast.show();
         } else{
-            sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences
+                    (getApplicationContext());
             String lyrics = sharedPreferences.getString("lyrics", "null");
             String kml = sharedPreferences.getString("kml", "null");
             String title = sharedPreferences.getString("title", "null");
@@ -51,8 +73,10 @@ public class WelcomeScreen extends AppCompatActivity {
                 areYouSureFragment.show(getSupportFragmentManager(), "are you sure");
             } else{
                 Intent intent = new Intent(WelcomeScreen.this, ChooseSong.class);
-                sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                editor = sharedPreferences.edit();
+                sharedPreferences = PreferenceManager.getDefaultSharedPreferences
+                        (getApplicationContext());
+
+                SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.remove("successList");
                 editor.remove("title");
                 editor.remove("kml");
@@ -65,13 +89,13 @@ public class WelcomeScreen extends AppCompatActivity {
     }
 
     /**
-     * {@link android.view.View.OnClickListener} for the resume song button. Redirects to {@link GameUI}.
-     *
-     * @param view Should always be the resume song button.
+     * {@link android.view.View.OnClickListener} for the resume song button. Redirects to
+     * {@link GameUI}.
      */
-    public void startResumeSong(View view) {
+    private void startResumeSong() {
         Intent mapIntent = new Intent(WelcomeScreen.this, GameUI.class);
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences
+                (getApplicationContext());
         String lyrics = sharedPreferences.getString("lyrics", "null");
         String kml = sharedPreferences.getString("kml", "null");
         String title = sharedPreferences.getString("title", "null");
@@ -86,11 +110,10 @@ public class WelcomeScreen extends AppCompatActivity {
     }
 
     /**
-     * {@link android.view.View.OnClickListener} for the settings button. Redirects to {@link SettingsActivity}.
-     *
-     * @param view Should always be the settings button.
+     * {@link android.view.View.OnClickListener} for the settings button. Redirects to
+     * {@link SettingsActivity}.
      */
-    public void startSettings(View view) {
+    private void startSettings() {
         Intent intent = new Intent(WelcomeScreen.this, SettingsActivity.class);
         startActivity(intent);
     }
@@ -100,7 +123,7 @@ public class WelcomeScreen extends AppCompatActivity {
      *
      * @return True if connected, false if not.
      */
-    public boolean isOnline() {
+    private boolean isOnline() {
         ConnectivityManager connMgr = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);
         assert connMgr != null;

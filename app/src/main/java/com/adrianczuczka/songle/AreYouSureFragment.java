@@ -15,8 +15,6 @@ import android.widget.Button;
  * Fragment for asking user whether he wants to start new game when a game already exists. Has a Proceed and a Go Back button.
  */
 public class AreYouSureFragment extends DialogFragment {
-    private SharedPreferences sharedPreferences;
-    private SharedPreferences.Editor editor;
 
     /**
      * Method for creating new instance.
@@ -37,13 +35,13 @@ public class AreYouSureFragment extends DialogFragment {
         yesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onYesClick(view);
+                onYesClick();
             }
         });
         noButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onNoClick(view);
+                onNoClick();
             }
         });
         return view;
@@ -52,12 +50,13 @@ public class AreYouSureFragment extends DialogFragment {
     /**
      * Proceed button listener. Erases existing game data, then closes this fragment and redirects to the choose song screen.
      *
-     * @param view should always be proceed button.
      */
-    public void onYesClick(View view) {
+    private void onYesClick() {
         Intent intent = new Intent(getActivity(), ChooseSong.class);
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
-        editor = sharedPreferences.edit();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences
+                (getActivity().getApplicationContext());
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.remove("successList");
         editor.remove("title");
         editor.remove("kml");
@@ -71,9 +70,8 @@ public class AreYouSureFragment extends DialogFragment {
     /**
      * Go back button listener. Does nothing except close the fragment.
      *
-     * @param view should always be go back button.
      */
-    public void onNoClick(View view) {
+    private void onNoClick() {
         dismiss();
     }
 }

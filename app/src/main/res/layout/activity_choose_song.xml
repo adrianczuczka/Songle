@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
     android:background="@color/cyan"
     android:fitsSystemWindows="true"
-    tools:context="com.adrianczuczka.songle.ChooseSong">
+    tools:context="com.adrianczuczka.songle.ChooseSong"
+    tools:ignore="Overdraw">
 
     <include
         layout="@layout/content_choose_song"

@@ -1,6 +1,7 @@
 package com.adrianczuczka.songle;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
@@ -62,6 +63,7 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
@@ -76,18 +78,15 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
     private final Looper looper = Looper.getMainLooper();
     private final LocationRequest mLocationRequest = new LocationRequest();
     private final LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
-    private final HashMap<Marker, String> MarkerWordMap = new HashMap<>();
-    private final HashMap<Marker, String> SuccessWordMap = new HashMap<>();
-    private final ArrayList<String> SuccessList = new ArrayList<>();
+    private final HashMap<Marker, String> markerWordMap = new HashMap<>();
+    private final ArrayList<String> successList = new ArrayList<>();
     private final ArrayList<LatLng> latLngList = new ArrayList<>();
     private HeatmapTileProvider mProvider;
     private TileOverlay mOverlay;
     private int tries = 0;
-    private boolean isTries, isTimer;
+    private boolean isTries;
     private int maxTries;
-    private int timerAmount;
     private long timeStarted;
-    private String mapType;
     private FusedLocationProviderClient mFusedLocationClient;
     private GoogleMap mMap;
     private boolean mRequestingLocationUpdates;
@@ -125,14 +124,16 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
             mRequestingLocationUpdates = false;
             SettingsClient client = LocationServices.getSettingsClient(this);
             Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
-            task.addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
+            task.addOnSuccessListener(new OnSuccessListener<LocationSettingsResponse>() {
                 @Override
                 public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
                     // All location settings are satisfied. The client can initialize
                     // location requests here.
                     // ...
                     String kml = getIntent().getStringExtra("kml");
-                    new createKMLtask().execute(kml);
+                    new createKMLtask(mMap, GameUI.this, latLngList, successList, markerWordMap,
+                            getIntent().getStringExtra("lyrics")
+                    ).execute(kml);
                     startLocationUpdates();
                 }
             });
@@ -162,7 +163,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                     }
                 }
             });
-            mapType = sharedPreferences.getString("set_map_type_list", "1");
+            String mapType = sharedPreferences.getString("set_map_type_list", "1");
             switch(mapType){
                 case "1":
                     break;
@@ -172,6 +173,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                 case "-1":
                     mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
             }
+            int timerAmount;
             if(sharedPreferences.getBoolean("set_extreme_mode_switch", false)){
                 isTries = true;
                 maxTries = 1;
@@ -182,7 +184,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
             } else{
                 isTries = sharedPreferences.getBoolean("set_try_switch", false);
                 maxTries = Integer.valueOf(sharedPreferences.getString("set_try_amount", "5"));
-                isTimer = sharedPreferences.getBoolean("set_timer_switch", false);
+                boolean isTimer = sharedPreferences.getBoolean("set_timer_switch", false);
                 timerAmount = getIntent().hasExtra("resumed") ? sharedPreferences.getInt("set_timer_amount_resumed", 1800000) : sharedPreferences
                         .getInt("set_timer_amount", 1800000);
                 if(isTimer){
@@ -206,7 +208,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         editor.putString("lyrics", getIntent().getStringExtra("lyrics"));
         editor.putString("kml", getIntent().getStringExtra("kml"));
         editor.putString("title", getIntent().getStringExtra("title"));
-        SuccessList.addAll(sharedPreferences.getStringSet("successList", new HashSet<String>()));
+        successList.addAll(sharedPreferences.getStringSet("successList", new HashSet<String>()));
         editor.apply();
         timeStarted = new Date().getTime();
         final SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -217,9 +219,9 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
-                if(! MarkerWordMap.isEmpty() && isMarkers){
+                if(! markerWordMap.isEmpty() && isMarkers){
                     for(Location location : locationResult.getLocations()){
-                        for(Marker marker : MarkerWordMap.keySet()){
+                        for(Marker marker : markerWordMap.keySet()){
                             MarkerInfo markerInfo = (MarkerInfo) marker.getTag();
                             Location location1 = new Location("location");
                             Double latitude = marker.getPosition().latitude;
@@ -254,7 +256,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         showList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                WordListFragment wordListFragment = WordListFragment.newInstance(SuccessList);
+                WordListFragment wordListFragment = WordListFragment.newInstance(successList);
                 wordListFragment.show(getSupportFragmentManager(), "hello");
             }
         });
@@ -268,8 +270,9 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                 String answer = answerInput.getText().toString();
                 String title = getIntent().getStringExtra("title");
                 if(levDistance(answer, title) <= 2){
-                    SuccessFragment successFragment = SuccessFragment.newInstance(tries, new Date().getTime() - timeStarted, getIntent()
-                            .getStringExtra("title"), SuccessList.size(), latLngList.size());
+                    SuccessFragment successFragment = SuccessFragment.newInstance(tries, new
+                            Date().getTime() - timeStarted, title, successList.size(), latLngList
+                            .size());
                     successFragment.show(getSupportFragmentManager(), "success");
                 } else{
                     if(isTries){
@@ -341,29 +344,6 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         }
     }
 
-    private String formatTime(int millis) {
-        int hours = millis / 3600000;
-        int minutes = (millis % 3600000) / 60000;
-        int seconds = (millis % 60000) / 1000;
-        String hoursString, minutesString, secondsString;
-        if(hours < 10){
-            hoursString = "0" + String.valueOf(hours);
-        } else{
-            hoursString = String.valueOf(hours);
-        }
-        if(minutes < 10){
-            minutesString = "0" + String.valueOf(minutes);
-        } else{
-            minutesString = String.valueOf(minutes);
-        }
-        if(seconds < 10){
-            secondsString = "0" + String.valueOf(seconds);
-        } else{
-            secondsString = String.valueOf(seconds);
-        }
-        return hoursString + ":" + minutesString + ":" + secondsString;
-    }
-
     private String formatTime(long millis) {
         long hours = millis / 3600000;
         long minutes = (millis % 3600000) / 60000;
@@ -412,8 +392,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         super.onBackPressed();
         mMap.clear();
         stopLocationUpdates();
-        Intent intent = new Intent(GameUI.this, WelcomeScreen.class);
-        startActivity(intent);
+        startActivity(new Intent(GameUI.this, WelcomeScreen.class));
         this.finish();
     }
 
@@ -463,18 +442,17 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
             public boolean onMarkerClick(Marker marker) {
                 MarkerInfo markerInfo = (MarkerInfo) marker.getTag();
                 //DEBUGGING
-                SuccessList.add(MarkerWordMap.get(marker));
-                editor.putStringSet("successList", new HashSet<>(SuccessList));
+                successList.add(markerWordMap.get(marker));
+                editor.putStringSet("successList", new HashSet<>(successList));
                 editor.commit();
                 //DEBUGGING
                 assert markerInfo != null;
                 if(markerInfo.isGreen){
                     //success!
-                    SuccessWordMap.put(marker, MarkerWordMap.get(marker));
-                    //SuccessList.add(MarkerWordMap.get(marker));
-                    editor.putStringSet("successList", new HashSet<>(SuccessList));
+                    //successList.add(markerWordMap.get(marker));
+                    editor.putStringSet("successList", new HashSet<>(successList));
                     editor.commit();
-                    MarkerWordMap.remove(marker);
+                    markerWordMap.remove(marker);
                     marker.remove();
                 }
                 return false;
@@ -503,12 +481,12 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
             public void onClick(View view) {
                 if(! isMarkers){
                     isMarkers = true;
-                    for(Marker marker : MarkerWordMap.keySet()){
+                    for(Marker marker : markerWordMap.keySet()){
                         marker.setVisible(true);
                     }
                 } else{
                     isMarkers = false;
-                    for(Marker marker : MarkerWordMap.keySet()){
+                    for(Marker marker : markerWordMap.keySet()){
                         marker.setVisible(false);
                     }
                 }
@@ -535,7 +513,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         }
     }
 
-    private String findLyric(String lyrics, String wordLoc) {
+    private static String findLyric(String lyrics, String wordLoc) {
         String[] coordinates = wordLoc.split(":");
         String result;
         String[] lines = lyrics.split("[0-9]+\t");
@@ -566,12 +544,31 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         return result;
     }
 
-    private class createKMLtask extends AsyncTask<String, Void, KmlLayer> {
+    private static class createKMLtask extends AsyncTask<String, Void, KmlLayer> {
+        final GoogleMap mMap;
+        final ArrayList<LatLng> latLngList;
+        final ArrayList<String> successList;
+        final HashMap<Marker, String> markerWordMap;
+        final WeakReference<Context> contextWeakReference;
+        final String lyrics;
+
+        public createKMLtask(GoogleMap mMap, Context context, ArrayList<LatLng> latLngList,
+                ArrayList<String> successList, HashMap<Marker, String> markerWordMap, String
+                lyrics) {
+            this.mMap = mMap;
+            this.contextWeakReference = new WeakReference<>(context);
+            this.latLngList = latLngList;
+            this.successList = successList;
+            this.markerWordMap = markerWordMap;
+            this.lyrics = lyrics;
+        }
+        
         @Override
         protected KmlLayer doInBackground(String... params) {
             try{
-                InputStream stream = new ByteArrayInputStream(params[0].getBytes(StandardCharsets.UTF_8.name()));
-                return new KmlLayer(mMap, stream, GameUI.this);
+                InputStream stream = new ByteArrayInputStream(params[0].getBytes(StandardCharsets
+                        .UTF_8.name()));
+                return new KmlLayer(mMap, stream, contextWeakReference.get());
             } catch(XmlPullParserException | IOException e){
                 return null;
             }
@@ -590,8 +587,8 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                         KmlPoint point = (KmlPoint) placemark.getGeometry();
                         LatLng latLng = new LatLng(point.getGeometryObject().latitude, point.getGeometryObject().longitude);
                         latLngList.add(latLng);
-                        String lyric = findLyric(getIntent().getStringExtra("lyrics"), placemark.getProperty("name"));
-                        if(! SuccessList.contains(lyric)){
+                        String lyric = findLyric(lyrics, placemark.getProperty("name"));
+                        if(! successList.contains(lyric)){
                             Marker marker;
                             switch(placemark.getStyleId()){
                                 case "#unclassified":
@@ -600,7 +597,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                                             .icon(BitmapDescriptorFactory.fromResource(R.mipmap.white_blank))
                                             .title("unclassified"));
                                     marker.setTag(new MarkerInfo("unclassified"));
-                                    MarkerWordMap.put(marker, lyric);
+                                    markerWordMap.put(marker, lyric);
                                     break;
                                 case "#boring":
                                     marker = mMap.addMarker(new MarkerOptions()
@@ -608,7 +605,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                                             .icon(BitmapDescriptorFactory.fromResource(R.mipmap.yellow_blank))
                                             .title("boring"));
                                     marker.setTag(new MarkerInfo("boring"));
-                                    MarkerWordMap.put(marker, lyric);
+                                    markerWordMap.put(marker, lyric);
                                     break;
                                 case "#notboring":
                                     marker = mMap.addMarker(new MarkerOptions()
@@ -616,7 +613,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                                             .icon(BitmapDescriptorFactory.fromResource(R.mipmap.yellow_circle))
                                             .title("not boring"));
                                     marker.setTag(new MarkerInfo("not boring"));
-                                    MarkerWordMap.put(marker, lyric);
+                                    markerWordMap.put(marker, lyric);
                                     break;
                                 case "#interesting":
                                     marker = mMap.addMarker(new MarkerOptions()
@@ -624,7 +621,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                                             .icon(BitmapDescriptorFactory.fromResource(R.mipmap.orange_diamond))
                                             .title("interesting"));
                                     marker.setTag(new MarkerInfo("interesting"));
-                                    MarkerWordMap.put(marker, lyric);
+                                    markerWordMap.put(marker, lyric);
                                     break;
                                 case "#veryinteresting":
                                     marker = mMap.addMarker(new MarkerOptions()
@@ -632,7 +629,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                                             .icon(BitmapDescriptorFactory.fromResource(R.mipmap.red_stars))
                                             .title("very interesting"));
                                     marker.setTag(new MarkerInfo("very interesting"));
-                                    MarkerWordMap.put(marker, lyric);
+                                    markerWordMap.put(marker, lyric);
                                     break;
                             }
                         }
@@ -643,7 +640,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         }
     }
 
-    private class MarkerInfo {
+    private static class MarkerInfo {
         private final String key;
         private boolean isGreen;
 

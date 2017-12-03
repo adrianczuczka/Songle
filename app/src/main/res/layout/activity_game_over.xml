@@ -6,7 +6,6 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/game_over_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -33,12 +32,10 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="103dp"
         android:fontFamily="@font/sniglet"
-        android:onClick="onReturnClick"
         android:text="@string/return_to_menu"
         android:textSize="35sp" />
 
     <ImageView
-        android:id="@+id/game_over_crying_emoji"
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:layout_alignParentTop="true"
@@ -49,7 +46,6 @@
         android:contentDescription="@string/crying_emoji" />
 
     <ImageView
-        android:id="@+id/game_over_confused_emoji"
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:layout_alignEnd="@+id/game_over_return_button"

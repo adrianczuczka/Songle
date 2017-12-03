@@ -19,10 +19,6 @@ public class SetTimerPreference extends DialogPreference {
     private EditText editTextHours = null, editTextMinutes = null, editTextSeconds = null;
     private TextView hoursWarning = null, minutesWarning = null, secondsWarning = null;
 
-    /**
-     * @param context
-     * @param attrs
-     */
     public SetTimerPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
         setDialogLayoutResource(R.layout.pref_set_time);
@@ -32,23 +28,7 @@ public class SetTimerPreference extends DialogPreference {
         setDialogIcon(null);
     }
 
-    public int getTotal() {
-        return total;
-    }
-
-    public int getHours() {
-        return hours;
-    }
-
-    public int getMinutes() {
-        return minutes;
-    }
-
-    public int getSeconds() {
-        return seconds;
-    }
-
-    public void setTotal(int total) {
+    private void setTotal(int total) {
         this.total = total;
         persistInt(total);
     }
@@ -120,18 +100,13 @@ public class SetTimerPreference extends DialogPreference {
 
     public class MinMaxFilter implements InputFilter {
 
-        private int mIntMin, mIntMax;
-        private String view;
+        private final int mIntMin;
+        private final int mIntMax;
+        private final String view;
 
         public MinMaxFilter(int minValue, int maxValue, String view) {
             this.mIntMin = minValue;
             this.mIntMax = maxValue;
-            this.view = view;
-        }
-
-        public MinMaxFilter(String minValue, String maxValue, String view) {
-            this.mIntMin = Integer.parseInt(minValue);
-            this.mIntMax = Integer.parseInt(maxValue);
             this.view = view;
         }
 

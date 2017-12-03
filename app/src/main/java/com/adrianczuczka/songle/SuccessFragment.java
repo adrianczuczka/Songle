@@ -26,9 +26,6 @@ public class SuccessFragment extends DialogFragment {
     private int tries, markersFound, totalMarkers;
     private long time;
     private String name;
-    private SharedPreferences sharedPreferences;
-    private SharedPreferences.Editor editor;
-    private Set<String> finishedSongsList;
 
     /**
      * @param tries        The amount of attempts taken at guessing the song.
@@ -74,7 +71,7 @@ public class SuccessFragment extends DialogFragment {
         finishButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onFinishClick(view);
+                onFinishClick();
             }
         });
         congratsText.setText(getResources().getString(R.string.you_guessed_it, name));
@@ -113,12 +110,14 @@ public class SuccessFragment extends DialogFragment {
     /**
      * Button listener for finishing the game and returning to the welcome screen.
      *
-     * @param view Should always be the finish button.
      */
-    public void onFinishClick(View view) {
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
-        editor = sharedPreferences.edit();
-        finishedSongsList = sharedPreferences.getStringSet("finishedSongsList", new HashSet<String>());
+    private void onFinishClick() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences
+                (getActivity().getApplicationContext());
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Set<String> finishedSongsList = sharedPreferences.getStringSet("finishedSongsList", new
+                HashSet<String>());
         finishedSongsList.add(name);
         editor.putStringSet("finishedSongsList", finishedSongsList);
         editor.remove("successList");

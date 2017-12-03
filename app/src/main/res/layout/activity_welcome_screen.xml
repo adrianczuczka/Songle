@@ -5,10 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/cyan"
-    android:id="@+id/welcome_screen_layout"
     tools:context="com.adrianczuczka.songle.WelcomeScreen"
     tools:layout_editor_absoluteX="0dp"
-    tools:layout_editor_absoluteY="81dp">
+    tools:layout_editor_absoluteY="81dp"
+    tools:ignore="Overdraw">
 
     <TextView
         android:id="@+id/welcome_screen_main_title"
@@ -42,7 +42,6 @@
         android:layout_marginRight="8dp"
         android:layout_marginTop="10dp"
         android:fontFamily="@font/sniglet_extrabold"
-        android:onClick="startChooseSong"
         android:text="@string/welcome_play_button"
         android:textSize="40sp"
         app:layout_constraintHorizontal_bias="0.503"
@@ -58,7 +57,6 @@
         android:layout_marginRight="8dp"
         android:text="@string/welcome_resume_button"
         android:fontFamily="@font/sniglet_extrabold"
-        android:onClick="startResumeSong"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintHorizontal_bias="0.502"
@@ -66,7 +64,7 @@
         app:layout_constraintTop_toBottomOf="@+id/welcome_screen_play_button" />
 
     <Button
-        android:id="@+id/welcome_screen_settings_game"
+        android:id="@+id/welcome_screen_settings_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
@@ -74,7 +72,6 @@
         android:width="100dp"
         android:elevation="0dp"
         android:fontFamily="@font/sniglet_extrabold"
-        android:onClick="startSettings"
         android:text="@string/welcome_settings_button"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -83,7 +80,6 @@
         app:layout_constraintTop_toBottomOf="@+id/welcome_screen_resume_button" />
 
     <ImageView
-        android:id="@+id/welcome_screen_joy_emoji"
         android:layout_width="161dp"
         android:layout_height="83dp"
         android:layout_marginEnd="80dp"
@@ -126,7 +122,6 @@
         tools:ignore="ContentDescription" />
 
     <ImageView
-        android:id="@+id/welcome_screen_music_emoji"
         android:layout_width="80dp"
         android:layout_height="76dp"
         android:layout_marginBottom="8dp"
@@ -153,7 +148,6 @@
         tools:ignore="ContentDescription" />
 
     <ImageView
-        android:id="@+id/welcome_screen_orange_on_disk"
         android:layout_width="57dp"
         android:layout_height="64dp"
         android:layout_marginBottom="8dp"
@@ -171,7 +165,6 @@
         tools:ignore="ContentDescription" />
 
     <ImageView
-        android:id="@+id/welcome_screen_yellow_on_disk"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
@@ -189,7 +182,6 @@
         tools:ignore="ContentDescription" />
 
     <ImageView
-        android:id="@+id/welcome_screen_red_on_disk"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"

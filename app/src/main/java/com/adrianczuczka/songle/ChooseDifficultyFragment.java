@@ -65,65 +65,29 @@ public class ChooseDifficultyFragment extends DialogFragment {
         Button mediumButton = view.findViewById(R.id.medium_button);
         Button hardButton = view.findViewById(R.id.hard_button);
         Button extremeButton = view.findViewById(R.id.extreme_button);
-        veryEasyButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent kmlIntent = new Intent(getActivity(), NetworkActivity.class);
-                kmlIntent.putExtra("url", url + "map5.kml");
-                kmlIntent.putExtra("number", number);
-                kmlIntent.putExtra("title", title);
-                getActivity().startActivityForResult(kmlIntent, LOAD_KML_REQUEST);
-                dismiss();
-            }
-        });
-        easyButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent kmlIntent = new Intent(getActivity(), NetworkActivity.class);
-                kmlIntent.putExtra("url", url + "map4.kml");
-                kmlIntent.putExtra("number", number);
-                kmlIntent.putExtra("title", title);
-                getActivity().startActivityForResult(kmlIntent, LOAD_KML_REQUEST);
-                dismiss();
-            }
-        });
-        mediumButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent kmlIntent = new Intent(getActivity(), NetworkActivity.class);
-                kmlIntent.putExtra("url", url + "map3.kml");
-                kmlIntent.putExtra("number", number);
-                kmlIntent.putExtra("title", title);
-                getActivity().startActivityForResult(kmlIntent, LOAD_KML_REQUEST);
-                dismiss();
-            }
-        });
-        hardButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent kmlIntent = new Intent(getActivity(), NetworkActivity.class);
-                kmlIntent.putExtra("url", url + "map2.kml");
-                kmlIntent.putExtra("number", number);
-                kmlIntent.putExtra("title", title);
-                getActivity().startActivityForResult(kmlIntent, LOAD_KML_REQUEST);
-                dismiss();
-            }
-        });
-        extremeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent kmlIntent = new Intent(getActivity(), NetworkActivity.class);
-                kmlIntent.putExtra("url", url + "map1.kml");
-                kmlIntent.putExtra("number", number);
-                kmlIntent.putExtra("title", title);
-                getActivity().startActivityForResult(kmlIntent, LOAD_KML_REQUEST);
-                dismiss();
-            }
-        });
+        setOnClick(veryEasyButton, 5);
+        setOnClick(easyButton, 4);
+        setOnClick(mediumButton, 3);
+        setOnClick(hardButton, 2);
+        setOnClick(extremeButton, 1);
         DisplayMetrics displaymetrics = getResources().getDisplayMetrics();
         int width = displaymetrics.widthPixels;
         view.setMinimumWidth(width - 200);
         return view;
+    }
+
+    private void setOnClick(Button button, final int num) {
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent kmlIntent = new Intent(getActivity(), NetworkActivity.class);
+                kmlIntent.putExtra("url", url + "map" + num + ".kml");
+                kmlIntent.putExtra("number", number);
+                kmlIntent.putExtra("title", title);
+                getActivity().startActivityForResult(kmlIntent, LOAD_KML_REQUEST);
+                dismiss();
+            }
+        });
     }
 
 }

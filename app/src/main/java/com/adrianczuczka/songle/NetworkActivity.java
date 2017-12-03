@@ -69,28 +69,6 @@ public class NetworkActivity extends FragmentActivity implements DownloadCallbac
     }
 
     @Override
-    public void onProgressUpdate(int progressCode, int percentComplete) {
-        switch(progressCode){
-            // You can add UI behavior for progress updates here.
-            case DownloadCallback.Progress.ERROR:
-                //...
-                break;
-            case DownloadCallback.Progress.CONNECT_SUCCESS:
-                //...
-                break;
-            case DownloadCallback.Progress.GET_INPUT_STREAM_SUCCESS:
-                //...
-                break;
-            case DownloadCallback.Progress.PROCESS_INPUT_STREAM_IN_PROGRESS:
-                //...
-                break;
-            case DownloadCallback.Progress.PROCESS_INPUT_STREAM_SUCCESS:
-                //...
-                break;
-        }
-    }
-
-    @Override
     public void finishDownloading() {
         mDownloading = false;
         if(mNetworkFragment != null){

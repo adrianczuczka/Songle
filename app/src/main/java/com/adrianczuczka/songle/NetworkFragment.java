@@ -60,6 +60,7 @@ public class NetworkFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         // Host Activity will handle callbacks from task.
+        //noinspection unchecked
         mCallback = (DownloadCallback<String>) context;
     }
 
@@ -80,9 +81,11 @@ public class NetworkFragment extends Fragment {
     /**
      * Start non-blocking execution of DownloadTask.
      */
+    @SuppressWarnings("unchecked")
     public void startDownload(Context context) {
         cancelDownload();
         mUrlString = getArguments().getString(URL_KEY);
+        //noinspection unchecked
         mCallback = (DownloadCallback<String>) context;
         mDownloadTask = new DownloadTask(mCallback);
         mDownloadTask.execute(mUrlString);
@@ -201,7 +204,7 @@ public class NetworkFragment extends Fragment {
                 stream = connection.getInputStream();
                 //publishProgress(DownloadCallback.Progress.GET_INPUT_STREAM_SUCCESS, 0);
                 if(stream != null){
-                    // Converts Stream to String with max length of 2000.
+                    // Converts Stream to String with max length of 200000.
                     result = readStream(stream, 200000);
                 }
             } finally{

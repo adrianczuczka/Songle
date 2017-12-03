@@ -4,7 +4,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.List;
@@ -20,13 +19,9 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.MyViewHolder
         public final TextView number;
         public final TextView artist;
         public final TextView title;
-        public final RelativeLayout layout;
-        public final View view;
 
         public MyViewHolder(View view) {
             super(view);
-            this.view = view;
-            layout = view.findViewById(R.id.song_list_row_layout);
             number = view.findViewById(R.id.Number);
             artist = view.findViewById(R.id.Artist);
             title = view.findViewById(R.id.Title);

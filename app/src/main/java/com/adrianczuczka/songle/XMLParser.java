@@ -12,18 +12,16 @@ import java.util.ArrayList;
 /**
  * Parser for the XML file containing the list of songs available.
  */
-public class XMLParser {
+class XMLParser {
     public class Song {
         public final String Number;
         public final String Artist;
         public final String Title;
-        public final String Link;
 
-        private Song(String Number, String Artist, String Title, String Link) {
+        private Song(String Number, String Artist, String Title) {
             this.Number = Number;
             this.Artist = Artist;
             this.Title = Title;
-            this.Link = Link;
         }
     }
 
@@ -66,7 +64,6 @@ public class XMLParser {
         String number = null;
         String artist = null;
         String title = null;
-        String link = null;
         while(parser.next() != XmlPullParser.END_TAG){
             if(parser.getEventType() != XmlPullParser.START_TAG){
                 continue;
@@ -82,15 +79,12 @@ public class XMLParser {
                 case "Title":
                     title = readTitle(parser);
                     break;
-                case "Link":
-                    link = readLink(parser);
-                    break;
                 default:
                     skip(parser);
                     break;
             }
         }
-        return new Song(number, artist, title, link);
+        return new Song(number, artist, title);
     }
 
     private String readNumber(XmlPullParser parser) throws XmlPullParserException, IOException {
@@ -112,13 +106,6 @@ public class XMLParser {
         String title = readText(parser);
         parser.require(XmlPullParser.END_TAG, ns, "Title");
         return title;
-    }
-
-    private String readLink(XmlPullParser parser) throws XmlPullParserException, IOException {
-        parser.require(XmlPullParser.START_TAG, ns, "Link");
-        String link = readText(parser);
-        parser.require(XmlPullParser.END_TAG, ns, "Link");
-        return link;
     }
 
     private String readText(XmlPullParser parser) throws IOException, XmlPullParserException {

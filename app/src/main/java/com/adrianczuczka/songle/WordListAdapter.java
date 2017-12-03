@@ -11,7 +11,7 @@ import java.util.ArrayList;
 /**
  * Adapter for showing the list of words already found while playing a game.
  */
-public class WordListAdapter extends BaseAdapter {
+class WordListAdapter extends BaseAdapter {
     private final Context mContext;
     private final ArrayList<String> wordList;
 
