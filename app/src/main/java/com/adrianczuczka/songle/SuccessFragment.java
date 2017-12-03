@@ -19,8 +19,10 @@ import java.util.Set;
 
 
 /**
- * A {@link DialogFragment} that shows the amount of attempts needed to guess the song, the time taken, the name of the song, the amount of markers
- * found and a ratio between markers found and total markers. Also has a return button that redirects to the welcome screen.
+ * A {@link DialogFragment} that shows the amount of attempts needed to guess the song, the time
+ * taken, the name of the song, the amount of markers
+ * found and a ratio between markers found and total markers. Also has a return button that
+ * redirects to the welcome screen.
  */
 public class SuccessFragment extends DialogFragment {
     private int tries, markersFound, totalMarkers;
@@ -35,7 +37,8 @@ public class SuccessFragment extends DialogFragment {
      * @param totalMarkers The total amount of markers found.
      * @return A new SuccessFragment.
      */
-    public static SuccessFragment newInstance(int tries, long time, String name, int markersFound, int totalMarkers) {
+    public static SuccessFragment newInstance(int tries, long time, String name, int
+            markersFound, int totalMarkers) {
         SuccessFragment successFragment = new SuccessFragment();
         Bundle args = new Bundle();
         args.putString("name", name);
@@ -60,7 +63,8 @@ public class SuccessFragment extends DialogFragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle
+            savedInstanceState) {
         final View view = inflater.inflate(R.layout.success_fragment, container, false);
         getDialog().setCanceledOnTouchOutside(false);
         TextView congratsText = view.findViewById(R.id.congrats_text);
@@ -74,11 +78,12 @@ public class SuccessFragment extends DialogFragment {
                 onFinishClick();
             }
         });
-        congratsText.setText(getResources().getString(R.string.you_guessed_it, name));
+        congratsText.setText(getResources().getString(R.string.the_song_was, name));
         triesAmount.setText(getResources().getString(R.string.attemps_needed, tries));
         timeTaken.setText(getResources().getString(R.string.time_taken, formatTime(time)));
         double ratio = ((double) markersFound / (double) totalMarkers) * 100;
-        markerAmount.setText(getResources().getQuantityString(R.plurals.markers_found, markersFound, markersFound, String.format(Locale.getDefault
+        markerAmount.setText(getResources().getQuantityString(R.plurals.markers_found,
+                markersFound, markersFound, String.format(Locale.getDefault
                 (), "%.2f", ratio)));
         return view;
     }
@@ -109,12 +114,10 @@ public class SuccessFragment extends DialogFragment {
 
     /**
      * Button listener for finishing the game and returning to the welcome screen.
-     *
      */
     private void onFinishClick() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences
                 (getActivity().getApplicationContext());
-
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Set<String> finishedSongsList = sharedPreferences.getStringSet("finishedSongsList", new
                 HashSet<String>());

@@ -163,9 +163,7 @@ public class ChooseSong extends AppCompatActivity {
 
     /**
      * Listener for the random button. When clicked, a random song will be picked from the list
-     * of not yet guessed ones, then a
-     * ChooseDifficultyFragment will be shown for the song.
-     *
+     * of not yet guessed ones, then a ChooseDifficultyFragment will be shown for the song.
      */
     private void onClickRandom() {
         int randomNum = ThreadLocalRandom.current().nextInt(0, notGuessedList.size());

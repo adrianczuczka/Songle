@@ -25,9 +25,7 @@ public class GameOverActivity extends AppCompatActivity {
         returnButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(GameOverActivity.this, WelcomeScreen.class);
-                startActivity(intent);
-                finish();
+                finishGame();
             }
         });
         if(getIntent().hasExtra("timer")){
@@ -39,12 +37,19 @@ public class GameOverActivity extends AppCompatActivity {
                 (getApplicationContext());
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.remove("successList");
+        editor.remove("title");
+        editor.remove("kml");
+        editor.remove("lyrics");
         editor.apply();
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        finishGame();
+    }
+
+    public void finishGame() {
         Intent intent = new Intent(GameOverActivity.this, WelcomeScreen.class);
         startActivity(intent);
         finish();

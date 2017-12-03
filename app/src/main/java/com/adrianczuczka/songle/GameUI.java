@@ -24,6 +24,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.CommonStatusCodes;
@@ -504,10 +505,15 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                         grantResults[0] == PackageManager.PERMISSION_GRANTED){
                     mapReadyFunction();
                 } else{
+                    Toast toast = Toast.makeText(GameUI.this, "Location permissions must be " +
+                                    "given for Songle to work properly. Please enable this in " +
+                                    "settings.",
+                            Toast
+                                    .LENGTH_LONG);
+                    toast.show();
                     //permission denied
                 }
             }
-
             // other 'case' lines to check for other
             // permissions this app might request
         }
@@ -552,10 +558,11 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         final WeakReference<Context> contextWeakReference;
         final String lyrics;
 
-        public createKMLtask(GoogleMap mMap, Context context, ArrayList<LatLng> latLngList,
+        createKMLtask(GoogleMap mMap, Context context, ArrayList<LatLng> latLngList,
                 ArrayList<String> successList, HashMap<Marker, String> markerWordMap, String
                 lyrics) {
             this.mMap = mMap;
+
             this.contextWeakReference = new WeakReference<>(context);
             this.latLngList = latLngList;
             this.successList = successList;
