@@ -75,7 +75,6 @@ public class WelcomeScreen extends AppCompatActivity {
                 Intent intent = new Intent(WelcomeScreen.this, ChooseSong.class);
                 sharedPreferences = PreferenceManager.getDefaultSharedPreferences
                         (getApplicationContext());
-
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.remove("successList");
                 editor.remove("title");
@@ -99,7 +98,9 @@ public class WelcomeScreen extends AppCompatActivity {
         String lyrics = sharedPreferences.getString("lyrics", "null");
         String kml = sharedPreferences.getString("kml", "null");
         String title = sharedPreferences.getString("title", "null");
+        int difficulty = sharedPreferences.getInt("difficulty", 0);
         if(! (lyrics.equals("null") || kml.equals("null") || title.equals("null"))){
+            mapIntent.putExtra("difficulty", 0);
             mapIntent.putExtra("resumed", true);
             mapIntent.putExtra("lyrics", lyrics);
             mapIntent.putExtra("kml", kml);

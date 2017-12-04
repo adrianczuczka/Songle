@@ -53,6 +53,8 @@ import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.google.maps.android.data.kml.KmlContainer;
 import com.google.maps.android.data.kml.KmlLayer;
 import com.google.maps.android.data.kml.KmlPlacemark;
@@ -65,15 +67,19 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * Songle's main activity. Shows the map with markers on it. Also has a bottom sheet containing a "show list of markers found" button, an input
- * field where the user can type in the song's name, and a confirm button that lets the user guess the song based on the input field.
+ * Songle's main activity. Shows the map with markers on it. Also has a bottom sheet containing a
+ * "show list of markers found" button, an input
+ * field where the user can type in the song's name, and a confirm button that lets the user
+ * guess the song based on the input field.
  */
 public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
     private final Looper looper = Looper.getMainLooper();
@@ -82,6 +88,8 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
     private final HashMap<Marker, String> markerWordMap = new HashMap<>();
     private final ArrayList<String> successList = new ArrayList<>();
     private final ArrayList<LatLng> latLngList = new ArrayList<>();
+    private final ArrayList<TimerMarkerWrapper> timeMarkerWrapperList = new ArrayList<>();
+    private final ArrayList<Marker> timeMarkerList = new ArrayList<>();
     private HeatmapTileProvider mProvider;
     private TileOverlay mOverlay;
     private int tries = 0;
@@ -99,6 +107,14 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
     private CountDownTimer normalCountdownTimer;
     private int timerAmountResumed;
     private TextView timerView;
+    private int difficulty;
+    private static LatLng northWestLatLng = new LatLng(55.946233, - 3.192473);
+    private static LatLng northEastLatLng = new LatLng(55.946233, - 3.184319);
+    private static LatLng southWestLatLng = new LatLng(55.942617, - 3.192473);
+    private static LatLng southEastLatLng = new LatLng(55.942617, - 3.184319);
+    private static LatLng centralLatLng = new LatLng(55.944425, - 3.188396);
+    private static Gson gson = new Gson();
+    private Boolean isResumed;
 
     private void startLocationUpdates() {
         try{
@@ -133,8 +149,9 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                     // ...
                     String kml = getIntent().getStringExtra("kml");
                     new createKMLtask(mMap, GameUI.this, latLngList, successList, markerWordMap,
-                            getIntent().getStringExtra("lyrics")
-                    ).execute(kml);
+                            getIntent().getStringExtra("lyrics"), difficulty, timeMarkerWrapperList,
+                            sharedPreferences, editor, isResumed, timeMarkerList).execute(kml);
+
                     startLocationUpdates();
                 }
             });
@@ -179,14 +196,15 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                 isTries = true;
                 maxTries = 1;
                 timerView.setVisibility(View.VISIBLE);
-                timerAmount = getIntent().hasExtra("resumed") ? sharedPreferences.getInt("set_timer_amount_resumed", 900000) : 900000;
-                Log.e("asidaiso", "asoidj");
+                timerAmount = isResumed ? sharedPreferences.getInt
+                        ("set_timer_amount_resumed", 900000) : 900000;
                 normalCountdownTimer = startTimer(timerAmount);
             } else{
                 isTries = sharedPreferences.getBoolean("set_try_switch", false);
                 maxTries = Integer.valueOf(sharedPreferences.getString("set_try_amount", "5"));
                 boolean isTimer = sharedPreferences.getBoolean("set_timer_switch", false);
-                timerAmount = getIntent().hasExtra("resumed") ? sharedPreferences.getInt("set_timer_amount_resumed", 1800000) : sharedPreferences
+                timerAmount = getIntent().hasExtra("resumed") ? sharedPreferences.getInt
+                        ("set_timer_amount_resumed", 1800000) : sharedPreferences
                         .getInt("set_timer_amount", 1800000);
                 if(isTimer){
                     timerView.setVisibility(View.VISIBLE);
@@ -204,13 +222,26 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_ui);
         timerView = findViewById(R.id.game_ui_timer_view);
+        isResumed = getIntent().getBooleanExtra("resumed", false);
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         editor = sharedPreferences.edit();
         editor.putString("lyrics", getIntent().getStringExtra("lyrics"));
         editor.putString("kml", getIntent().getStringExtra("kml"));
         editor.putString("title", getIntent().getStringExtra("title"));
-        successList.addAll(sharedPreferences.getStringSet("successList", new HashSet<String>()));
+        editor.putInt("difficulty", getIntent().getIntExtra("difficulty", 0));
+        ArrayList<String> tempList1 = isResumed ? gson.fromJson
+                (sharedPreferences.getString("successList",
+                        null), ArrayList.class) : new ArrayList<String>();
+        successList.addAll(tempList1);
+        Type listType = new TypeToken<ArrayList<TimerMarkerWrapper>>() {}.getType();
+        ArrayList<TimerMarkerWrapper> tempList2 = isResumed ? (ArrayList<TimerMarkerWrapper>)
+                gson.fromJson
+                        (sharedPreferences.getString("timeMarkerWrapperList",
+                                null), listType) : new ArrayList<TimerMarkerWrapper>();
+        timeMarkerWrapperList.addAll(tempList2);
+        editor.putString("successList", gson.toJson(successList));
         editor.apply();
+        difficulty = sharedPreferences.getInt("difficulty", 0);
         timeStarted = new Date().getTime();
         final SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -229,17 +260,43 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                             Double longitude = marker.getPosition().longitude;
                             location1.setLatitude(latitude);
                             location1.setLongitude(longitude);
-                            double locDistance = Double.parseDouble(String.valueOf(location.distanceTo(location1)));
+                            double locDistance = Double.parseDouble(String.valueOf(location
+                                    .distanceTo(location1)));
                             if(locDistance < 40){
-                                assert markerInfo != null;
                                 if(! markerInfo.getGreen()){
-                                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.success_marker));
+                                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap
+                                            .success_marker));
                                     markerInfo.setGreen(true);
                                 }
                             } else{
                                 assert markerInfo != null;
                                 if(markerInfo.getGreen()){
-                                    marker.setIcon(BitmapDescriptorFactory.fromResource(getMarkerStyle(markerInfo)));
+                                    marker.setIcon(BitmapDescriptorFactory.fromResource
+                                            (getMarkerStyle(markerInfo)));
+                                    markerInfo.setGreen(false);
+                                }
+                            }
+                        }
+                        for(Marker marker : timeMarkerList){
+                            MarkerInfo markerInfo = (MarkerInfo) marker.getTag();
+                            Location location1 = new Location("location");
+                            Double latitude = marker.getPosition().latitude;
+                            Double longitude = marker.getPosition().longitude;
+                            location1.setLatitude(latitude);
+                            location1.setLongitude(longitude);
+                            double locDistance = Double.parseDouble(String.valueOf(location
+                                    .distanceTo(location1)));
+                            if(locDistance < 100){
+                                if(! markerInfo.getGreen()){
+                                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap
+                                            .clock_in_range));
+                                    markerInfo.setGreen(true);
+                                }
+                            } else{
+                                assert markerInfo != null;
+                                if(markerInfo.getGreen()){
+                                    marker.setIcon(BitmapDescriptorFactory.fromResource
+                                            (getMarkerStyle(markerInfo)));
                                     markerInfo.setGreen(false);
                                 }
                             }
@@ -248,7 +305,6 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                 }
             }
         };
-
         LinearLayout view = findViewById(R.id.game_ui_bottom_sheet);
         BottomSheetBehavior mBottomSheetBehavior = BottomSheetBehavior.from(view);
         mBottomSheetBehavior.setPeekHeight(125);
@@ -278,7 +334,8 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                 } else{
                     if(isTries){
                         if(tries < maxTries){
-                            triesView.setText(getResources().getString(R.string.attempts_left, (maxTries - tries)));
+                            triesView.setText(getResources().getString(R.string.attempts_left,
+                                    (maxTries - tries)));
                         } else{
                             Intent intent = new Intent(GameUI.this, GameOverActivity.class);
                             intent.putExtra("tries", "tries");
@@ -324,14 +381,15 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         super.onPause();
         Log.e("paused", "paused");
         Boolean timerBackground = sharedPreferences.getBoolean("set_timer_background", false);
+        editor.putInt("difficulty", difficulty);
         if(normalCountdownTimer != null){
             editor.putInt("set_timer_amount_resumed", timerAmountResumed);
-            editor.commit();
             if(! timerBackground){
                 Log.e("canceled", "canceled");
                 normalCountdownTimer.cancel();
             }
         }
+        editor.commit();
     }
 
     @Override
@@ -343,49 +401,6 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
             normalCountdownTimer.cancel();
             normalCountdownTimer = startTimer(amount);
         }
-    }
-
-    private String formatTime(long millis) {
-        long hours = millis / 3600000;
-        long minutes = (millis % 3600000) / 60000;
-        long seconds = (millis % 60000) / 1000;
-        String hoursString, minutesString, secondsString;
-        if(hours < 10){
-            hoursString = "0" + String.valueOf(hours);
-        } else{
-            hoursString = String.valueOf(hours);
-        }
-        if(minutes < 10){
-            minutesString = "0" + String.valueOf(minutes);
-        } else{
-            minutesString = String.valueOf(minutes);
-        }
-        if(seconds < 10){
-            secondsString = "0" + String.valueOf(seconds);
-        } else{
-            secondsString = String.valueOf(seconds);
-        }
-        return hoursString + ":" + minutesString + ":" + secondsString;
-    }
-
-    private int levDistance(String a, String b) {
-        a = a.toLowerCase();
-        b = b.toLowerCase();
-        // i == 0
-        int[] costs = new int[b.length() + 1];
-        for(int j = 0; j < costs.length; j++)
-            costs[j] = j;
-        for(int i = 1; i <= a.length(); i++){
-            // j == 0; nw = lev(i - 1, j)
-            costs[0] = i;
-            int nw = i - 1;
-            for(int j = 1; j <= b.length(); j++){
-                int cj = Math.min(1 + Math.min(costs[j], costs[j - 1]), a.charAt(i - 1) == b.charAt(j - 1) ? nw : nw + 1);
-                nw = costs[j];
-                costs[j] = cj;
-            }
-        }
-        return costs[b.length()];
     }
 
     @Override
@@ -435,7 +450,6 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
             triesView.setVisibility(View.GONE);
             triesView.setText(getResources().getString(R.string.incorrect_try_again));
         }
-        LatLng centralLatLng = new LatLng(55.944425, - 3.188396);
         CameraPosition central = new CameraPosition(centralLatLng, 15, 0, 0);
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(central));
         mMap.setOnMarkerClickListener(new OnMarkerClickListener() {
@@ -443,19 +457,31 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
             public boolean onMarkerClick(Marker marker) {
                 MarkerInfo markerInfo = (MarkerInfo) marker.getTag();
                 //DEBUGGING
-                successList.add(markerWordMap.get(marker));
-                editor.putStringSet("successList", new HashSet<>(successList));
-                editor.commit();
-                //DEBUGGING
-                assert markerInfo != null;
                 if(markerInfo.isGreen){
-                    //success!
-                    //successList.add(markerWordMap.get(marker));
-                    editor.putStringSet("successList", new HashSet<>(successList));
-                    editor.commit();
-                    markerWordMap.remove(marker);
-                    marker.remove();
+                    if(markerInfo.getKey().equals("timer")){
+                        normalCountdownTimer.cancel();
+                        timerAmountResumed += (markerInfo.getMinutes() * 60000);
+                        normalCountdownTimer = startTimer(timerAmountResumed);
+                        List<TimerMarkerWrapper> toRemove = new ArrayList<>();
+                        for(TimerMarkerWrapper tmw : timeMarkerWrapperList){
+                            if(tmw.getLatLng().equals(marker.getPosition())){
+                                toRemove.add(tmw);
+                            }
+                        }
+                        timeMarkerWrapperList.removeAll(toRemove);
+                        timeMarkerList.remove(marker);
+                        editor.putString("timeMarkerWrapperList", gson.toJson
+                                (timeMarkerWrapperList));
+                        marker.remove();
+                    } else{
+                        Log.e("gson", marker.toString());
+                        successList.add(markerWordMap.get(marker));
+                        editor.putString("successList", gson.toJson(successList));
+                        markerWordMap.remove(marker);
+                        marker.remove();
+                    }
                 }
+                editor.commit();
                 return false;
             }
         });
@@ -469,7 +495,8 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                             .data(latLngList)
                             .build();
                     // Add a tile overlay to the map, using the heat map tile provider.
-                    mOverlay = mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
+                    mOverlay = mMap.addTileOverlay(new TileOverlayOptions().tileProvider
+                            (mProvider));
                 } else{
                     isHeatmap = false;
                     mOverlay.remove();
@@ -519,34 +546,41 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         }
     }
 
+    private static void addTimerMarkers(int difficulty, HashMap<Marker, String>
+            markerWordMap,
+            GoogleMap mMap, ArrayList<TimerMarkerWrapper> timeMarkerWrapperList,
+            ArrayList<Marker> timeMarkerList) {
+        Log.e("difficulty", String.valueOf(difficulty));
+
+        if(difficulty != 1 && difficulty != 0){
+            //Set amount of time markers to 10% of actual markers;
+            int amount = markerWordMap.keySet().size() / 10;
+            Log.e("amount", String.valueOf(amount));
+            for(int i = 0; i < amount; i++){
+                Double gauss = (ThreadLocalRandom.current().nextGaussian() + difficulty);
+                int gaussian = gauss.intValue();
+                double latitude = ThreadLocalRandom.current().nextDouble(southEastLatLng.latitude,
+                        northWestLatLng.latitude);
+                double longitude = ThreadLocalRandom.current().nextDouble(southWestLatLng
+                        .longitude, northEastLatLng.longitude);
+                LatLng latLng = new LatLng(latitude, longitude);
+                Marker marker = mMap.addMarker(new MarkerOptions()
+                        .position(latLng)
+                        .icon(BitmapDescriptorFactory.fromResource(R.mipmap.clock))
+                        .title("more time!"));
+                marker.setTag(new MarkerInfo("timer", gaussian));
+                timeMarkerWrapperList.add(new TimerMarkerWrapper(marker));
+                timeMarkerList.add(marker);
+            }
+        }
+    }
+
     private static String findLyric(String lyrics, String wordLoc) {
         String[] coordinates = wordLoc.split(":");
         String result;
         String[] lines = lyrics.split("[0-9]+\t");
-        result = lines[Integer.parseInt(coordinates[0])].split("\\s")[Integer.parseInt(coordinates[1]) - 1];
-        return result;
-    }
-
-    private int getMarkerStyle(MarkerInfo markerInfo) {
-        String key = markerInfo.key;
-        int result = 0;
-        switch(key){
-            case "unclassified":
-                result = R.mipmap.white_blank;
-                break;
-            case "boring":
-                result = R.mipmap.yellow_blank;
-                break;
-            case "not boring":
-                result = R.mipmap.yellow_circle;
-                break;
-            case "interesting":
-                result = R.mipmap.orange_diamond;
-                break;
-            case "very interesting":
-                result = R.mipmap.red_stars;
-                break;
-        }
+        result = lines[Integer.parseInt(coordinates[0])].split("\\s")[Integer.parseInt
+                (coordinates[1]) - 1];
         return result;
     }
 
@@ -557,19 +591,33 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         final HashMap<Marker, String> markerWordMap;
         final WeakReference<Context> contextWeakReference;
         final String lyrics;
+        final int difficulty;
+        final ArrayList<TimerMarkerWrapper> timeMarkerWrapperList;
+        final SharedPreferences sharedPreferences;
+        final SharedPreferences.Editor editor;
+        final Boolean isResumed;
+        final ArrayList<Marker> timeMarkerList;
 
         createKMLtask(GoogleMap mMap, Context context, ArrayList<LatLng> latLngList,
                 ArrayList<String> successList, HashMap<Marker, String> markerWordMap, String
-                lyrics) {
+                lyrics, int difficulty, ArrayList<TimerMarkerWrapper> timeMarkerWrapperList,
+                SharedPreferences
+                        sharedPreferences, SharedPreferences.Editor editor, Boolean isResumed,
+                ArrayList<Marker> timeMarkerList) {
             this.mMap = mMap;
-
             this.contextWeakReference = new WeakReference<>(context);
             this.latLngList = latLngList;
             this.successList = successList;
             this.markerWordMap = markerWordMap;
             this.lyrics = lyrics;
+            this.difficulty = difficulty;
+            this.timeMarkerWrapperList = timeMarkerWrapperList;
+            this.sharedPreferences = sharedPreferences;
+            this.editor = editor;
+            this.isResumed = isResumed;
+            this.timeMarkerList = timeMarkerList;
         }
-        
+
         @Override
         protected KmlLayer doInBackground(String... params) {
             try{
@@ -592,7 +640,8 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                 for(KmlPlacemark placemark : containers.getPlacemarks()){
                     if(placemark.getGeometry().getGeometryType().equals("Point")){
                         KmlPoint point = (KmlPoint) placemark.getGeometry();
-                        LatLng latLng = new LatLng(point.getGeometryObject().latitude, point.getGeometryObject().longitude);
+                        LatLng latLng = new LatLng(point.getGeometryObject().latitude, point
+                                .getGeometryObject().longitude);
                         latLngList.add(latLng);
                         String lyric = findLyric(lyrics, placemark.getProperty("name"));
                         if(! successList.contains(lyric)){
@@ -601,7 +650,8 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                                 case "#unclassified":
                                     marker = mMap.addMarker(new MarkerOptions()
                                             .position(latLng)
-                                            .icon(BitmapDescriptorFactory.fromResource(R.mipmap.white_blank))
+                                            .icon(BitmapDescriptorFactory.fromResource(R.mipmap
+                                                    .white_blank))
                                             .title("unclassified"));
                                     marker.setTag(new MarkerInfo("unclassified"));
                                     markerWordMap.put(marker, lyric);
@@ -609,7 +659,8 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                                 case "#boring":
                                     marker = mMap.addMarker(new MarkerOptions()
                                             .position(latLng)
-                                            .icon(BitmapDescriptorFactory.fromResource(R.mipmap.yellow_blank))
+                                            .icon(BitmapDescriptorFactory.fromResource(R.mipmap
+                                                    .yellow_blank))
                                             .title("boring"));
                                     marker.setTag(new MarkerInfo("boring"));
                                     markerWordMap.put(marker, lyric);
@@ -617,7 +668,8 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                                 case "#notboring":
                                     marker = mMap.addMarker(new MarkerOptions()
                                             .position(latLng)
-                                            .icon(BitmapDescriptorFactory.fromResource(R.mipmap.yellow_circle))
+                                            .icon(BitmapDescriptorFactory.fromResource(R.mipmap
+                                                    .yellow_circle))
                                             .title("not boring"));
                                     marker.setTag(new MarkerInfo("not boring"));
                                     markerWordMap.put(marker, lyric);
@@ -625,7 +677,8 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                                 case "#interesting":
                                     marker = mMap.addMarker(new MarkerOptions()
                                             .position(latLng)
-                                            .icon(BitmapDescriptorFactory.fromResource(R.mipmap.orange_diamond))
+                                            .icon(BitmapDescriptorFactory.fromResource(R.mipmap
+                                                    .orange_diamond))
                                             .title("interesting"));
                                     marker.setTag(new MarkerInfo("interesting"));
                                     markerWordMap.put(marker, lyric);
@@ -633,7 +686,8 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                                 case "#veryinteresting":
                                     marker = mMap.addMarker(new MarkerOptions()
                                             .position(latLng)
-                                            .icon(BitmapDescriptorFactory.fromResource(R.mipmap.red_stars))
+                                            .icon(BitmapDescriptorFactory.fromResource(R.mipmap
+                                                    .red_stars))
                                             .title("very interesting"));
                                     marker.setTag(new MarkerInfo("very interesting"));
                                     markerWordMap.put(marker, lyric);
@@ -643,25 +697,164 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                     }
                 }
             }
+            Boolean isTimer = sharedPreferences.getBoolean("set_timer_switch", false);
+            Boolean isExtremeMode = sharedPreferences.getBoolean("set_extreme_mode_switch", false);
+            Log.e("istimer", isTimer.toString());
+            Log.e("isExtremeMode", isExtremeMode.toString());
+            if(isTimer && ! isExtremeMode){
+                if(timeMarkerWrapperList.isEmpty() && ! isResumed){
+                    addTimerMarkers(difficulty, markerWordMap, mMap, timeMarkerWrapperList,
+                            timeMarkerList);
+                } else{
+                    Log.e("true", "true");
+                    for(TimerMarkerWrapper marker : timeMarkerWrapperList){
+                        marker.addMarker(mMap);
+                        /*MarkerInfo markerInfo = (MarkerInfo) marker.getTag();
+                        Marker tempMarker = mMap.addMarker(new MarkerOptions()
+                                .position(marker.getPosition())
+                                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.clock))
+                                .title("more time!"));
+                        tempMarker.setTag(new MarkerInfo("timer", markerInfo.getMinutes()));*/
+                    }
+                }
+            }
+            editor.putString("timeMarkerWrapperList", gson.toJson(timeMarkerWrapperList));
+            editor.commit();
             kmlLayer.removeLayerFromMap();
         }
+    }
+
+    private int levDistance(String a, String b) {
+        a = a.toLowerCase();
+        b = b.toLowerCase();
+        // i == 0
+        int[] costs = new int[b.length() + 1];
+        for(int j = 0; j < costs.length; j++)
+            costs[j] = j;
+        for(int i = 1; i <= a.length(); i++){
+            // j == 0; nw = lev(i - 1, j)
+            costs[0] = i;
+            int nw = i - 1;
+            for(int j = 1; j <= b.length(); j++){
+                int cj = Math.min(1 + Math.min(costs[j], costs[j - 1]), a.charAt(i - 1) == b
+                        .charAt(j - 1) ? nw : nw + 1);
+                nw = costs[j];
+                costs[j] = cj;
+            }
+        }
+        return costs[b.length()];
+    }
+
+
+    private String formatTime(long millis) {
+        long hours = millis / 3600000;
+        long minutes = (millis % 3600000) / 60000;
+        long seconds = (millis % 60000) / 1000;
+        String hoursString, minutesString, secondsString;
+        if(hours < 10){
+            hoursString = "0" + String.valueOf(hours);
+        } else{
+            hoursString = String.valueOf(hours);
+        }
+        if(minutes < 10){
+            minutesString = "0" + String.valueOf(minutes);
+        } else{
+            minutesString = String.valueOf(minutes);
+        }
+        if(seconds < 10){
+            secondsString = "0" + String.valueOf(seconds);
+        } else{
+            secondsString = String.valueOf(seconds);
+        }
+        return hoursString + ":" + minutesString + ":" + secondsString;
+    }
+
+    private int getMarkerStyle(MarkerInfo markerInfo) {
+        String key = markerInfo.key;
+        int result = 0;
+        switch(key){
+            case "unclassified":
+                result = R.mipmap.white_blank;
+                break;
+            case "boring":
+                result = R.mipmap.yellow_blank;
+                break;
+            case "not boring":
+                result = R.mipmap.yellow_circle;
+                break;
+            case "interesting":
+                result = R.mipmap.orange_diamond;
+                break;
+            case "very interesting":
+                result = R.mipmap.red_stars;
+                break;
+            case "timer":
+                result = R.mipmap.clock;
+        }
+        return result;
     }
 
     private static class MarkerInfo {
         private final String key;
         private boolean isGreen;
+        private int minutes;
 
         MarkerInfo(String key) {
             this.key = key;
             this.isGreen = false;
+            this.minutes = - 1;
         }
 
-        public void setGreen(boolean green) {
+        MarkerInfo(String key, int minutes) {
+            this.key = key;
+            this.isGreen = false;
+            this.minutes = minutes;
+        }
+
+        void setGreen(boolean green) {
             isGreen = green;
         }
 
-        public Boolean getGreen() {
+        Boolean getGreen() {
             return isGreen;
         }
+
+        String getKey() {
+            return key;
+        }
+
+        int getMinutes() {
+            return minutes;
+        }
     }
+
+    private static class TimerMarkerWrapper {
+        private LatLng latLng;
+        private String title;
+        private MarkerInfo markerInfo;
+
+        TimerMarkerWrapper(Marker marker) {
+            this.latLng = marker.getPosition();
+            this.title = marker.getTitle();
+            this.markerInfo = (MarkerInfo) marker.getTag();
+        }
+
+        public LatLng getLatLng() {
+            return latLng;
+        }
+
+        public MarkerInfo getMarkerInfo() {
+            return markerInfo;
+        }
+
+        public Marker addMarker(GoogleMap mMap) {
+            Marker marker = mMap.addMarker(new MarkerOptions()
+                    .position(latLng)
+                    .title(title)
+                    .icon(BitmapDescriptorFactory.fromResource(R.mipmap.clock)));
+            marker.setTag(new MarkerInfo("timer", markerInfo.getMinutes()));
+            return marker;
+        }
+    }
+
 }

@@ -48,17 +48,12 @@ public class NetworkActivity extends FragmentActivity implements DownloadCallbac
         if(getIntent().hasExtra("title")){
             resultIntent.putExtra("title", getIntent().getStringExtra("title"));
         }
+        if(getIntent().hasExtra("difficulty")){
+            resultIntent.putExtra("difficulty", getIntent().getIntExtra("difficulty", 0));
+        }
         setResult(Activity.RESULT_OK, resultIntent);
         finish();
     }
-
-
-    /*public void sendStream(InputStream stream) {
-        // Update your UI here based on result of download.
-        Intent returnIntent = getIntent();
-        returnIntent.putExtra("stream", stream);
-        returnIntent;
-    }*/
 
     @Override
     public NetworkInfo getActiveNetworkInfo() {

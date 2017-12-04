@@ -112,9 +112,11 @@ public class ChooseSong extends AppCompatActivity {
                 break;
             case LOAD_KML_REQUEST:
                 Intent lyricIntent = new Intent(ChooseSong.this, NetworkActivity.class);
+                int difficulty = data.getIntExtra("difficulty", 0);
                 String kml = data.getStringExtra("string");
                 String number = data.getStringExtra("number");
                 String title = data.getStringExtra("title");
+                lyricIntent.putExtra("difficulty", difficulty);
                 lyricIntent.putExtra("url", "http://www.inf.ed.ac" +
                         ".uk/teaching/courses/selp/data/songs/" + number + "/words.txt");
                 lyricIntent.putExtra("kml", kml);
@@ -123,9 +125,11 @@ public class ChooseSong extends AppCompatActivity {
                 break;
             case LOAD_LYRICS_REQUEST:
                 Intent mapIntent = new Intent(ChooseSong.this, GameUI.class);
+                int mapDifficulty = data.getIntExtra("difficulty", 0);
                 String lyrics = data.getStringExtra("string");
                 String mapKml = data.getStringExtra("kml");
                 String mapTitle = data.getStringExtra("title");
+                mapIntent.putExtra("difficulty", mapDifficulty);
                 mapIntent.putExtra("lyrics", lyrics);
                 mapIntent.putExtra("kml", mapKml);
                 mapIntent.putExtra("title", mapTitle);

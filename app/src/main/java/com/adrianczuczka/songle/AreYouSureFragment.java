@@ -61,6 +61,7 @@ public class AreYouSureFragment extends DialogFragment {
         editor.remove("title");
         editor.remove("kml");
         editor.remove("lyrics");
+        editor.remove("timeMarkerList");
         editor.apply();
         startActivity(intent);
         getActivity().finish();

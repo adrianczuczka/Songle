@@ -48,6 +48,7 @@ public class ChooseDifficultyFragment extends DialogFragment {
         }
         if(PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).getBoolean("set_extreme_mode_switch", false)){
             Intent kmlIntent = new Intent(getActivity(), NetworkActivity.class);
+            kmlIntent.putExtra("difficulty", 1);
             kmlIntent.putExtra("url", url + "map1.kml");
             kmlIntent.putExtra("number", number);
             kmlIntent.putExtra("title", title);
@@ -81,6 +82,7 @@ public class ChooseDifficultyFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 Intent kmlIntent = new Intent(getActivity(), NetworkActivity.class);
+                kmlIntent.putExtra("difficulty", num);
                 kmlIntent.putExtra("url", url + "map" + num + ".kml");
                 kmlIntent.putExtra("number", number);
                 kmlIntent.putExtra("title", title);
