@@ -75,6 +75,9 @@
         <item>-1</item>
     </string-array>
 
+    <string name="pref_title_set_location_switch">Set the game location</string>
+    <string name="pref_description_set_location_switch">If on, the game\'s location will be your location when you start the game. If off, the location will be George Square in Edinburgh.</string>
+
     <string name="pref_title_set_extreme_mode">EXTREME MODE</string>
     <string name="pref_description_set_extreme_mode">Want the ultimate challenge? 15 minute timer, the hardest maps for every song, only one guess!</string>
 
