@@ -1,12 +1,18 @@
 package com.adrianczuczka.songle;
 
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.GridView;
+import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
 

@@ -73,6 +73,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -90,6 +91,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
     private final ArrayList<LatLng> latLngList = new ArrayList<>();
     private final ArrayList<TimerMarkerWrapper> timeMarkerWrapperList = new ArrayList<>();
     private final ArrayList<Marker> timeMarkerList = new ArrayList<>();
+    private HashMap<String, String> resumedSettingsMap = new HashMap<>();
     private HeatmapTileProvider mProvider;
     private TileOverlay mOverlay;
     private int tries = 0;
@@ -115,6 +117,10 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
     private static LatLng centralLatLng = new LatLng(55.944425, - 3.188396);
     private static Gson gson = new Gson();
     private Boolean isResumed;
+    private Boolean isExtremeMode;
+    private Boolean isTimerBackground;
+    private Boolean isTimer;
+    private int timerAmount;
 
     private void startLocationUpdates() {
         try{
@@ -181,40 +187,93 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                     }
                 }
             });
-            String mapType = sharedPreferences.getString("set_map_type_list", "1");
-            switch(mapType){
-                case "1":
-                    break;
-                case "0":
-                    mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-                    break;
-                case "-1":
-                    mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+            if(isResumed){
+                Log.e("hello","hello");
+                resumeSettings();
             }
-            int timerAmount;
-            if(sharedPreferences.getBoolean("set_extreme_mode_switch", false)){
-                isTries = true;
-                maxTries = 1;
-                timerView.setVisibility(View.VISIBLE);
-                timerAmount = isResumed ? sharedPreferences.getInt
-                        ("set_timer_amount_resumed", 900000) : 900000;
-                normalCountdownTimer = startTimer(timerAmount);
-            } else{
-                isTries = sharedPreferences.getBoolean("set_try_switch", false);
-                maxTries = Integer.valueOf(sharedPreferences.getString("set_try_amount", "5"));
-                boolean isTimer = sharedPreferences.getBoolean("set_timer_switch", false);
-                timerAmount = getIntent().hasExtra("resumed") ? sharedPreferences.getInt
-                        ("set_timer_amount_resumed", 1800000) : sharedPreferences
-                        .getInt("set_timer_amount", 1800000);
-                if(isTimer){
-                    timerView.setVisibility(View.VISIBLE);
-                    normalCountdownTimer = startTimer(timerAmount);
-                }
+            else {
+                setSettings();
             }
-
         } catch(SecurityException e){
             //warning
         }
+    }
+
+    public void resumeSettings(){
+        Type type = new TypeToken<HashMap<String, String>>(){}.getType();
+        resumedSettingsMap = gson.fromJson(sharedPreferences.getString("resumed_settings_map", null), type);
+        String mapType = resumedSettingsMap.get("set_timer_switch");
+        switch(mapType){
+            case "1":
+                mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                break;
+            case "0":
+                mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                break;
+            case "-1":
+                mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+        }
+        isTimerBackground = Boolean.valueOf(resumedSettingsMap.get("set_timer_background"));
+        isExtremeMode = Boolean.valueOf(resumedSettingsMap.get("set_extreme_mode_switch"));
+        isTimer = Boolean.valueOf(resumedSettingsMap.get("set_timer_switch"));
+        if(isExtremeMode){
+            isTries = true;
+            maxTries = 1;
+            timerView.setVisibility(View.VISIBLE);
+            timerAmountResumed = sharedPreferences.getInt("set_timer_amount_resumed", - 1);
+            normalCountdownTimer = startTimer(timerAmountResumed);
+        } else{
+            isTries = sharedPreferences.getBoolean("set_try_switch", false);
+            maxTries = Integer.valueOf(sharedPreferences.getString("set_try_amount", "5"));
+            timerAmount = sharedPreferences.getInt("set_timer_amount_resumed", 1800000);
+            if(isTimer){
+                timerView.setVisibility(View.VISIBLE);
+                normalCountdownTimer = startTimer(timerAmount);
+            }
+        }
+    }
+
+    public void setSettings(){
+        String mapType = sharedPreferences.getString("set_map_type_list", "1");
+        switch(mapType){
+            case "1":
+                mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                break;
+            case "0":
+                mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                break;
+            case "-1":
+                mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+        }
+        resumedSettingsMap.put("set_map_type_list", mapType);
+        isTimerBackground = sharedPreferences.getBoolean("set_timer_background", false);
+        isExtremeMode = sharedPreferences.getBoolean("set_extreme_mode_switch", false);
+        isTimer = sharedPreferences.getBoolean("set_timer_switch", false);
+        if(isExtremeMode){
+            isTries = true;
+            maxTries = 1;
+            timerView.setVisibility(View.VISIBLE);
+            timerAmount = isResumed ? sharedPreferences.getInt
+                    ("set_timer_amount_resumed", 900000) : 900000;
+            normalCountdownTimer = startTimer(timerAmount);
+        } else{
+            isTries = sharedPreferences.getBoolean("set_try_switch", false);
+            maxTries = Integer.valueOf(sharedPreferences.getString("set_try_amount", "5"));
+            timerAmount = getIntent().hasExtra("resumed") ? sharedPreferences.getInt
+                    ("set_timer_amount_resumed", 1800000) : sharedPreferences
+                    .getInt("set_timer_amount", 1800000);
+            if(isTimer){
+                timerView.setVisibility(View.VISIBLE);
+                normalCountdownTimer = startTimer(timerAmount);
+            }
+        }
+        resumedSettingsMap.put("set_extreme_mode_switch", String.valueOf(isExtremeMode));
+        resumedSettingsMap.put("set_try_switch", String.valueOf(isTries));
+        resumedSettingsMap.put("set_try_amount", String.valueOf(maxTries));
+        resumedSettingsMap.put("set_timer_switch", String.valueOf(isTimer));
+        resumedSettingsMap.put("set_timer_amount", String.valueOf(timerAmount));
+        resumedSettingsMap.put("set_timer_background", String.valueOf(isTimerBackground));
+        editor.putString("resumed_settings_map", gson.toJson(resumedSettingsMap));
     }
 
     @Override
@@ -346,6 +405,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                         new CountDownTimer(5000, 1000) {
                             @Override
                             public void onTick(long l) {
+
                             }
 
                             @Override
@@ -379,13 +439,11 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
     @Override
     protected void onPause() {
         super.onPause();
-        Log.e("paused", "paused");
         Boolean timerBackground = sharedPreferences.getBoolean("set_timer_background", false);
         editor.putInt("difficulty", difficulty);
         if(normalCountdownTimer != null){
             editor.putInt("set_timer_amount_resumed", timerAmountResumed);
             if(! timerBackground){
-                Log.e("canceled", "canceled");
                 normalCountdownTimer.cancel();
             }
         }
@@ -406,11 +464,9 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        mMap.clear();
-        stopLocationUpdates();
         startActivity(new Intent(GameUI.this, WelcomeScreen.class));
-        this.finish();
     }
+
 
     private void stopLocationUpdates() {
         mFusedLocationClient.removeLocationUpdates(mLocationCallback);
@@ -457,7 +513,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
             public boolean onMarkerClick(Marker marker) {
                 MarkerInfo markerInfo = (MarkerInfo) marker.getTag();
                 //DEBUGGING
-                if(markerInfo.isGreen){
+                //if(markerInfo.isGreen){
                     if(markerInfo.getKey().equals("timer")){
                         normalCountdownTimer.cancel();
                         timerAmountResumed += (markerInfo.getMinutes() * 60000);
@@ -474,13 +530,12 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                                 (timeMarkerWrapperList));
                         marker.remove();
                     } else{
-                        Log.e("gson", marker.toString());
                         successList.add(markerWordMap.get(marker));
                         editor.putString("successList", gson.toJson(successList));
                         markerWordMap.remove(marker);
                         marker.remove();
                     }
-                }
+                //}
                 editor.commit();
                 return false;
             }
@@ -550,12 +605,10 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
             markerWordMap,
             GoogleMap mMap, ArrayList<TimerMarkerWrapper> timeMarkerWrapperList,
             ArrayList<Marker> timeMarkerList) {
-        Log.e("difficulty", String.valueOf(difficulty));
 
         if(difficulty != 1 && difficulty != 0){
             //Set amount of time markers to 10% of actual markers;
             int amount = markerWordMap.keySet().size() / 10;
-            Log.e("amount", String.valueOf(amount));
             for(int i = 0; i < amount; i++){
                 Double gauss = (ThreadLocalRandom.current().nextGaussian() + difficulty);
                 int gaussian = gauss.intValue();
@@ -699,14 +752,11 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
             }
             Boolean isTimer = sharedPreferences.getBoolean("set_timer_switch", false);
             Boolean isExtremeMode = sharedPreferences.getBoolean("set_extreme_mode_switch", false);
-            Log.e("istimer", isTimer.toString());
-            Log.e("isExtremeMode", isExtremeMode.toString());
             if(isTimer && ! isExtremeMode){
                 if(timeMarkerWrapperList.isEmpty() && ! isResumed){
                     addTimerMarkers(difficulty, markerWordMap, mMap, timeMarkerWrapperList,
                             timeMarkerList);
                 } else{
-                    Log.e("true", "true");
                     for(TimerMarkerWrapper marker : timeMarkerWrapperList){
                         marker.addMarker(mMap);
                         /*MarkerInfo markerInfo = (MarkerInfo) marker.getTag();
