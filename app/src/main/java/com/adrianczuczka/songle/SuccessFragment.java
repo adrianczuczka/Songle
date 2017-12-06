@@ -8,7 +8,6 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -117,43 +116,47 @@ public class SuccessFragment extends DialogFragment {
     @Override
     public void onDismiss(DialogInterface dialog) {
         super.onDismiss(dialog);
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences
-                (getActivity().getApplicationContext());
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        Set<String> finishedSongsList = sharedPreferences.getStringSet("finishedSongsList", new
-                HashSet<String>());
-        finishedSongsList.add(name);
-        editor.putStringSet("finishedSongsList", finishedSongsList);
-        editor.remove("successList");
-        editor.remove("title");
-        editor.remove("kml");
-        editor.remove("lyrics");
-        editor.apply();
-        Intent intent = new Intent(getActivity(), WelcomeScreen.class);
-        getActivity().startActivity(intent);
-        getActivity().finish();
-        dismiss();
+        if(getActivity() != null){
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences
+                    (getActivity().getApplicationContext());
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            Set<String> finishedSongsList = sharedPreferences.getStringSet("finishedSongsList", new
+                    HashSet<String>());
+            finishedSongsList.add(name);
+            editor.putStringSet("finishedSongsList", finishedSongsList);
+            editor.remove("successList");
+            editor.remove("title");
+            editor.remove("kml");
+            editor.remove("lyrics");
+            editor.apply();
+            Intent intent = new Intent(getActivity(), WelcomeScreen.class);
+            getActivity().startActivity(intent);
+            getActivity().finish();
+            dismiss();
+        }
     }
 
     /**
      * Button listener for finishing the game and returning to the welcome screen.
      */
     private void onFinishClick() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences
-                (getActivity().getApplicationContext());
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        Set<String> finishedSongsList = sharedPreferences.getStringSet("finishedSongsList", new
-                HashSet<String>());
-        finishedSongsList.add(name);
-        editor.putStringSet("finishedSongsList", finishedSongsList);
-        editor.remove("successList");
-        editor.remove("title");
-        editor.remove("kml");
-        editor.remove("lyrics");
-        editor.apply();
-        Intent intent = new Intent(getActivity(), WelcomeScreen.class);
-        getActivity().startActivity(intent);
-        getActivity().finish();
-        dismiss();
+        if(getActivity() != null){
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences
+                    (getActivity().getApplicationContext());
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            Set<String> finishedSongsList = sharedPreferences.getStringSet("finishedSongsList", new
+                    HashSet<String>());
+            finishedSongsList.add(name);
+            editor.putStringSet("finishedSongsList", finishedSongsList);
+            editor.remove("successList");
+            editor.remove("title");
+            editor.remove("kml");
+            editor.remove("lyrics");
+            editor.apply();
+            Intent intent = new Intent(getActivity(), WelcomeScreen.class);
+            getActivity().startActivity(intent);
+            getActivity().finish();
+            dismiss();
+        }
     }
 }

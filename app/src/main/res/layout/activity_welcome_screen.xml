@@ -71,6 +71,7 @@
         android:layout_marginRight="8dp"
         android:width="100dp"
         android:elevation="0dp"
+        android:minWidth="100dp"
         android:fontFamily="@font/sniglet_extrabold"
         android:text="@string/welcome_settings_button"
         app:layout_constraintHorizontal_bias="0.498"

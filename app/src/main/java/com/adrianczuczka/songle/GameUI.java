@@ -434,7 +434,9 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                             triesView.setText(getResources().getString(R.string.attempts_left,
                                     (maxTries - tries)));
                         } else{
-                            normalCountdownTimer.cancel();
+                            if(normalCountdownTimer != null){
+                                normalCountdownTimer.cancel();
+                            }
                             Intent intent = new Intent(GameUI.this, GameOverActivity.class);
                             intent.putExtra("tries", "tries");
                             startActivity(intent);
