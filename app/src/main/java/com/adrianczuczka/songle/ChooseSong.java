@@ -92,8 +92,6 @@ public class ChooseSong extends AppCompatActivity {
                     for(XMLParser.Song song : songs){
                         songList.put(song.Title, song);
                     }
-                    successList.add(songList.get("Song 2"));
-                    successList.add(songList.get("Bad Romance"));
                     for(String name : songList.keySet()){
                         if(sharedPreferences.getStringSet("finishedSongsList", new
                                 HashSet<String>())

@@ -1,5 +1,6 @@
 package com.adrianczuczka.songle;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -111,6 +112,27 @@ public class SuccessFragment extends DialogFragment {
             secondsString = String.valueOf(seconds);
         }
         return hoursString + ":" + minutesString + ":" + secondsString;
+    }
+
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        super.onDismiss(dialog);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences
+                (getActivity().getApplicationContext());
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Set<String> finishedSongsList = sharedPreferences.getStringSet("finishedSongsList", new
+                HashSet<String>());
+        finishedSongsList.add(name);
+        editor.putStringSet("finishedSongsList", finishedSongsList);
+        editor.remove("successList");
+        editor.remove("title");
+        editor.remove("kml");
+        editor.remove("lyrics");
+        editor.apply();
+        Intent intent = new Intent(getActivity(), WelcomeScreen.class);
+        getActivity().startActivity(intent);
+        getActivity().finish();
+        dismiss();
     }
 
     /**

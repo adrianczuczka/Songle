@@ -417,6 +417,9 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                 String answer = answerInput.getText().toString();
                 String title = getIntent().getStringExtra("title");
                 if (levDistance(answer, title) <= 2) {
+                    if(normalCountdownTimer != null){
+                        normalCountdownTimer.cancel();
+                    }
                     SuccessFragment successFragment = SuccessFragment.newInstance(tries, new
                             Date().getTime() - timeStarted, title, successList.size(), latLngList
                             .size());
@@ -427,6 +430,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                             triesView.setText(getResources().getString(R.string.attempts_left,
                                     (maxTries - tries)));
                         } else {
+                            normalCountdownTimer.cancel();
                             Intent intent = new Intent(GameUI.this, GameOverActivity.class);
                             intent.putExtra("tries", "tries");
                             startActivity(intent);
