@@ -800,8 +800,8 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
             }
             Boolean isTimer = sharedPreferences.getBoolean("set_timer_switch", false);
             Boolean isExtremeMode = sharedPreferences.getBoolean("set_extreme_mode_switch", false);
-            if(isTimer && ! isExtremeMode){
-                if(timeMarkerWrapperList.isEmpty() && ! isResumed){
+            if(isTimer && ! isExtremeMode && ! isResumed){
+                if(timeMarkerWrapperList.isEmpty()){
                     addTimerMarkers(difficulty, markerWordMap, mMap, timeMarkerWrapperList,
                             timeMarkerList, northEastLatLng, southWestLatLng);
                 } else{
@@ -825,12 +825,10 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
     private int levDistance(String a, String b) {
         a = a.toLowerCase();
         b = b.toLowerCase();
-        // i == 0
         int[] costs = new int[b.length() + 1];
         for(int j = 0; j < costs.length; j++)
             costs[j] = j;
         for(int i = 1; i <= a.length(); i++){
-            // j == 0; nw = lev(i - 1, j)
             costs[0] = i;
             int nw = i - 1;
             for(int j = 1; j <= b.length(); j++){
