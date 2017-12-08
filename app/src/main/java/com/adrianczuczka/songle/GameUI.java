@@ -17,7 +17,6 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -146,6 +145,9 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         locReq.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
+    /**
+     * Contains everything that should happen when the map is ready
+     */
     private void mapReadyFunction() {
         try{
             mMap.getUiSettings().setMapToolbarEnabled(false);
@@ -157,13 +159,16 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                     .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                         @Override
                         public void onSuccess(Location location) {
-                            // Got last known location. In some rare situations this can be null.
+                            //Set central location to user location if the setting is enabled,
+                            // otherwise keep it to default. Do the same for the northeast and
+                            // southwest corners. Move camera to central location.
                             if(location != null){
                                 startLocation = location;
                                 if(isSetLocation){
                                     centralLatLng = new LatLng(startLocation.getLatitude(),
                                             startLocation.getLongitude());
-                                } else{
+                                }
+                                else{
                                     centralLatLng = defaultCentral;
                                 }
                                 northEastLatLng = new LatLng(centralLatLng.latitude + eastDiff,
@@ -179,9 +184,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
             task.addOnSuccessListener(new OnSuccessListener<LocationSettingsResponse>() {
                 @Override
                 public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
-                    // All location settings are satisfied. The client can initialize
-                    // location requests here.
-                    // ...
+                    //Start a new createKmlTask, passing all the necessary variables.
                     String kml = getIntent().getStringExtra("kml");
                     new createKMLtask(mMap, GameUI.this, latLngList, successList, markerWordMap,
                             getIntent().getStringExtra("lyrics"), difficulty,
@@ -218,9 +221,11 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                 }
             });
             if(isResumed){
-                Log.e("hello", "hello");
+                //if the game is resumed, load settings from resumed settings HashMap
                 resumeSettings();
-            } else{
+            }
+            else{
+                //if the game is new, load settings from SharedPreferences
                 setSettings();
             }
         } catch(SecurityException e){
@@ -228,9 +233,12 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         }
     }
 
+    /**
+     * Since settings must only be updated on a new game, keep a HashMap of game-specific
+     * settings. If the game is resumed, load settings from the HashMap
+     */
     public void resumeSettings() {
-        Type type = new TypeToken<HashMap<String, String>>() {
-        }.getType();
+        Type type = new TypeToken<HashMap<String, String>>() {}.getType();
         resumedSettingsMap = gson.fromJson(sharedPreferences.getString("resumed_settings_map",
                 null), type);
         String mapType = resumedSettingsMap.get("set_timer_switch");
@@ -254,7 +262,8 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
             timerView.setVisibility(View.VISIBLE);
             timerAmountResumed = sharedPreferences.getInt("set_timer_amount_resumed", - 1);
             normalCountdownTimer = startTimer(timerAmountResumed);
-        } else{
+        }
+        else{
             isTries = sharedPreferences.getBoolean("set_try_switch", false);
             maxTries = Integer.valueOf(sharedPreferences.getString("set_try_amount", "5"));
             timerAmount = sharedPreferences.getInt("set_timer_amount_resumed", 1800000);
@@ -265,6 +274,9 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         }
     }
 
+    /**
+     * If the game is new, set settings normally from SharedPreferences
+     */
     public void setSettings() {
         String mapType = sharedPreferences.getString("set_map_type_list", "1");
         switch(mapType){
@@ -283,13 +295,15 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         isExtremeMode = sharedPreferences.getBoolean("set_extreme_mode_switch", false);
         isTimer = sharedPreferences.getBoolean("set_timer_switch", false);
         if(isExtremeMode){
+            //if extreme mode is on, set settings accordingly
             isTries = true;
             maxTries = 1;
             timerView.setVisibility(View.VISIBLE);
             timerAmount = isResumed ? sharedPreferences.getInt
                     ("set_timer_amount_resumed", 900000) : 900000;
             normalCountdownTimer = startTimer(timerAmount);
-        } else{
+        }
+        else{
             isTries = sharedPreferences.getBoolean("set_try_switch", false);
             maxTries = Integer.valueOf(sharedPreferences.getString("set_try_amount", "5"));
             timerAmount = getIntent().hasExtra("resumed") ? sharedPreferences.getInt
@@ -300,6 +314,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                 normalCountdownTimer = startTimer(timerAmount);
             }
         }
+        //put settings into hashmap to use them for resuming the game
         resumedSettingsMap.put("set_map_type_list", mapType);
         resumedSettingsMap.put("set_extreme_mode_switch", String.valueOf(isExtremeMode));
         resumedSettingsMap.put("set_try_switch", String.valueOf(isTries));
@@ -315,19 +330,35 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_ui);
         timerView = findViewById(R.id.game_ui_timer_view);
+        /*
+        check if resumed game, note the time started and find the difficulty
+         */
         isResumed = getIntent().getBooleanExtra("resumed", false);
+        timeStarted = new Date().getTime();
+        difficulty = sharedPreferences.getInt("difficulty", 0);
+        /*
+         put song info into SharedPreferences for resuming the game
+         */
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         editor = sharedPreferences.edit();
         editor.putString("lyrics", getIntent().getStringExtra("lyrics"));
         editor.putString("kml", getIntent().getStringExtra("kml"));
         editor.putString("title", getIntent().getStringExtra("title"));
         editor.putInt("difficulty", getIntent().getIntExtra("difficulty", 0));
+        /*
+        Get previous list of words found if the game is resumed. If not, get a new ArrayList.
+        Gson used to avoid saving the list as a set, which would not allow duplicates.
+         */
         ArrayList<String> tempList1 = isResumed ? gson.fromJson
                 (sharedPreferences.getString("successList",
                         null), ArrayList.class) : new ArrayList<String>();
         successList.addAll(tempList1);
-        Type listType = new TypeToken<ArrayList<TimerMarkerWrapper>>() {
-        }.getType();
+        /*
+        A wrapper class had to be created to save the list of extra time markers, because
+        GoogleMap markers could not be saved with Gson. Populate the list of timerMarkerWrappers
+        here.
+         */
+        Type listType = new TypeToken<ArrayList<TimerMarkerWrapper>>() {}.getType();
         ArrayList<TimerMarkerWrapper> tempList2 = isResumed ? (ArrayList<TimerMarkerWrapper>)
                 gson.fromJson
                         (sharedPreferences.getString("timeMarkerWrapperList",
@@ -335,13 +366,14 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         timeMarkerWrapperList.addAll(tempList2);
         editor.putString("successList", gson.toJson(successList));
         editor.apply();
-        difficulty = sharedPreferences.getInt("difficulty", 0);
-        timeStarted = new Date().getTime();
         final SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         createLocationRequest(mLocationRequest);
+        /*
+        This is the function that is called every time the user's location is found.
+         */
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
@@ -356,13 +388,19 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                             location1.setLongitude(longitude);
                             double locDistance = Double.parseDouble(String.valueOf(location
                                     .distanceTo(location1)));
+                            /*
+                            If the distance between marker and user is less than 40, make sure
+                            this marker is green. If the distance is more than 40, make sure it
+                            is not green.
+                             */
                             if(locDistance < 40){
                                 if(! markerInfo.getGreen()){
                                     marker.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap
                                             .success_marker));
                                     markerInfo.setGreen(true);
                                 }
-                            } else{
+                            }
+                            else{
                                 assert markerInfo != null;
                                 if(markerInfo.getGreen()){
                                     marker.setIcon(BitmapDescriptorFactory.fromResource
@@ -380,13 +418,17 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                             location1.setLongitude(longitude);
                             double locDistance = Double.parseDouble(String.valueOf(location
                                     .distanceTo(location1)));
-                            if(locDistance < 100){
+                            /*
+                            Same check as with normal markers also applies to extra time markers
+                             */
+                            if(locDistance < 40){
                                 if(! markerInfo.getGreen()){
                                     marker.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap
                                             .clock_in_range));
                                     markerInfo.setGreen(true);
                                 }
-                            } else{
+                            }
+                            else{
                                 assert markerInfo != null;
                                 if(markerInfo.getGreen()){
                                     marker.setIcon(BitmapDescriptorFactory.fromResource
@@ -404,6 +446,9 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         mBottomSheetBehavior.setPeekHeight(125);
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         Button showList = findViewById(R.id.show_list);
+        /*
+        Show list of words on button click
+         */
         showList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -411,6 +456,10 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                 wordListFragment.show(getSupportFragmentManager(), "hello");
             }
         });
+        /*
+        On guess song button click, increment attempts counter. 2 Typos are allowed when guessing
+         the song
+         */
         Button guessSong = findViewById(R.id.guess_song);
         guessSong.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -420,6 +469,9 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                 final TextView triesView = findViewById(R.id.game_ui_tries_amount);
                 String answer = answerInput.getText().toString();
                 String title = getIntent().getStringExtra("title");
+                /*
+                 If the guess is correct, show a successFragment and pass the user statistics.
+                 */
                 if(levDistance(answer, title) <= 2){
                     if(normalCountdownTimer != null){
                         normalCountdownTimer.cancel();
@@ -428,12 +480,22 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                             Date().getTime() - timeStarted, title, successList.size(), latLngList
                             .size());
                     successFragment.show(getSupportFragmentManager(), "success");
-                } else{
+                }
+                /*
+                If the guess is incorrect, first check whether there is a limited number of
+                possible attempts.
+                 */
+                else{
                     if(isTries){
+                        /*
+                        If so, check whether this attempt means game over. If so, show
+                        Game Over Activity. If not, indicate amount of attempts left.
+                         */
                         if(tries < maxTries){
                             triesView.setText(getResources().getString(R.string.attempts_left,
                                     (maxTries - tries)));
-                        } else{
+                        }
+                        else{
                             if(normalCountdownTimer != null){
                                 normalCountdownTimer.cancel();
                             }
@@ -441,7 +503,8 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                             intent.putExtra("tries", "tries");
                             startActivity(intent);
                         }
-                    } else{
+                    }
+                    else{
                         triesView.setVisibility(View.VISIBLE);
                         new CountDownTimer(5000, 1000) {
                             @Override
@@ -537,13 +600,15 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     1);
             //}
-        } else{
+        }
+        else{
             mapReadyFunction();
         }
         TextView triesView = findViewById(R.id.game_ui_tries_amount);
         if(isTries){
             triesView.setText(getResources().getString(R.string.attempts_left, maxTries));
-        } else{
+        }
+        else{
             triesView.setVisibility(View.GONE);
             triesView.setText(getResources().getString(R.string.incorrect_try_again));
         }
@@ -567,7 +632,8 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                         editor.putString("timeMarkerWrapperList", gson.toJson
                                 (timeMarkerWrapperList));
                         marker.remove();
-                    } else{
+                    }
+                    else{
                         successList.add(markerWordMap.get(marker));
                         editor.putString("successList", gson.toJson(successList));
                         markerWordMap.remove(marker);
@@ -590,7 +656,8 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                     // Add a tile overlay to the map, using the heat map tile provider.
                     mOverlay = mMap.addTileOverlay(new TileOverlayOptions().tileProvider
                             (mProvider));
-                } else{
+                }
+                else{
                     isHeatmap = false;
                     mOverlay.remove();
                 }
@@ -605,7 +672,8 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                     for(Marker marker : markerWordMap.keySet()){
                         marker.setVisible(true);
                     }
-                } else{
+                }
+                else{
                     isMarkers = false;
                     for(Marker marker : markerWordMap.keySet()){
                         marker.setVisible(false);
@@ -624,7 +692,8 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                         permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION) &&
                         grantResults[0] == PackageManager.PERMISSION_GRANTED){
                     mapReadyFunction();
-                } else{
+                }
+                else{
                     Toast toast = Toast.makeText(GameUI.this, "Location permissions must be " +
                                     "given for Songle to work properly. Please enable this in " +
                                     "settings.",
@@ -740,7 +809,8 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                             double latDiff = centralLatLng.latitude - defaultCentral.latitude;
                             double longDiff = centralLatLng.longitude - defaultCentral.longitude;
                             latLng = new LatLng(latitude + latDiff, longitude + longDiff);
-                        } else{
+                        }
+                        else{
                             latLng = new LatLng(latitude, longitude);
                         }
                         latLngList.add(latLng);
@@ -804,7 +874,8 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                 if(timeMarkerWrapperList.isEmpty()){
                     addTimerMarkers(difficulty, markerWordMap, mMap, timeMarkerWrapperList,
                             timeMarkerList, northEastLatLng, southWestLatLng);
-                } else{
+                }
+                else{
                     for(TimerMarkerWrapper marker : timeMarkerWrapperList){
                         marker.addMarker(mMap);
                         /*MarkerInfo markerInfo = (MarkerInfo) marker.getTag();
@@ -849,17 +920,20 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         String hoursString, minutesString, secondsString;
         if(hours < 10){
             hoursString = "0" + String.valueOf(hours);
-        } else{
+        }
+        else{
             hoursString = String.valueOf(hours);
         }
         if(minutes < 10){
             minutesString = "0" + String.valueOf(minutes);
-        } else{
+        }
+        else{
             minutesString = String.valueOf(minutes);
         }
         if(seconds < 10){
             secondsString = "0" + String.valueOf(seconds);
-        } else{
+        }
+        else{
             secondsString = String.valueOf(seconds);
         }
         return hoursString + ":" + minutesString + ":" + secondsString;
