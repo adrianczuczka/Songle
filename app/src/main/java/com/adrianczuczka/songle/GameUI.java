@@ -17,11 +17,13 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -153,8 +155,14 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
             mMap.getUiSettings().setMapToolbarEnabled(false);
             mMap.setMyLocationEnabled(true);
             mRequestingLocationUpdates = false;
-            SettingsClient client = LocationServices.getSettingsClient(this);
-            Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
+            if(isResumed){
+                //if the game is resumed, load settings from resumed settings HashMap
+                resumeSettings();
+            }
+            else{
+                //if the game is new, load settings from SharedPreferences
+                setSettings();
+            }
             mFusedLocationClient.getLastLocation()
                     .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                         @Override
@@ -178,56 +186,62 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                                 CameraPosition central = new CameraPosition(centralLatLng, 15, 0,
                                         0);
                                 mMap.moveCamera(CameraUpdateFactory.newCameraPosition(central));
+                                final SettingsClient client = LocationServices.getSettingsClient
+                                        (GameUI.this);
+                                Task<LocationSettingsResponse> task = client
+                                        .checkLocationSettings(builder.build());
+                                task.addOnSuccessListener(new OnSuccessListener<LocationSettingsResponse>() {
+                                    @Override
+                                    public void onSuccess(LocationSettingsResponse
+                                            locationSettingsResponse) {
+                                        //Start a new createKmlTask, passing all the necessary
+                                        // variables.
+                                        String kml = getIntent().getStringExtra("kml");
+                                        new createKMLtask(mMap, GameUI.this, latLngList,
+                                                successList, markerWordMap,
+                                                getIntent().getStringExtra("lyrics"), difficulty,
+                                                timeMarkerWrapperList, isResumed, timeMarkerList,
+                                                northEastLatLng,
+                                                southWestLatLng, centralLatLng, isSetLocation)
+                                                .execute(kml);
+
+                                        startLocationUpdates();
+                                    }
+                                });
+                                task.addOnFailureListener(GameUI.this, new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        int REQUEST_CHECK_SETTINGS = 1;
+                                        int statusCode = ((ApiException) e).getStatusCode();
+                                        switch(statusCode){
+                                            case CommonStatusCodes.RESOLUTION_REQUIRED:
+                                                // Location settings are not satisfied, but this
+                                                // can be fixed
+                                                // by showing the user a dialog.
+                                                try{
+                                                    // Show the dialog by calling
+                                                    // startResolutionForResult(),
+                                                    // and check the result in onActivityResult().
+                                                    ResolvableApiException resolvable =
+                                                            (ResolvableApiException) e;
+                                                    resolvable.startResolutionForResult(GameUI.this,
+                                                            REQUEST_CHECK_SETTINGS);
+                                                } catch(IntentSender.SendIntentException sendEx){
+                                                    // Ignore the error.
+                                                }
+                                                break;
+                                            case LocationSettingsStatusCodes
+                                                    .SETTINGS_CHANGE_UNAVAILABLE:
+                                                // Location settings are not satisfied. However,
+                                                // we have no way
+                                                // to fix the settings so we won't show the dialog.
+                                                break;
+                                        }
+                                    }
+                                });
                             }
                         }
                     });
-            task.addOnSuccessListener(new OnSuccessListener<LocationSettingsResponse>() {
-                @Override
-                public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
-                    //Start a new createKmlTask, passing all the necessary variables.
-                    String kml = getIntent().getStringExtra("kml");
-                    new createKMLtask(mMap, GameUI.this, latLngList, successList, markerWordMap,
-                            getIntent().getStringExtra("lyrics"), difficulty,
-                            timeMarkerWrapperList, isResumed, timeMarkerList, northEastLatLng,
-                            southWestLatLng, centralLatLng, isSetLocation).execute(kml);
-
-                    startLocationUpdates();
-                }
-            });
-            task.addOnFailureListener(this, new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    int REQUEST_CHECK_SETTINGS = 1;
-                    int statusCode = ((ApiException) e).getStatusCode();
-                    switch(statusCode){
-                        case CommonStatusCodes.RESOLUTION_REQUIRED:
-                            // Location settings are not satisfied, but this can be fixed
-                            // by showing the user a dialog.
-                            try{
-                                // Show the dialog by calling startResolutionForResult(),
-                                // and check the result in onActivityResult().
-                                ResolvableApiException resolvable = (ResolvableApiException) e;
-                                resolvable.startResolutionForResult(GameUI.this,
-                                        REQUEST_CHECK_SETTINGS);
-                            } catch(IntentSender.SendIntentException sendEx){
-                                // Ignore the error.
-                            }
-                            break;
-                        case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                            // Location settings are not satisfied. However, we have no way
-                            // to fix the settings so we won't show the dialog.
-                            break;
-                    }
-                }
-            });
-            if(isResumed){
-                //if the game is resumed, load settings from resumed settings HashMap
-                resumeSettings();
-            }
-            else{
-                //if the game is new, load settings from SharedPreferences
-                setSettings();
-            }
         } catch(SecurityException e){
             //warning
         }
@@ -335,7 +349,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
          */
         isResumed = getIntent().getBooleanExtra("resumed", false);
         timeStarted = new Date().getTime();
-        difficulty = sharedPreferences.getInt("difficulty", 0);
+        difficulty = getIntent().getIntExtra("difficulty", 0);
         /*
          put song info into SharedPreferences for resuming the game
          */
@@ -344,14 +358,15 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         editor.putString("lyrics", getIntent().getStringExtra("lyrics"));
         editor.putString("kml", getIntent().getStringExtra("kml"));
         editor.putString("title", getIntent().getStringExtra("title"));
-        editor.putInt("difficulty", getIntent().getIntExtra("difficulty", 0));
+        editor.putInt("difficulty", difficulty);
         /*
         Get previous list of words found if the game is resumed. If not, get a new ArrayList.
         Gson used to avoid saving the list as a set, which would not allow duplicates.
          */
         ArrayList<String> tempList1 = isResumed ? gson.fromJson
                 (sharedPreferences.getString("successList",
-                        null), ArrayList.class) : new ArrayList<String>();
+                        "[]"), ArrayList.class) : new ArrayList<String>();
+        Log.e("templist", tempList1.toString());
         successList.addAll(tempList1);
         /*
         A wrapper class had to be created to save the list of extra time markers, because
@@ -362,7 +377,7 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         ArrayList<TimerMarkerWrapper> tempList2 = isResumed ? (ArrayList<TimerMarkerWrapper>)
                 gson.fromJson
                         (sharedPreferences.getString("timeMarkerWrapperList",
-                                null), listType) : new ArrayList<TimerMarkerWrapper>();
+                                "[]"), listType) : new ArrayList<TimerMarkerWrapper>();
         timeMarkerWrapperList.addAll(tempList2);
         editor.putString("successList", gson.toJson(successList));
         editor.apply();
@@ -442,10 +457,41 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
             }
         };
         LinearLayout view = findViewById(R.id.game_ui_bottom_sheet);
-        BottomSheetBehavior mBottomSheetBehavior = BottomSheetBehavior.from(view);
+
+        final BottomSheetBehavior mBottomSheetBehavior = BottomSheetBehavior.from(view);
         mBottomSheetBehavior.setPeekHeight(125);
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        Button showList = findViewById(R.id.show_list);
+        mBottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                if(newState == BottomSheetBehavior.STATE_EXPANDED){
+                    findViewById(R.id.game_ui_bottom_sheet_left_arrow).setRotation(0);
+                    findViewById(R.id.game_ui_bottom_sheet_right_arrow).setRotation(0);
+                }
+                else if(newState == BottomSheetBehavior.STATE_COLLAPSED){
+                    findViewById(R.id.game_ui_bottom_sheet_left_arrow).setRotation(180);
+                    findViewById(R.id.game_ui_bottom_sheet_right_arrow).setRotation(180);
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                // React to dragging events
+            }
+        });
+        RelativeLayout bottomSheetArrows = findViewById(R.id.game_ui_bottom_sheet_arrows);
+        bottomSheetArrows.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED){
+                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                }
+                else{
+                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                }
+            }
+        });
+        Button showList = findViewById(R.id.game_ui_show_list);
         /*
         Show list of words on button click
          */
@@ -460,12 +506,12 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
         On guess song button click, increment attempts counter. 2 Typos are allowed when guessing
          the song
          */
-        Button guessSong = findViewById(R.id.guess_song);
+        Button guessSong = findViewById(R.id.game_ui_guess_song);
         guessSong.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 tries++;
-                EditText answerInput = findViewById(R.id.guess_song_input);
+                EditText answerInput = findViewById(R.id.game_ui_guess_song_input);
                 final TextView triesView = findViewById(R.id.game_ui_tries_amount);
                 String answer = answerInput.getText().toString();
                 String title = getIntent().getStringExtra("title");
@@ -1011,10 +1057,6 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
 
         public LatLng getLatLng() {
             return latLng;
-        }
-
-        public MarkerInfo getMarkerInfo() {
-            return markerInfo;
         }
 
         public Marker addMarker(GoogleMap mMap) {

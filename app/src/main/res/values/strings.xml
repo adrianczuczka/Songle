@@ -33,7 +33,7 @@
     </plurals>
     <string name="incorrect_try_again">Incorrect! Try again</string>
     <string name="you_guessed_it">You guessed it!</string>
-    <string name="the_song_was">The song was %1$s</string>
+    <string name="the_song_was">The song was \" %1$s \"</string>
     <string name="hours">Hours</string>
     <string name="minutes">Minutes</string>
     <string name="seconds">Seconds</string>

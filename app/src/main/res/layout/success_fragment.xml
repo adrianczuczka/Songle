@@ -7,13 +7,16 @@
     android:orientation="vertical"
     android:padding="20dp"
     android:clipChildren="true">
+
     <TextView
         android:id="@+id/congrats_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        app:autoSizeTextType="uniform"
         android:layout_marginTop="88dp"
         android:fontFamily="@font/sniglet_extrabold"
         android:text="@string/congratulations"
+        android:textAlignment="center"
         android:textColor="@color/green"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"

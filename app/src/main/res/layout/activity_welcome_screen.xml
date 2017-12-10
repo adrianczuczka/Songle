@@ -12,12 +12,13 @@
 
     <TextView
         android:id="@+id/welcome_screen_main_title"
-        android:layout_width="311dp"
+        android:layout_width="match_parent"
         android:layout_height="103dp"
         android:layout_marginBottom="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="100dp"
+        app:autoSizeTextType="uniform"
         android:clickable="false"
         android:fontFamily="@font/sniglet_extrabold"
         android:shadowColor="@color/artist"
@@ -36,48 +37,49 @@
 
     <Button
         android:id="@+id/welcome_screen_play_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
+        android:layout_width="0dp"
+        android:layout_height="80dp"
+        android:layout_marginEnd="42dp"
+        android:layout_marginStart="42dp"
         android:layout_marginTop="10dp"
         android:fontFamily="@font/sniglet_extrabold"
         android:text="@string/welcome_play_button"
         android:textSize="40sp"
-        app:layout_constraintHorizontal_bias="0.503"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/welcome_screen_main_title" />
 
     <Button
         android:id="@+id/welcome_screen_resume_button"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:text="@string/welcome_resume_button"
-        android:fontFamily="@font/sniglet_extrabold"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintHorizontal_bias="0.502"
+        android:layout_width="0dp"
+        android:layout_height="55dp"
+        android:layout_marginEnd="110dp"
+        android:layout_marginStart="110dp"
         android:layout_marginTop="8dp"
+        android:fontFamily="@font/sniglet_extrabold"
+        android:text="@string/welcome_resume_button"
+        app:autoSizeTextType="uniform"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/welcome_screen_play_button" />
 
     <Button
         android:id="@+id/welcome_screen_settings_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
+        android:layout_width="0dp"
+        android:layout_height="55dp"
+        android:layout_marginEnd="130dp"
+        android:layout_marginStart="130dp"
+        android:layout_marginTop="8dp"
         android:width="100dp"
         android:elevation="0dp"
-        android:minWidth="100dp"
         android:fontFamily="@font/sniglet_extrabold"
+        android:maxLines="1"
+        android:minWidth="100dp"
         android:text="@string/welcome_settings_button"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginTop="8dp"
+        app:autoSizeTextType="uniform"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/welcome_screen_resume_button" />
 
     <ImageView
@@ -123,6 +125,7 @@
         tools:ignore="ContentDescription" />
 
     <ImageView
+        android:id="@+id/imageView"
         android:layout_width="80dp"
         android:layout_height="76dp"
         android:layout_marginBottom="8dp"
