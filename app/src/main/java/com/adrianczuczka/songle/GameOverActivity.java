@@ -28,9 +28,9 @@ public class GameOverActivity extends AppCompatActivity {
                 finishGame();
             }
         });
-        if(getIntent().hasExtra("timer")){
+        if (getIntent().hasExtra("timer")) {
             reason.setText(getResources().getString(R.string.you_ran_out_of_time));
-        } else if(getIntent().hasExtra("tries")){
+        } else if (getIntent().hasExtra("tries")) {
             reason.setText(getResources().getString(R.string.you_ran_out_of_attempts));
         }
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences

@@ -1,6 +1,9 @@
 package com.adrianczuczka.songle;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -10,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -81,15 +85,33 @@ public class ChooseDifficultyFragment extends DialogFragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent kmlIntent = new Intent(getActivity(), NetworkActivity.class);
-                kmlIntent.putExtra("difficulty", num);
-                kmlIntent.putExtra("url", url + "map" + num + ".kml");
-                kmlIntent.putExtra("number", number);
-                kmlIntent.putExtra("title", title);
-                getActivity().startActivityForResult(kmlIntent, LOAD_KML_REQUEST);
-                dismiss();
+                if(! isOnline()){
+                    Toast toast = Toast.makeText(getActivity(), "No Internet Connection", Toast
+                            .LENGTH_LONG);
+                    toast.show();
+                }
+                else {
+                    Intent kmlIntent = new Intent(getActivity(), NetworkActivity.class);
+                    kmlIntent.putExtra("difficulty", num);
+                    kmlIntent.putExtra("url", url + "map" + num + ".kml");
+                    kmlIntent.putExtra("number", number);
+                    kmlIntent.putExtra("title", title);
+                    getActivity().startActivityForResult(kmlIntent, LOAD_KML_REQUEST);
+                    dismiss();
+                }
             }
         });
     }
-
+    /**
+     * Checks if the app has access to the Internet.
+     *
+     * @return True if connected, false if not.
+     */
+    private boolean isOnline() {
+        ConnectivityManager connMgr = (ConnectivityManager)
+                getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        assert connMgr != null;
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        return (networkInfo != null && networkInfo.isConnected());
+    }
 }

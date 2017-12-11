@@ -1,7 +1,10 @@
 package com.adrianczuczka.songle;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -14,6 +17,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -69,12 +73,12 @@ public class ChooseSong extends AppCompatActivity {
 
         @Override
         protected ArrayList<XMLParser.Song> doInBackground(String... strings) {
-            try{
+            try {
                 InputStream stream = new ByteArrayInputStream(strings[0].getBytes
                         (StandardCharsets.UTF_8.name()));
                 XMLParser parser = new XMLParser();
                 return parser.parse(stream);
-            } catch(XmlPullParserException | IOException e){
+            } catch (XmlPullParserException | IOException e) {
                 throw new Error("Could not parse file.");
             }
         }
@@ -82,29 +86,31 @@ public class ChooseSong extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(resultCode != RESULT_OK) throw new Error("Sorry, something went wrong :/");
-        switch(requestCode){
+        if (resultCode != RESULT_OK) throw new Error("Sorry, something went wrong :/");
+        switch (requestCode) {
             case LOAD_XML_REQUEST:
                 String xml = data.getStringExtra("string");
                 ParseXMLTask parseXMLTask = new ParseXMLTask();
-                try{
+                try {
                     ArrayList<XMLParser.Song> songs = parseXMLTask.execute(xml).get();
-                    for(XMLParser.Song song : songs){
+                    for (XMLParser.Song song : songs) {
                         songList.put(song.Title, song);
                     }
-                    for(String name : songList.keySet()){
-                        if(sharedPreferences.getStringSet("finishedSongsList", new
+                    successList.add(songList.get("Song 2"));
+                    successList.add(songList.get("Bad Romance"));
+                    for (String name : songList.keySet()) {
+                        if (sharedPreferences.getStringSet("finishedSongsList", new
                                 HashSet<String>())
-                                .contains(name)){
+                                .contains(name)) {
                             successList.add(songList.get(name));
-                        } else{
+                        } else {
                             notGuessedList.add(songList.get(name));
                         }
                     }
                     SongsAdapter mAdapter = new SongsAdapter(successList);
                     recyclerView.setAdapter(mAdapter);
                     mAdapter.notifyDataSetChanged();
-                } catch(InterruptedException | ExecutionException e){
+                } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }
                 break;
@@ -152,15 +158,21 @@ public class ChooseSong extends AppCompatActivity {
      * @param view The clicked song.
      */
     public void onClickSong(View view) {
-        TextView numberView = view.findViewById(R.id.Number);
-        TextView titleView = view.findViewById(R.id.Title);
-        Intent kmlIntent = new Intent(ChooseSong.this, NetworkActivity.class);
-        kmlIntent.putExtra("url", "http://www.inf.ed.ac.uk/teaching/courses/selp/data/songs/" +
-                String.valueOf(numberView.getText()) + "/");
-        kmlIntent.putExtra("number", String.valueOf(numberView.getText()));
-        kmlIntent.putExtra("title", String.valueOf(titleView.getText()));
-        DialogFragment chooseDifficultyFragment = ChooseDifficultyFragment.newInstance(kmlIntent);
-        chooseDifficultyFragment.show(getSupportFragmentManager(), "hello");
+        if (!isOnline()) {
+            Toast toast = Toast.makeText(ChooseSong.this, "No Internet Connection", Toast
+                    .LENGTH_LONG);
+            toast.show();
+        } else {
+            TextView numberView = view.findViewById(R.id.Number);
+            TextView titleView = view.findViewById(R.id.Title);
+            Intent kmlIntent = new Intent(ChooseSong.this, NetworkActivity.class);
+            kmlIntent.putExtra("url", "http://www.inf.ed.ac.uk/teaching/courses/selp/data/songs/" +
+                    String.valueOf(numberView.getText()) + "/");
+            kmlIntent.putExtra("number", String.valueOf(numberView.getText()));
+            kmlIntent.putExtra("title", String.valueOf(titleView.getText()));
+            DialogFragment chooseDifficultyFragment = ChooseDifficultyFragment.newInstance(kmlIntent);
+            chooseDifficultyFragment.show(getSupportFragmentManager(), "hello");
+        }
     }
 
     /**
@@ -168,14 +180,33 @@ public class ChooseSong extends AppCompatActivity {
      * of not yet guessed ones, then a ChooseDifficultyFragment will be shown for the song.
      */
     private void onClickRandom() {
-        int randomNum = ThreadLocalRandom.current().nextInt(0, notGuessedList.size());
-        Intent kmlIntent = new Intent(ChooseSong.this, NetworkActivity.class);
-        kmlIntent.putExtra("url", "http://www.inf.ed.ac.uk/teaching/courses/selp/data/songs/" +
-                notGuessedList.get(randomNum).Number + "/");
-        kmlIntent.putExtra("number", notGuessedList.get(randomNum).Number);
-        kmlIntent.putExtra("title", notGuessedList.get(randomNum).Title);
-        DialogFragment chooseDifficultyFragment = ChooseDifficultyFragment.newInstance(kmlIntent);
-        chooseDifficultyFragment.show(getSupportFragmentManager(), "hello");
+        if (!isOnline()) {
+            Toast toast = Toast.makeText(ChooseSong.this, "No Internet Connection", Toast
+                    .LENGTH_LONG);
+            toast.show();
+        } else {
+            int randomNum = ThreadLocalRandom.current().nextInt(0, notGuessedList.size());
+            Intent kmlIntent = new Intent(ChooseSong.this, NetworkActivity.class);
+            kmlIntent.putExtra("url", "http://www.inf.ed.ac.uk/teaching/courses/selp/data/songs/" +
+                    notGuessedList.get(randomNum).Number + "/");
+            kmlIntent.putExtra("number", notGuessedList.get(randomNum).Number);
+            kmlIntent.putExtra("title", notGuessedList.get(randomNum).Title);
+            DialogFragment chooseDifficultyFragment = ChooseDifficultyFragment.newInstance(kmlIntent);
+            chooseDifficultyFragment.show(getSupportFragmentManager(), "hello");
+        }
+    }
+
+    /**
+     * Checks if the app has access to the Internet.
+     *
+     * @return True if connected, false if not.
+     */
+    private boolean isOnline() {
+        ConnectivityManager connMgr = (ConnectivityManager)
+                getSystemService(Context.CONNECTIVITY_SERVICE);
+        assert connMgr != null;
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        return (networkInfo != null && networkInfo.isConnected());
     }
 }
 

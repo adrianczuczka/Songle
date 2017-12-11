@@ -44,8 +44,7 @@ public class WelcomeScreen extends AppCompatActivity {
                 startSettings();
             }
         });
-        boolean isOnline = isOnline();
-        if(! isOnline){
+        if(!isOnline()){
             Toast toast = Toast.makeText(WelcomeScreen.this, "No Internet Connection", Toast
                     .LENGTH_LONG);
             toast.show();

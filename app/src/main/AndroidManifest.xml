@@ -36,10 +36,10 @@
             android:resource="@array/preloaded_fonts" />
         <activity
             android:name=".GameUI"
-            android:label="@string/map" />
+            android:label="@string/map"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
         <activity android:name=".NetworkActivity" />
-        <activity
-            android:name=".WelcomeScreen"
+        <activity android:name=".WelcomeScreen"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -50,8 +50,8 @@
         <activity
             android:name=".ChooseSong"
             android:label="@string/title_activity_choose_song"
-            android:parentActivityName=".WelcomeScreen"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:parentActivityName=".WelcomeScreen">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.adrianczuczka.songle.WelcomeScreen" />
