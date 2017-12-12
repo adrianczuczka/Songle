@@ -31,7 +31,6 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
@@ -459,15 +458,6 @@ public class GameUI extends AppCompatActivity implements OnMapReadyCallback {
                             }
                         }
                     }
-                }
-            }
-
-            @Override
-            public void onLocationAvailability(LocationAvailability locationAvailability) {
-                if (!locationAvailability.isLocationAvailable()) {
-                    Toast toast = Toast.makeText(GameUI.this, "Location could not be found.", Toast
-                            .LENGTH_LONG);
-                    toast.show();
                 }
             }
         };
