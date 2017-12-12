@@ -33,7 +33,8 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.0"
+        tools:ignore="MissingPrefix" />
 
     <Button
         android:id="@+id/welcome_screen_play_button"
@@ -62,7 +63,8 @@
         app:autoSizeTextType="uniform"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/welcome_screen_play_button" />
+        app:layout_constraintTop_toBottomOf="@+id/welcome_screen_play_button"
+        tools:ignore="MissingPrefix" />
 
     <Button
         android:id="@+id/welcome_screen_settings_button"
@@ -80,7 +82,8 @@
         app:autoSizeTextType="uniform"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/welcome_screen_resume_button" />
+        app:layout_constraintTop_toBottomOf="@+id/welcome_screen_resume_button"
+        tools:ignore="MissingPrefix" />
 
     <ImageView
         android:layout_width="161dp"

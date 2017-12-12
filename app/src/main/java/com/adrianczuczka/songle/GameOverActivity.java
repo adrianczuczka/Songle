@@ -49,7 +49,7 @@ public class GameOverActivity extends AppCompatActivity {
         finishGame();
     }
 
-    public void finishGame() {
+    private void finishGame() {
         Intent intent = new Intent(GameOverActivity.this, WelcomeScreen.class);
         startActivity(intent);
         finish();
